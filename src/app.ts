@@ -1,9 +1,12 @@
-import express, { json } from "express";
+import express from "express";
+require("dotenv").config();
+
 const app = express();
-app.use(json());
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ message: "Hello, world!" });
+  res.json({ message: "Hi!" });
 });
 
 app.listen(3000, () => {
