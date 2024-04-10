@@ -1,0 +1,25 @@
+[
+  {
+    "id": "64acfe2a-3b09-42fb-177b-08dc25ca66e2",
+    "userId": "735dc979-25ae-4043-abcc-ae76122b5138",
+    "author": "Скот Леш",
+    "description": "Термин «постмодернізм» став загальновідомим. Про постмодернізм друкують cерії статей найбільші газети у різних крайнах світу. Розв'язанню проблем, породжених постмодернізмом, присвячена величезна кількість телевізійних передач. Ставши загальновідомим, постмодернізм перетворився на своерідне кліше. Постмодернізм став предметом передусім естетичного, морального i політичного дискурсу. Однак він не став предметом серйозного систематичного аналізу, зокрема серйозного соціологічного аналізу. Саме такий спокійний соціологічний аналіз і є темою даного дослідження.",
+    "isbn": "966-663-106-7",
+    "pages": "344",
+    "publisher": "Кальвария",
+    "title": "Соціологія постмодернізму",
+    "year": "2003"
+  },
+  {
+    "id": "735dc979-25ae-4043-abcc-ae76122b5139",
+    "userId": "735dc979-25ae-4043-abcc-ae76122b5138",
+    "author": "J. M. Coetzee",
+    "title": "Disgrace",
+    "year": 2003,
+    "pages": 250,
+    "publisher": "Viking",
+    "genres": ["fiction"],
+    "isbn": "9780143036371",
+    "description": "Set in post-apartheid South Africa, J. M. Coetzee’s searing novel tells the story of David Lurie, a twice divorced, 52-year-old professor of communications and Romantic Poetry at Cape Technical University. Lurie believes he has created a comfortable, if somewhat passionless, life for himself. He lives within his financial and emotional means. Though his position at the university has been reduced, he teaches his classes dutifully; and while age has diminished his attractiveness, weekly visits to a prostitute satisfy his sexual needs. He considers himself happy. However, when Lurie seduces one of his students, he sets in motion a chain of events that will shatter his complacency and leave him utterly disgraced."
+  }
+]

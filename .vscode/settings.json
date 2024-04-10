@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/b844420b-f9ef-4f4c-872b-75fd5ea646d9/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/test-intellishelf-api",
+  "appService.deploySubpath": "."
+}

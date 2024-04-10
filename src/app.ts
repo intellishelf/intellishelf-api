@@ -4,7 +4,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 require("dotenv").config();
 
-import { booksRouter } from "./routes/books";
+import { booksRouter } from "./routes/books.route";
 
 const app = express();
 
@@ -13,19 +13,20 @@ app.use(express.json());
 var options = {
   swaggerDefinition: {
     info: {
-      title: "My API",
+      title: "Intellishelf API",
       version: "1.0.0",
-      description: "My API for doing cool stuff!",
+      description: "Intellishelf API",
     },
   },
   apis: [path.join(__dirname, "/routes/*.*")],
 };
+
 var swaggerSpecs = swaggerJsdoc(options);
 
 app.use("/books", booksRouter);
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
-app.listen(3000, () => {
-  console.log("Server started on port 3000");
+app.listen(process.env.PORT || 8080, () => {
+  console.log("Server started on port " + process.env.PORT);
 });
