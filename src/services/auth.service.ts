@@ -13,16 +13,15 @@ export class AuthService {
     username: string,
     pass: string
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findByName(username);
 
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-
-    const { password, ...result } = user;
+    if (user?.password !== pass) throw new UnauthorizedException();
 
     return {
-      access_token: this.jwtService.sign(result),
+      access_token: this.jwtService.sign({
+        userName: user.userName,
+        userId: user.userId,
+      }),
     };
   }
 }
