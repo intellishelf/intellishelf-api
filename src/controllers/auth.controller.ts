@@ -10,12 +10,12 @@ import {
   HttpException,
 } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { LoginRequest } from "../models/login.request";
+import { LoginRequest } from "../models/dtos/login.request";
 import { AuthService } from "../services/auth.service";
 import { AuthGuard } from "../middlewares/auth.guard";
 import { UsersService } from "../services/users.service";
-import { UserResponse } from "../models/user.response";
-import { AuthorizedRequest } from "../utils/authorizedRequest";
+import { UserResponse } from "../models/dtos/user.response";
+import { AuthorizedRequest } from "../models/dtos/authorizedRequest";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -27,8 +27,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post("login")
-  login(@Body() loginReques: LoginRequest) {
-    return this.authService.signIn(loginReques.userName, loginReques.password);
+  async login(@Body() loginReques: LoginRequest): Promise<string> {
+    return await this.authService.signIn(loginReques.userName, loginReques.password);
   }
 
   @UseGuards(AuthGuard)
@@ -38,12 +38,12 @@ export class AuthController {
   async me(@Request() req: AuthorizedRequest): Promise<UserResponse> {
     const user = await this.userService.findById(req.userId);
 
-    if (user === undefined)
+    if (user === undefined || user === null)
       throw new HttpException("Not found", HttpStatus.NOT_FOUND);
 
     return {
+      userId: user._id.toString(),
       userName: user.userName,
-      userId: user.userId,
     };
   }
 }

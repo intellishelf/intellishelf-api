@@ -12,6 +12,7 @@
     "moduleResolution": "node",
     "isolatedModules": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "noUncheckedIndexedAccess": true,
     "outDir": "./dist"
   }
