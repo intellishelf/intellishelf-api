@@ -3,13 +3,10 @@ import {
   Controller,
   Post,
   Request,
-  HttpCode,
-  HttpStatus,
   Get,
   UseGuards,
-  HttpException,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { LoginRequest } from "../models/dtos/auth/login-request.dto";
 import { AuthService } from "../services/auth.service";
 import { AuthGuard } from "../common/auth.guard";
@@ -25,25 +22,23 @@ export class AuthController {
     private readonly userService: UsersService
   ) {}
 
-  @HttpCode(HttpStatus.OK)
   @Post("login")
-  async login(@Body() loginReques: LoginRequest): Promise<string> {
-    return await this.authService.signIn(loginReques.userName, loginReques.password);
+  async login(@Body() loginRequest: LoginRequest): Promise<string> {
+    return await this.authService.signIn(
+      loginRequest.userName,
+      loginRequest.password
+    );
   }
 
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @HttpCode(HttpStatus.NOT_FOUND)
   @Get("me")
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ type: UserResponse })
   async me(@Request() req: AuthorizedRequest): Promise<UserResponse> {
-    const user = await this.userService.findById(req.userId);
-
-    if (user === undefined || user === null)
-      throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+    const { id, userName } = await this.userService.findById(req.userId);
 
     return {
-      userId: user._id.toString(),
-      userName: user.userName,
+      userId: id,
+      userName: userName,
     };
   }
 }
