@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "yarn tsc",
+    "build": "npm run tsc",
     "start": "node dist/main.js",
-    "dev": "nodemon src/main.ts"
+    "dev": "nodemon src/main.ts",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.7",
