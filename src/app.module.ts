@@ -4,12 +4,15 @@ import { ConfigModule } from "@nestjs/config";
 import { UsersService } from "./services/users.service";
 import { AuthController } from "./controllers/auth.controller";
 import { AuthService } from "./services/auth.service";
-import { MongooseModule } from "@nestjs/mongoose";
 import { UserSchema, User } from "./models/schemas/user.schema";
+import { BooksController } from "./controllers/books.controller";
+import { Book, BookSchema } from "./models/schemas/book.schema";
+import { BooksService } from "./services/books.service";
+import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
-  controllers: [AuthController],
-  providers: [AuthService, UsersService],
+  controllers: [AuthController, BooksController],
+  providers: [AuthService, UsersService, BooksService],
   imports: [
     ConfigModule.forRoot(),
     JwtModule.register({ secret: process.env.PRIVATE_KEY }),
@@ -19,6 +22,10 @@ import { UserSchema, User } from "./models/schemas/user.schema";
         {
           name: User.name,
           schema: UserSchema,
+        },
+        {
+          name: Book.name,
+          schema: BookSchema,
         },
       ]
     ),

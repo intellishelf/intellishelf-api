@@ -10,12 +10,12 @@ import {
   HttpException,
 } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { LoginRequest } from "../models/dtos/login.request";
+import { LoginRequest } from "../models/dtos/auth/login-request.dto";
 import { AuthService } from "../services/auth.service";
-import { AuthGuard } from "../middlewares/auth.guard";
+import { AuthGuard } from "../common/auth.guard";
 import { UsersService } from "../services/users.service";
-import { UserResponse } from "../models/dtos/user.response";
-import { AuthorizedRequest } from "../models/dtos/authorizedRequest";
+import { UserResponse } from "../models/dtos/auth/user-response.dto";
+import { AuthorizedRequest } from "../common/authorizedRequest";
 
 @ApiTags("auth")
 @Controller("auth")
