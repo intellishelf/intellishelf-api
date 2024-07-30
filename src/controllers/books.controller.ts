@@ -7,8 +7,16 @@ import {
   Delete,
   Param,
   Body,
+  UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { AuthGuard } from "../common/auth.guard";
 import { AuthorizedRequest } from "../common/authorizedRequest";
 import { BookResponse } from "../models/dtos/books/book-response.dto";
@@ -16,11 +24,18 @@ import { BooksService } from "../services/books.service";
 import { DeleteBookRequest } from "../models/dtos/books/delete-book-request.dto";
 import { AddBookRequest } from "../models/dtos/books/add-book-request.dto";
 import { BookDocument } from "../models/schemas/book.schema";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { ParseImageRequest } from "../models/dtos/books/parse-image-request.dto";
+import { ParsedBookResponse } from "../models/dtos/books/parsed-book-response.dto";
+import { AiService } from "../services/ai.service";
 
 @ApiTags("books")
 @Controller("books")
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly aiService: AiService
+  ) {}
 
   @Get()
   @UseGuards(AuthGuard)
@@ -50,6 +65,20 @@ export class BooksController {
     @Param() params: DeleteBookRequest
   ) {
     await this.booksService.deleteBook(req.userId, params.bookId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post("parse-image")
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    description: "Image with book information",
+    type: ParseImageRequest,
+  })
+  async parseImage(
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<ParsedBookResponse> {
+    return this.aiService.parseBook(file.buffer);
   }
 }
 
