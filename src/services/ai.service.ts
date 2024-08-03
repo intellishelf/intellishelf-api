@@ -14,7 +14,7 @@ export class AiService {
   //   "You are a book page parser. You are given a verso book page which may include all information about book. I want add this to my personal library. Extract content language, title, authors, publisher, publicationDate, pages, isbn, description. Also, include annotationStart (which keeps first 3-5 words of annotation) and annotationEnd (3-5 words of annotation ending). Return as JSON with double quotes. Language of content may be any so find out yourself. Don't translate content, don't rephrase content, just parse. Example: {'language': 'ua', 'title': 'Castle', authors: ['Franz Kafka']}";
   
   private prompt =
-    "You are a book page parser. You are given a verso book page which may include all information about book. I want add this to my personal library. Extract content language, title, authors, publisher, publicationDate, pages, isbn, description. Return as JSON with double quotes. Language of content may be any so find out yourself. Don't translate content, don't rephrase content, just parse. Example: {'language': 'ua', 'title': 'Castle', authors: ['Franz Kafka']}";
+    "You are a book page parser. You are given a verso book page which may include all information about book. I want add this to my personal library. Extract content language, title, author, publisher, publicationDate, pages, isbn, description. Return as JSON with double quotes. Language of content may be any so find out yourself. Don't translate content, don't rephrase content, just parse. Example: {'language': 'ua', 'title': 'Castle', author: 'Franz Kafka'}";
   
   private imageAnalysisClient: ImageAnalysisClient;
   private openAiClient: OpenAI;

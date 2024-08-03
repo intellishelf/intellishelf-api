@@ -5,6 +5,7 @@ import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix("api");
 
   const config = new DocumentBuilder()
     .setTitle("intellishelf API")
@@ -17,7 +18,7 @@ async function bootstrap() {
   SwaggerModule.setup("swagger", app, document);
 
   const configService = app.get(ConfigService);
-  const port = configService.get("PORT") || 8080;
+  const port = configService.get("WEBSITES_PORT") || 8080;
   await app.listen(port);
 }
 bootstrap();
