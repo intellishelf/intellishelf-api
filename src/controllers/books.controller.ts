@@ -9,6 +9,7 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  HttpCode,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -69,6 +70,7 @@ export class BooksController {
 
   @UseGuards(AuthGuard)
   @Post("parse-image")
+  @HttpCode(200)
   @UseInterceptors(FileInterceptor("file"))
   @ApiConsumes("multipart/form-data")
   @ApiBody({
