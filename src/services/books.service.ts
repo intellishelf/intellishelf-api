@@ -19,6 +19,7 @@ export class BooksService {
       ...book,
       userId: new Types.ObjectId(userId),
       createdDate: new Date(),
+      authors: book.authors.split(","),
     });
 
     return id;

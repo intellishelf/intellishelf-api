@@ -23,11 +23,13 @@ export class AuthController {
   ) {}
 
   @Post("login")
-  async login(@Body() loginRequest: LoginRequest): Promise<string> {
-    return await this.authService.signIn(
-      loginRequest.userName,
-      loginRequest.password
-    );
+  async login(@Body() loginRequest: LoginRequest): Promise<{ token: string }> {
+    return {
+      token: await this.authService.signIn(
+        loginRequest.userName,
+        loginRequest.password
+      ),
+    };
   }
 
   @Get("me")

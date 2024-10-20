@@ -14,6 +14,9 @@ export class AddBookRequest {
   isbn: string;
 
   @ApiPropertyOptional()
+  annotation: string;
+
+  @ApiPropertyOptional()
   description: string;
 
   @ApiPropertyOptional()
@@ -21,4 +24,7 @@ export class AddBookRequest {
 
   @ApiPropertyOptional()
   pages: number;
+
+  @ApiPropertyOptional()
+  imageUrl: string;
 }

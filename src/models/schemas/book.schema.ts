@@ -15,13 +15,16 @@ export class Book {
   title: string;
 
   @Prop()
-  authors: string;
+  authors: string[];
 
   @Prop()
   publicationDate: Date;
 
   @Prop()
   isbn: string;
+
+  @Prop()
+  annotation: string;
 
   @Prop()
   description: string;
@@ -31,6 +34,9 @@ export class Book {
 
   @Prop()
   pages: number;
+
+  @Prop()
+  imageUrl: string;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

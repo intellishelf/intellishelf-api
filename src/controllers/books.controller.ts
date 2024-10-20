@@ -86,11 +86,13 @@ const mapBook = (book: BookDocument): BookResponse => {
   return {
     id: book.id,
     title: book.title,
-    authors: book.authors,
+    authors: book.authors.join(","),
     publicationDate: book.publicationDate,
     isbn: book.isbn,
+    annotation: book.annotation,
     description: book.description,
     publisher: book.publisher,
     pages: book.pages,
+    imageUrl: book.imageUrl,
   };
 };

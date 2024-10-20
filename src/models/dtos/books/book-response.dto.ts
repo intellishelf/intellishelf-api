@@ -17,11 +17,17 @@ export class BookResponse {
   isbn: string;
 
   @ApiProperty()
+  annotation: string;
+
+  @ApiProperty()
   description: string;
 
   @ApiProperty()
   publisher: string;
-  
+
   @ApiProperty()
   pages: number;
+
+  @ApiProperty()
+  imageUrl: string;
 }
