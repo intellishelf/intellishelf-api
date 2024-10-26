@@ -60,6 +60,7 @@ export class BooksController {
   }
 
   @UseGuards(AuthGuard)
+  @HttpCode(204)
   @Delete(":bookId")
   async deleteBook(
     @Request() req: AuthorizedRequest,

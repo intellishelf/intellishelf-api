@@ -5,6 +5,7 @@ import {
   Request,
   Get,
   UseGuards,
+  HttpCode,
 } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { LoginRequest } from "../models/dtos/auth/login-request.dto";
@@ -23,6 +24,7 @@ export class AuthController {
   ) {}
 
   @Post("login")
+  @HttpCode(200)  
   async login(@Body() loginRequest: LoginRequest): Promise<{ token: string }> {
     return {
       token: await this.authService.signIn(
