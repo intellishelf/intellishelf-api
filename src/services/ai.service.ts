@@ -68,5 +68,34 @@ export class AiService {
     book.publicationDate = new Date(book.publicationDate);
 
     return book;
+
+    // return {
+    //   "title": "Історія молодого Гегеля",
+    //   "authors": "Вільгельм Дільтей",
+    //   "publisher": "ВПЦ «Три крапки»",
+    //   "publicationDate": new Date("2008-01-01T00:00:00.000Z"),
+    //   "pages": 256,
+    //   "isbn": "",
+    //   "description": "Переклад з німецької: Олексій Литвиненко. Наукове редагування, звірка та уточнення перекладу, вступна стаття, примітки: доктор філософських наук Юрій Кушаков."
+    // };
+  }
+
+  async parseBookFromText(text: string): Promise<ParsedBookResponse> {
+    const chatCompletion = await this.openAiClient.chat.completions.create({
+      messages: [
+        { role: "user", content: text },
+        { role: "system", content: this.prompt },
+      ],
+      model: "gpt-3.5-turbo",
+      temperature: 0,
+    });
+
+    let book = JSON.parse(chatCompletion.choices[0]!.message.content!);
+    
+    if (book.publicationDate) {
+      book.publicationDate = new Date(book.publicationDate);
+    }
+
+    return book;
   }
 }

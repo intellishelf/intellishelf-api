@@ -29,6 +29,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ParseImageRequest } from "../models/dtos/books/parse-image-request.dto";
 import { ParsedBookResponse } from "../models/dtos/books/parsed-book-response.dto";
 import { AiService } from "../services/ai.service";
+import { ParseTextRequest } from "../models/dtos/books/parse-text-request.dto";
 
 @ApiTags("books")
 @Controller("books")
@@ -36,7 +37,7 @@ export class BooksController {
   constructor(
     private readonly booksService: BooksService,
     private readonly aiService: AiService
-  ) {}
+  ) { }
 
   @Get()
   @UseGuards(AuthGuard)
@@ -82,6 +83,16 @@ export class BooksController {
     @UploadedFile() file: Express.Multer.File
   ): Promise<ParsedBookResponse> {
     return this.aiService.parseBook(file.buffer);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post("parse-text")
+  @HttpCode(200)
+  @ApiBody({
+    description: "Text with book information",
+  })
+  async parseText(@Body() params: ParseTextRequest): Promise<ParsedBookResponse> {
+    return this.aiService.parseBookFromText(params.text);
   }
 }
 
