@@ -5,6 +5,6 @@ namespace Intellishelf.Api.Mappers.Books;
 
 public interface IBooksMapper
 {
-    AddBook MapAdd(string userId, AddBookContract contract);
-    DeleteBook MapDelete(string userId, string bookId);
+    AddBookRequest MapAdd(string userId, AddBookRequestContract contract);
+    DeleteBookRequest MapDelete(string userId, string bookId);
 }

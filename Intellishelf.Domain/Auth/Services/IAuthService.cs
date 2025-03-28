@@ -7,5 +7,5 @@ public interface IAuthService
 {
     Task<TryResult<User>> TryFindByNameAndPasswordAsync(string userName, string password);
     Task<TryResult<User>> TryFindByIdAsync(string id);
-    Task<TryResult<string>> TrySignInAsync(Login request);
+    Task<TryResult<string>> TrySignInAsync(LoginRequest request);
 }

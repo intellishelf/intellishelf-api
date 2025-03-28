@@ -25,12 +25,12 @@ public class AuthController(IAuthMapper mapper, IAuthService authService) : ApiC
     }
 
     [HttpGet("me")]
-    public async Task<ActionResult<UserContract>> Me()
+    public async Task<ActionResult<UserResponseContract>> Me()
     {
         var user = await authService.TryFindByIdAsync(CurrentUserId);
 
         return user.IsSuccess
-            ? Ok(new UserContract(user.Value.UserId, user.Value.UserName))
+            ? Ok(new UserResponseContract(user.Value.UserId, user.Value.UserName))
             : HandleErrorResponse(user.Error);
     }
 

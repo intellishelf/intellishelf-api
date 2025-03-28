@@ -5,7 +5,7 @@ namespace Intellishelf.Api.Mappers.Books;
 
 public class BooksMapper : IBooksMapper
 {
-    public AddBook MapAdd(string userId, AddBookContract contract) =>
+    public AddBookRequest MapAdd(string userId, AddBookRequestContract contract) =>
         new()
         {
             UserId = userId,
@@ -21,6 +21,6 @@ public class BooksMapper : IBooksMapper
             Tags = contract.Tags
         };
 
-    public DeleteBook MapDelete(string userId, string bookId) =>
+    public DeleteBookRequest MapDelete(string userId, string bookId) =>
         new(userId, bookId);
 }

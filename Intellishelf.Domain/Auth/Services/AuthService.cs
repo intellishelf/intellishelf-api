@@ -22,7 +22,7 @@ public class AuthService(IUserDao userDao, IOptions<AuthConfig> options) : IAuth
         return await userDao.FindByIdAsync(id);
     }
 
-    public async Task<TryResult<string>> TrySignInAsync(Login request)
+    public async Task<TryResult<string>> TrySignInAsync(LoginRequest request)
     {
         var result = await TryFindByNameAndPasswordAsync(request.UserName, request.Password);
 

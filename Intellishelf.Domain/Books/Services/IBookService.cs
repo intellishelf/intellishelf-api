@@ -7,7 +7,7 @@ public interface IBookService
 {
     Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId);
 
-    Task<TryResult> TryAddBookAsync(AddBook request);
+    Task<TryResult> TryAddBookAsync(AddBookRequest request);
 
-    Task<TryResult> TryDeleteBookAsync(DeleteBook request);
+    Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request);
 }

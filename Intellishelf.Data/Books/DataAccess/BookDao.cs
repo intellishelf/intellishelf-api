@@ -36,7 +36,7 @@ public class BookDao(IMongoDatabase database) : IBookDao
         return TryResult.Success<IReadOnlyCollection<Book>>(result);
     }
 
-    public async Task<TryResult> AddBookAsync(AddBook request)
+    public async Task<TryResult> AddBookAsync(AddBookRequest request)
     {
         var book = new BookEntity
         {

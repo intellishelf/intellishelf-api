@@ -5,5 +5,5 @@ namespace Intellishelf.Api.Mappers.Auth;
 
 public interface IAuthMapper
 {
-    Login Map(LoginRequestContract contract);
+    LoginRequest Map(LoginRequestContract contract);
 }

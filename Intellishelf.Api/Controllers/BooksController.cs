@@ -11,7 +11,7 @@ namespace Intellishelf.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("books")]
-public class BooksController(IBooksMapper mapper, AiService aiService, IBookService bookService) : ApiControllerBase
+public class BooksController(IBooksMapper mapper, AiServiceOld aiService, IBookService bookService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<Book>>> GetBooks()
@@ -22,7 +22,7 @@ public class BooksController(IBooksMapper mapper, AiService aiService, IBookServ
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> AddBook([FromBody] AddBookContract contract)
+    public async Task<ActionResult<string>> AddBook([FromBody] AddBookRequestContract contract)
     {
         var id = await bookService.TryAddBookAsync(mapper.MapAdd(CurrentUserId, contract));
 
