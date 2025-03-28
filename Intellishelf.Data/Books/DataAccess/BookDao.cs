@@ -30,17 +30,17 @@ public class BookDao(IMongoDatabase database) : IBookDao
             Publisher = b.Publisher,
             ImageUrl = b.ImageUrl,
             CreatedDate = b.CreatedDate,
-            Tags = b.Tags,
+            Tags = b.Tags
         }).ToList();
 
         return TryResult.Success<IReadOnlyCollection<Book>>(result);
     }
 
-    public async Task<TryResult> AddBookAsync(string userId, AddBook request)
+    public async Task<TryResult> AddBookAsync(AddBook request)
     {
         var book = new BookEntity
         {
-            UserId = userId,
+            UserId = request.UserId,
             Title = request.Title,
             Authors = request.Authors,
             PublicationDate = request.PublicationDate,

@@ -1,4 +1,5 @@
-using Intellishelf.Api.Models.Dtos;
+using Intellishelf.Api.Contracts.Books;
+using Intellishelf.Api.Mappers.Books;
 using Intellishelf.Api.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
@@ -8,48 +9,36 @@ using Microsoft.AspNetCore.Mvc;
 namespace Intellishelf.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("books")]
-public class BooksController(AiService aiService, IBookService bookService) : ControllerBase
+public class BooksController(IBooksMapper mapper, AiService aiService, IBookService bookService) : ApiControllerBase
 {
     [HttpGet]
-    [Authorize]
     public async Task<ActionResult<IReadOnlyCollection<Book>>> GetBooks()
     {
-        var userId = User.FindFirst("userId")?.Value;
-        if (userId == null)
-            return Unauthorized();
+        var result = await bookService.TryGetBooksAsync(CurrentUserId);
 
-        var books = await bookService.GetBooksAsync(userId);
-        return Ok(books.Value);
+        return Ok(result.Value);
     }
 
     [HttpPost]
-    [Authorize]
-    public async Task<ActionResult<string>> AddBook([FromBody] AddBook request)
+    public async Task<ActionResult<string>> AddBook([FromBody] AddBookContract contract)
     {
-        var userId = User.FindFirst("userId")?.Value;
-        if (userId == null)
-            return Unauthorized();
+        var id = await bookService.TryAddBookAsync(mapper.MapAdd(CurrentUserId, contract));
 
-        var id = await bookService.AddBookAsync(userId, request);
-        return CreatedAtAction(nameof(GetBooks), new { id = id }, id);
+        return CreatedAtAction(nameof(GetBooks), new { id }, id);
     }
 
     [HttpDelete("{bookId}")]
-    [Authorize]
     public async Task<IActionResult> DeleteBook(string bookId)
     {
-        var userId = User.FindFirst("userId")?.Value;
-        if (userId == null)
-            return Unauthorized();
+        await bookService.TryDeleteBookAsync(mapper.MapDelete(CurrentUserId, bookId));
 
-        await bookService.DeleteBookAsync(userId, bookId);
         return NoContent();
     }
 
     [HttpPost("parse-image")]
-    [Authorize]
-    public async Task<ActionResult<ParsedBookResponse>> ParseImage([FromForm] IFormFile file)
+    public async Task<ActionResult<ParsedBookResponseContract>> ParseImage([FromForm] IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("File is empty");
@@ -62,10 +51,9 @@ public class BooksController(AiService aiService, IBookService bookService) : Co
     }
 
     [HttpPost("parse-text")]
-    [Authorize]
-    public async Task<ActionResult<ParsedBookResponse>> ParseText([FromBody] ParseTextRequest request)
+    public async Task<ActionResult<ParsedBookResponseContract>> ParseText([FromBody] ParseFromTextContract contract)
     {
-        var result = await aiService.ParseBookFromTextAsync(request.Text);
+        var result = await aiService.ParseBookFromTextAsync(contract.Text);
         return Ok(result);
     }
 }

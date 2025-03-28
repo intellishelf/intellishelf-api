@@ -7,7 +7,7 @@ public interface IBookDao
 {
     Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId);
 
-    Task<TryResult> AddBookAsync(string userId, AddBook request);
+    Task<TryResult> AddBookAsync(AddBook request);
 
     Task<TryResult> DeleteBookAsync(string userId, string bookId);
 }

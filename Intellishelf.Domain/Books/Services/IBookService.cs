@@ -5,9 +5,9 @@ namespace Intellishelf.Domain.Books.Services;
 
 public interface IBookService
 {
-    Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId);
+    Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId);
 
-    Task<TryResult> AddBookAsync(string userId, AddBook request);
+    Task<TryResult> TryAddBookAsync(AddBook request);
 
-    Task<TryResult> DeleteBookAsync(string userId, string bookId);
+    Task<TryResult> TryDeleteBookAsync(DeleteBook request);
 }

@@ -12,19 +12,19 @@ namespace Intellishelf.Domain.Auth.Services;
 
 public class AuthService(IUserDao userDao, IOptions<AuthConfig> options) : IAuthService
 {
-    public async Task<TryResult<User>> FindByNameAndPasswordAsync(string userName, string password)
+    public async Task<TryResult<User>> TryFindByNameAndPasswordAsync(string userName, string password)
     {
         return await userDao.FindByNameAndPasswordAsync(userName, password);
     }
 
-    public async Task<TryResult<User>> FindByIdAsync(string id)
+    public async Task<TryResult<User>> TryFindByIdAsync(string id)
     {
         return await userDao.FindByIdAsync(id);
     }
 
-    public async Task<TryResult<string>> SignInAsync(string username, string password)
+    public async Task<TryResult<string>> TrySignInAsync(Login request)
     {
-        var result = await FindByNameAndPasswordAsync(username, password);
+        var result = await TryFindByNameAndPasswordAsync(request.UserName, request.Password);
 
         if (!result.IsSuccess)
             return result.Error;

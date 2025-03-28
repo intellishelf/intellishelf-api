@@ -1,6 +1,6 @@
  namespace Intellishelf.Api.Configuration
 {
-    public class AiOptions
+    public class AiConfig
     {
         public const string SectionName = "Ai";
         

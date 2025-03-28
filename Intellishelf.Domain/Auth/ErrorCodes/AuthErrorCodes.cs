@@ -2,5 +2,5 @@ namespace Intellishelf.Domain.Auth.ErrorCodes;
 
 public static class AuthErrorCodes
 {
-    public const string UserNotFound = "UserNotFound";
+    public const string UserNotFound = "Auth.UserNotFound";
 }

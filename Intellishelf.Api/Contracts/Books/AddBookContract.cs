@@ -1,10 +1,9 @@
-namespace Intellishelf.Domain.Books.Models;
+namespace Intellishelf.Api.Contracts.Books;
 
-public class AddBook
+public class AddBookContract
 {
-    public required string UserId { get; init; }
     public required string Title { get; init; }
-    
+
     public string? Annotation { get; init; }
     public string[]? Authors { get; init; }
     public string? Description { get; init; }
