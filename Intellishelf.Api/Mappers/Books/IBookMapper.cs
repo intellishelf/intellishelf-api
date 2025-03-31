@@ -3,7 +3,7 @@ using Intellishelf.Domain.Books.Models;
 
 namespace Intellishelf.Api.Mappers.Books;
 
-public interface IBooksMapper
+public interface IBookMapper
 {
     AddBookRequest MapAdd(string userId, AddBookRequestContract contract);
     DeleteBookRequest MapDelete(string userId, string bookId);

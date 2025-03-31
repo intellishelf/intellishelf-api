@@ -1,6 +1,6 @@
 using Intellishelf.Api.Contracts.Books;
 using Intellishelf.Api.Mappers.Books;
-using Intellishelf.Api.Services;
+using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,12 +11,20 @@ namespace Intellishelf.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("books")]
-public class BooksController(IBooksMapper mapper, AiServiceOld aiService, IBookService bookService) : ApiControllerBase
+public class BooksController(IBookMapper mapper, IAiService aiService, IBookService bookService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<Book>>> GetBooks()
     {
         var result = await bookService.TryGetBooksAsync(CurrentUserId);
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("{bookId}")]
+    public async Task<ActionResult<Book>> GetBook(string bookId)
+    {
+        var result = await bookService.TryGetBookAsync(CurrentUserId, bookId);
 
         return Ok(result.Value);
     }
@@ -37,23 +45,27 @@ public class BooksController(IBooksMapper mapper, AiServiceOld aiService, IBookS
         return NoContent();
     }
 
-    [HttpPost("parse-image")]
-    public async Task<ActionResult<ParsedBookResponseContract>> ParseImage([FromForm] IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-            return BadRequest("File is empty");
-
-        using (var stream = file.OpenReadStream())
-        {
-            var result = await aiService.ParseBookAsync(stream);
-            return Ok(result);
-        }
-    }
-
     [HttpPost("parse-text")]
-    public async Task<ActionResult<ParsedBookResponseContract>> ParseText([FromBody] ParseFromTextContract contract)
+    public async Task<ActionResult<ParsedBook>> ParseText([FromBody] ParseFromTextContract contract)
     {
-        var result = await aiService.ParseBookFromTextAsync(contract.Text);
+        Request.Headers.TryGetValue("X-Mock-Ai", out var mockAiHeader);
+
+        bool.TryParse(mockAiHeader.FirstOrDefault(), out var mockAi);
+
+        var result = await aiService.ParseBookFromTextAsync(contract.Text, mockAi);
         return Ok(result);
     }
+
+    // [HttpPost("parse-image")]
+    // public async Task<ActionResult<ParsedBookResponseContract>> ParseImage([FromForm] IFormFile file)
+    // {
+    //     if (file == null || file.Length == 0)
+    //         return BadRequest("File is empty");
+    //
+    //     using (var stream = file.OpenReadStream())
+    //     {
+    //         var result = await aiService.ParseBookAsync(stream);
+    //         return Ok(result);
+    //     }
+    // }
 }

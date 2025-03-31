@@ -1,4 +1,4 @@
-namespace Intellishelf.Domain.Books.ErrorCodes;
+namespace Intellishelf.Domain.Books.Errors;
 
 public static class BookErrorCodes
 {

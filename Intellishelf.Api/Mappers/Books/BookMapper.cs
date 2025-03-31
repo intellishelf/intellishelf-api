@@ -3,7 +3,7 @@ using Intellishelf.Domain.Books.Models;
 
 namespace Intellishelf.Api.Mappers.Books;
 
-public class BooksMapper : IBooksMapper
+public class BookMapper : IBookMapper
 {
     public AddBookRequest MapAdd(string userId, AddBookRequestContract contract) =>
         new()
