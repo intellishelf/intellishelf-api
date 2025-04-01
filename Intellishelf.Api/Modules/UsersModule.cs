@@ -1,9 +1,8 @@
 using System.Text;
-using Intellishelf.Api.Mappers.Auth;
-using Intellishelf.Data.Auth.DataAccess;
-using Intellishelf.Domain.Auth.Config;
-using Intellishelf.Domain.Auth.DataAccess;
-using Intellishelf.Domain.Auth.Services;
+using Intellishelf.Data.Users.DataAccess;
+using Intellishelf.Domain.Users.Config;
+using Intellishelf.Domain.Users.DataAccess;
+using Intellishelf.Domain.Users.Services;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Intellishelf.Api.Modules;
@@ -29,14 +28,15 @@ public static class UsersModule
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true,
+                    ValidateLifetime = true
                 };
             });
 
-        builder.Services.AddSingleton<IAuthMapper, AuthMapper>();
+        builder.Services.AddSingleton<Data.Users.Mappers.IUserMapper, Data.Users.Mappers.UserMapper>();
+        builder.Services.AddSingleton<Mappers.Users.IUserMapper, Mappers.Users.UserMapper>();
         builder.Services.AddTransient<IUserDao, UserDao>();
         builder.Services.AddTransient<IAuthService, AuthService>();
     }

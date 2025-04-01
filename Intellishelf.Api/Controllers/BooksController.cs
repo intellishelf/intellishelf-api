@@ -48,12 +48,11 @@ public class BooksController(IBookMapper mapper, IAiService aiService, IBookServ
     [HttpPost("parse-text")]
     public async Task<ActionResult<ParsedBook>> ParseText([FromBody] ParseFromTextContract contract)
     {
-        Request.Headers.TryGetValue("X-Mock-Ai", out var mockAiHeader);
-
-        bool.TryParse(mockAiHeader.FirstOrDefault(), out var mockAi);
+        var mockAi = Request.Headers.Any(h => h.Key == "X-Mock-Ai");
 
         var result = await aiService.ParseBookFromTextAsync(contract.Text, mockAi);
-        return Ok(result);
+
+        return Ok(result.Value);
     }
 
     // [HttpPost("parse-image")]

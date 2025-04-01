@@ -1,8 +1,8 @@
 using Intellishelf.Api.Contracts.Auth;
-using Intellishelf.Api.Mappers.Auth;
+using Intellishelf.Api.Mappers.Users;
 using Intellishelf.Common.TryResult;
-using Intellishelf.Domain.Auth.ErrorCodes;
-using Intellishelf.Domain.Auth.Services;
+using Intellishelf.Domain.Users.ErrorCodes;
+using Intellishelf.Domain.Users.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,34 +11,47 @@ namespace Intellishelf.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("auth")]
-public class AuthController(IAuthMapper mapper, IAuthService authService) : ApiControllerBase
+public class AuthController(IUserMapper mapper, IAuthService authService) : ApiControllerBase
 {
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<LoginResponseContract>> Login([FromBody] LoginRequestContract loginRequest)
+    public async Task<ActionResult<LoginResultContract>> Login([FromBody] LoginRequestContract loginRequest)
     {
-        var result = await authService.TrySignInAsync(mapper.Map(loginRequest));
+        var result = await authService.TrySignInAsync(mapper.MapLoginRequest(loginRequest));
 
         return !result.IsSuccess
             ? HandleErrorResponse(result.Error)
-            : Ok(new LoginResponseContract(result.Value));
+            : Ok(mapper.MapLoginResult(result.Value));
+    }
+
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Register([FromBody] RegisterUserRequestContract registerRequest)
+    {
+        var result = await authService.TryRegisterAsync(mapper.MapRegisterUserRequest(registerRequest));
+
+        return !result.IsSuccess
+            ? HandleErrorResponse(result.Error)
+            : Ok(mapper.MapLoginResult(result.Value));
     }
 
     [HttpGet("me")]
     public async Task<ActionResult<UserResponseContract>> Me()
     {
-        var user = await authService.TryFindByIdAsync(CurrentUserId);
+        var result = await authService.TryFindByIdAsync(CurrentUserId);
 
-        return user.IsSuccess
-            ? Ok(new UserResponseContract(user.Value.UserId, user.Value.UserName))
-            : HandleErrorResponse(user.Error);
+        return result.IsSuccess
+            ? Ok(mapper.MapUser(result.Value))
+            : HandleErrorResponse(result.Error);
     }
 
     private ObjectResult HandleErrorResponse(Error error)
     {
         return error.Code switch
         {
-            AuthErrorCodes.UserNotFound => NotFound(error),
+            UserErrorCodes.UserNotFound => NotFound(error),
+            UserErrorCodes.InvalidCredentials => Unauthorized(error),
+            UserErrorCodes.UserAlreadyExists => Conflict(error),
             _ => StatusCode(StatusCodes.Status500InternalServerError, error)
         };
     }

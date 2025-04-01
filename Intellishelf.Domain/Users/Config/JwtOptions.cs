@@ -1,4 +1,4 @@
-namespace Intellishelf.Domain.Auth.Config;
+namespace Intellishelf.Domain.Users.Config;
 
 public class AuthConfig
 {

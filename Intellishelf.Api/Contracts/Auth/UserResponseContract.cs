@@ -1,3 +1,3 @@
 namespace Intellishelf.Api.Contracts.Auth;
 
-public record UserResponseContract(string UserId, string UserName);
+public record UserResponseContract(string Id, string Email);
