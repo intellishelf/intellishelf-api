@@ -23,4 +23,5 @@ public class BookEntity
     public string? Description { get; init; }
     public string[]? Tags { get; init; }
     public required DateTime CreatedDate { get; init; }
+    public required DateTime ModifiedDate { get; init; }
 }

@@ -9,7 +9,9 @@ public interface IBookDao
 
     Task<TryResult<Book>> GetBookAsync(string userId, string bookId);
 
-    Task<TryResult> AddBookAsync(AddBookRequest request);
+    Task<TryResult<Book>> AddBookAsync(AddBookRequest request);
+
+    Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request);
 
     Task<TryResult> DeleteBookAsync(DeleteBookRequest request);
 }

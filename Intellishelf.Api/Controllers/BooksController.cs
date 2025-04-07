@@ -30,11 +30,25 @@ public class BooksController(IBookMapper mapper, IAiService aiService, IBookServ
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> AddBook([FromBody] AddBookRequestContract contract)
+    public async Task<ActionResult<Book>> AddBook([FromForm] BookRequestContractBase contract)
     {
-        var id = await bookService.TryAddBookAsync(mapper.MapAdd(CurrentUserId, contract));
+        var result = await bookService.TryAddBookAsync(mapper.MapAdd(CurrentUserId, contract));
 
-        return CreatedAtAction(nameof(GetBooks), new { id }, id);
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetBook), new { bookId = result.Value.Id }, result.Value);
+        }
+
+        return BadRequest(result);
+    }
+
+
+    [HttpPut("{bookId}")]
+    public async Task<ActionResult<string>> UpdateBook([FromForm] BookRequestContractBase contract, [FromRoute] string bookId)
+    {
+        await bookService.TryUpdateBookAsync(mapper.MapUpdate(CurrentUserId, bookId, contract));
+
+        return Ok();
     }
 
     [HttpDelete("{bookId}")]

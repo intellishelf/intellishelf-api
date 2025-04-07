@@ -9,7 +9,9 @@ public interface IBookService
 
     Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId);
 
-    Task<TryResult> TryAddBookAsync(AddBookRequest request);
+    Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request);
+
+    Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request);
 
     Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request);
 }

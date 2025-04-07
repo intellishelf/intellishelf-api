@@ -12,8 +12,11 @@ public class BookService(IBookDao bookDao) : IBookService
     public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
         await bookDao.GetBookAsync(userId, bookId);
 
-    public async Task<TryResult> TryAddBookAsync(AddBookRequest request) =>
+    public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request) =>
         await bookDao.AddBookAsync(request);
+
+    public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request) =>
+        await bookDao.TryUpdateBookAsync(request);
 
     public async Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request) =>
         await bookDao.DeleteBookAsync(request);
