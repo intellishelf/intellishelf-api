@@ -3,8 +3,7 @@ using Intellishelf.Api.Modules;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevPolicy", policy =>
@@ -26,12 +25,13 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseCors("DevPolicy");
 }
 
 app.UsePathBase(new PathString("/api"));
+app.UseExceptionHandler();
 app.UseAuthentication();
+app.UseStatusCodePages();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

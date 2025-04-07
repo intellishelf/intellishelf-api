@@ -45,14 +45,11 @@ public class AuthController(IUserMapper mapper, IAuthService authService) : ApiC
             : HandleErrorResponse(result.Error);
     }
 
-    private ObjectResult HandleErrorResponse(Error error)
+    protected override int MapErrorToStatusCode(string code) => code switch
     {
-        return error.Code switch
-        {
-            UserErrorCodes.UserNotFound => NotFound(error),
-            UserErrorCodes.InvalidCredentials => Unauthorized(error),
-            UserErrorCodes.UserAlreadyExists => Conflict(error),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, error)
-        };
-    }
+        UserErrorCodes.UserNotFound => StatusCodes.Status404NotFound,
+        UserErrorCodes.InvalidCredentials => StatusCodes.Status401Unauthorized,
+        UserErrorCodes.UserAlreadyExists => StatusCodes.Status409Conflict,
+        _ => StatusCodes.Status500InternalServerError
+    };
 }

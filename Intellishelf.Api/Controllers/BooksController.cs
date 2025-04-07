@@ -81,4 +81,9 @@ public class BooksController(IBookMapper mapper, IAiService aiService, IBookServ
     //         return Ok(result);
     //     }
     // }
+
+    protected override int MapErrorToStatusCode(string code) => code switch
+    {
+        _ => StatusCodes.Status500InternalServerError
+    };
 }
