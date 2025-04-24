@@ -1,7 +1,5 @@
 using Intellishelf.Api.Contracts.Auth;
 using Intellishelf.Api.Mappers.Users;
-using Intellishelf.Common.TryResult;
-using Intellishelf.Domain.Users.ErrorCodes;
 using Intellishelf.Domain.Users.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,12 +42,4 @@ public class AuthController(IUserMapper mapper, IAuthService authService) : ApiC
             ? Ok(mapper.MapUser(result.Value))
             : HandleErrorResponse(result.Error);
     }
-
-    protected override int MapErrorToStatusCode(string code) => code switch
-    {
-        UserErrorCodes.UserNotFound => StatusCodes.Status404NotFound,
-        UserErrorCodes.InvalidCredentials => StatusCodes.Status401Unauthorized,
-        UserErrorCodes.UserAlreadyExists => StatusCodes.Status409Conflict,
-        _ => StatusCodes.Status500InternalServerError
-    };
 }

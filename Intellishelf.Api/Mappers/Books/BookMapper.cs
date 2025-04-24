@@ -13,12 +13,14 @@ public class BookMapper : IBookMapper
             Annotation = contract.Annotation,
             Authors = contract.Authors,
             Description = contract.Description,
-            ImageUrl = contract.ImageUrl,
             Isbn = contract.Isbn,
             Pages = contract.Pages,
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
-            Tags = contract.Tags
+            Tags = contract.Tags,
+            BookCover = contract.ImageFile == null
+                ? null
+                : new BookCover(GetUniqueFileName(contract.ImageFile.FileName), contract.ImageFile.OpenReadStream())
         };
 
     public UpdateBookRequest MapUpdate(string userId, string bookId, BookRequestContractBase contract) =>
@@ -30,14 +32,18 @@ public class BookMapper : IBookMapper
             Annotation = contract.Annotation,
             Authors = contract.Authors,
             Description = contract.Description,
-            ImageUrl = contract.ImageUrl,
             Isbn = contract.Isbn,
             Pages = contract.Pages,
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
-            Tags = contract.Tags
+            Tags = contract.Tags,
+            BookCover = contract.ImageFile == null
+                ? null
+                : new BookCover(GetUniqueFileName(contract.ImageFile.FileName), contract.ImageFile.OpenReadStream())
         };
 
     public DeleteBookRequest MapDelete(string userId, string bookId) =>
         new(userId, bookId);
+
+    private static string GetUniqueFileName(string fileName) => $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
 }

@@ -1,8 +1,10 @@
 using Intellishelf.Api.Contracts.Books;
 using Intellishelf.Api.Mappers.Books;
+using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
+using Intellishelf.Domain.Files.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,11 @@ namespace Intellishelf.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("books")]
-public class BooksController(IBookMapper mapper, IAiService aiService, IBookService bookService) : ApiControllerBase
+public class BooksController(
+    IBookMapper mapper,
+    IAiService aiService,
+    IBookService bookService,
+    IFileStorageService fileStorageService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<Book>>> GetBooks()
@@ -34,21 +40,21 @@ public class BooksController(IBookMapper mapper, IAiService aiService, IBookServ
     {
         var result = await bookService.TryAddBookAsync(mapper.MapAdd(CurrentUserId, contract));
 
-        if (result.IsSuccess)
-        {
-            return CreatedAtAction(nameof(GetBook), new { bookId = result.Value.Id }, result.Value);
-        }
-
-        return BadRequest(result);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetBook), new { bookId = result.Value.Id }, result.Value)
+            : HandleErrorResponse(result.Error);
     }
 
 
     [HttpPut("{bookId}")]
-    public async Task<ActionResult<string>> UpdateBook([FromForm] BookRequestContractBase contract, [FromRoute] string bookId)
+    public async Task<ActionResult<string>> UpdateBook([FromForm] BookRequestContractBase contract,
+        [FromRoute] string bookId)
     {
-        await bookService.TryUpdateBookAsync(mapper.MapUpdate(CurrentUserId, bookId, contract));
+        var updateResult = await bookService.TryUpdateBookAsync(mapper.MapUpdate(CurrentUserId, bookId, contract));
 
-        return Ok();
+        return updateResult.IsSuccess
+            ? NoContent()
+            : HandleErrorResponse(updateResult.Error);
     }
 
     [HttpDelete("{bookId}")]
@@ -81,9 +87,4 @@ public class BooksController(IBookMapper mapper, IAiService aiService, IBookServ
     //         return Ok(result);
     //     }
     // }
-
-    protected override int MapErrorToStatusCode(string code) => code switch
-    {
-        _ => StatusCodes.Status500InternalServerError
-    };
 }

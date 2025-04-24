@@ -17,6 +17,7 @@ builder.Services.AddCors(options =>
 });
 
 DbModule.Register(builder);
+AzureModule.Register(builder);
 UsersModule.Register(builder);
 BooksModule.Register(builder.Services);
 AiModule.Register(builder);

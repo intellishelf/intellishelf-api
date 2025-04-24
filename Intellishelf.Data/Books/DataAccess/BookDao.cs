@@ -46,7 +46,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Description = request.Description,
             Publisher = request.Publisher,
             Pages = request.Pages,
-            ImageUrl = request.ImageUrl,
+            FileName = request.BookCover?.FileName,
             CreatedDate = DateTime.UtcNow,
             ModifiedDate = DateTime.UtcNow
         };
@@ -61,7 +61,8 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         var filter = Builders<BookEntity>.Filter
             .Where(b => b.Id == request.Id && b.UserId == request.UserId);
 
-        var update = Builders<BookEntity>.Update.Combine(
+        var updates = new List<UpdateDefinition<BookEntity>>
+        {
             Builders<BookEntity>.Update.Set(b => b.Title, request.Title),
             Builders<BookEntity>.Update.Set(b => b.Authors, request.Authors),
             Builders<BookEntity>.Update.Set(b => b.PublicationDate, request.PublicationDate),
@@ -71,11 +72,20 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Builders<BookEntity>.Update.Set(b => b.Description, request.Description),
             Builders<BookEntity>.Update.Set(b => b.Publisher, request.Publisher),
             Builders<BookEntity>.Update.Set(b => b.Pages, request.Pages),
-            Builders<BookEntity>.Update.Set(b => b.ImageUrl, request.ImageUrl),
             Builders<BookEntity>.Update.CurrentDate(b => b.ModifiedDate)
-        );
+        };
 
-        var result = await _booksCollection.UpdateOneAsync(filter, update);
+        if (request.BookCover != null)
+        {
+            updates.Add(
+                Builders<BookEntity>
+                    .Update
+                    .Set(b => b.FileName, request.BookCover.FileName));
+        }
+
+        var combinedUpdate = Builders<BookEntity>.Update.Combine(updates);
+
+        var result = await _booksCollection.UpdateOneAsync(filter, combinedUpdate);
 
         return result.MatchedCount == 0
             ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to update")

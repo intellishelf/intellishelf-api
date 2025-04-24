@@ -1,5 +1,8 @@
 using System.Security.Claims;
 using Intellishelf.Common.TryResult;
+using Intellishelf.Domain.Books.Errors;
+using Intellishelf.Domain.Files.ErrorCodes;
+using Intellishelf.Domain.Users.ErrorCodes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Intellishelf.Api.Controllers;
@@ -8,7 +11,13 @@ public abstract class ApiControllerBase : ControllerBase
 {
     protected string CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
 
-    protected abstract int MapErrorToStatusCode(string code);
+    private static int MapErrorToStatusCode(string code) => code switch
+    {
+        BookErrorCodes.BookNotFound or UserErrorCodes.UserNotFound or FileErrorCodes.DownloadingFailed => StatusCodes.Status404NotFound,
+        UserErrorCodes.Unauthorized => StatusCodes.Status401Unauthorized,
+        UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,
+        _ => StatusCodes.Status500InternalServerError
+    };
 
     protected ObjectResult HandleErrorResponse(Error error)
     {
@@ -16,12 +25,9 @@ public abstract class ApiControllerBase : ControllerBase
 
         var problem = new ProblemDetails
         {
+            Title = error.Code,
             Detail = error.Message,
-            Status = statusCode,
-            Extensions =
-            {
-                ["code"] = error.Code
-            }
+            Status = statusCode
         };
 
         return new ObjectResult(problem)
