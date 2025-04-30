@@ -9,11 +9,14 @@ public class UserMapper : IUserMapper
         new(contract.Email, contract.Password);
 
     public LoginResultContract MapLoginResult(LoginResult model) =>
-        new(model.Token);
+        new(model.AccessToken, model.RefreshToken, model.AccessTokenExpiry);
 
     public UserResponseContract MapUser(User contract) =>
         new(contract.Id, contract.Email);
 
     public RegisterUserRequest MapRegisterUserRequest(RegisterUserRequestContract contract) =>
         new(contract.Email, contract.Password);
+        
+    public RefreshTokenRequest MapRefreshTokenRequest(RefreshTokenRequestContract contract) =>
+        new(contract.RefreshToken);
 }

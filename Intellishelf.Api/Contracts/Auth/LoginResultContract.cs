@@ -1,3 +1,6 @@
 namespace Intellishelf.Api.Contracts.Auth;
 
-public record LoginResultContract(string Token);
+public record LoginResultContract(
+    string AccessToken,
+    string RefreshToken,
+    DateTime AccessTokenExpiry);

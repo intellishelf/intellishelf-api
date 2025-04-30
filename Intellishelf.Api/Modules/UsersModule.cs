@@ -1,5 +1,7 @@
 using System.Text;
+using Intellishelf.Api.Services;
 using Intellishelf.Data.Users.DataAccess;
+using Intellishelf.Data.Users.Mappers;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
 using Intellishelf.Domain.Users.Services;
@@ -31,13 +33,24 @@ public static class UsersModule
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Remove default 5 minute clock skew to ensure tokens expire exactly when they should
                 };
             });
 
+        // Mappers
         builder.Services.AddSingleton<Data.Users.Mappers.IUserMapper, Data.Users.Mappers.UserMapper>();
         builder.Services.AddSingleton<Mappers.Users.IUserMapper, Mappers.Users.UserMapper>();
+        builder.Services.AddSingleton<IRefreshTokenMapper, RefreshTokenMapper>();
+        
+        // Data Access
         builder.Services.AddTransient<IUserDao, UserDao>();
+        builder.Services.AddTransient<IRefreshTokenDao, RefreshTokenDao>();
+        
+        // Services
         builder.Services.AddTransient<IAuthService, AuthService>();
+        
+        // Background Services
+        builder.Services.AddHostedService<RefreshTokenCleanupService>();
     }
 }

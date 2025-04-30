@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch MyApp via dotnet run",
+        "type": "coreclr",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/Intellishelf.Api",
+        "program": "dotnet",
+        "args": [
+          "run",
+          "--launch-profile", "MyApp"
+        ],
+        "env": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+        }
+      }
+    ]
+  }

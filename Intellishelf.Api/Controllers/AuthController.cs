@@ -33,6 +33,27 @@ public class AuthController(IUserMapper mapper, IAuthService authService) : ApiC
             : Ok(mapper.MapLoginResult(result.Value));
     }
 
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<ActionResult<LoginResultContract>> RefreshToken([FromBody] RefreshTokenRequestContract request)
+    {
+        var result = await authService.TryRefreshTokenAsync(mapper.MapRefreshTokenRequest(request));
+        
+        return !result.IsSuccess
+            ? HandleErrorResponse(result.Error)
+            : Ok(mapper.MapLoginResult(result.Value));
+    }
+
+    [HttpPost("revoke")]
+    public async Task<ActionResult> RevokeToken([FromBody] RefreshTokenRequestContract request)
+    {
+        var result = await authService.TryRevokeRefreshTokenAsync(mapper.MapRefreshTokenRequest(request));
+        
+        return !result.IsSuccess
+            ? HandleErrorResponse(result.Error)
+            : Ok();
+    }
+
     [HttpGet("me")]
     public async Task<ActionResult<UserResponseContract>> Me()
     {

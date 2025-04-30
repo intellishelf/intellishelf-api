@@ -12,7 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Intellishelf.Domain.Users.Services;
 
-public class AuthService(IOptions<AuthConfig> options, IUserDao userDao) : IAuthService
+public class AuthService(
+    IOptions<AuthConfig> options, 
+    IUserDao userDao,
+    IRefreshTokenDao refreshTokenDao) : IAuthService
 {
     public async Task<TryResult<User>> TryFindByIdAsync(string id) =>
         await userDao.TryFindByIdAsync(id);
@@ -31,8 +34,7 @@ public class AuthService(IOptions<AuthConfig> options, IUserDao userDao) : IAuth
         if(!result.IsSuccess)
             return result.Error;
 
-        var token = GenerateJwtToken(result.Value);
-        return new LoginResult(token);
+        return await GenerateTokensAsync(result.Value);
     }
 
     public async Task<TryResult<LoginResult>> TrySignInAsync(LoginRequest request)
@@ -45,13 +47,69 @@ public class AuthService(IOptions<AuthConfig> options, IUserDao userDao) : IAuth
         var verifyHashResult =
             VerifyPasswordHash(request.Password, result.Value.PasswordHash, result.Value.PasswordSalt);
 
-        var token = GenerateJwtToken(result.Value);
-        return verifyHashResult
-            ? new LoginResult(token)
-            : new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
+        if (!verifyHashResult)
+            return new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
+
+        return await GenerateTokensAsync(result.Value);
     }
 
-    private string GenerateJwtToken(User user)
+    public async Task<TryResult<LoginResult>> TryRefreshTokenAsync(RefreshTokenRequest request)
+    {
+        var refreshTokenResult = await refreshTokenDao.TryFindByTokenAsync(request.RefreshToken);
+        
+        if (!refreshTokenResult.IsSuccess)
+            return refreshTokenResult.Error;
+        
+        var refreshToken = refreshTokenResult.Value;
+        
+        // Check if token is expired
+        if (refreshToken.ExpiryDate < DateTime.UtcNow)
+            return new Error(UserErrorCodes.RefreshTokenExpired, "Refresh token has expired");
+        
+        // Check if token is revoked
+        if (refreshToken.IsRevoked)
+            return new Error(UserErrorCodes.RefreshTokenRevoked, "Refresh token has been revoked");
+        
+        // Get user from the token
+        var userResult = await userDao.TryFindByIdAsync(refreshToken.UserId);
+        
+        if (!userResult.IsSuccess)
+            return userResult.Error;
+        
+        // Revoke the current refresh token
+        refreshToken = refreshToken with { IsRevoked = true };
+        await refreshTokenDao.TryUpdateAsync(refreshToken);
+        
+        // Generate new tokens
+        return await GenerateTokensAsync(userResult.Value);
+    }
+
+    public async Task<TryResult<bool>> TryRevokeRefreshTokenAsync(RefreshTokenRequest request)
+    {
+        var refreshTokenResult = await refreshTokenDao.TryFindByTokenAsync(request.RefreshToken);
+        
+        if (!refreshTokenResult.IsSuccess)
+            return refreshTokenResult.Error;
+        
+        var refreshToken = refreshTokenResult.Value;
+        
+        refreshToken = refreshToken with { IsRevoked = true };
+        return await refreshTokenDao.TryUpdateAsync(refreshToken);
+    }
+
+    private async Task<LoginResult> GenerateTokensAsync(User user)
+    {
+        var accessToken = GenerateAccessToken(user);
+        var accessTokenExpiry = DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpirationMinutes);
+        
+        var refreshToken = GenerateRefreshToken(user.Id);
+        
+        await refreshTokenDao.TryAddAsync(refreshToken);
+        
+        return new LoginResult(accessToken, refreshToken.Token, accessTokenExpiry);
+    }
+
+    private string GenerateAccessToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var keyBytes = Encoding.UTF8.GetBytes(options.Value.Key);
@@ -69,12 +127,28 @@ public class AuthService(IOptions<AuthConfig> options, IUserDao userDao) : IAuth
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(1),
+            Expires = DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpirationMinutes),
             SigningCredentials = credentials
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    private RefreshToken GenerateRefreshToken(string userId)
+    {
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+        
+        return new RefreshToken(
+            Id: string.Empty, // MongoDB will generate this
+            Token: Convert.ToBase64String(randomBytes),
+            UserId: userId,
+            ExpiryDate: DateTime.UtcNow.AddDays(options.Value.RefreshTokenExpirationDays),
+            IsRevoked: false,
+            CreatedAt: DateTime.UtcNow
+        );
     }
 
     private static void CreatePasswordHash(string password, out string hash, out string salt)
