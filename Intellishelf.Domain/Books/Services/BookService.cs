@@ -9,6 +9,9 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
 {
     public async Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId) =>
         await bookDao.GetBooksAsync(userId);
+        
+    public async Task<TryResult<PagedResult<Book>>> TryGetPagedBooksAsync(string userId, BookQueryParameters queryParameters) =>
+        await bookDao.GetPagedBooksAsync(userId, queryParameters);
 
     public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
         await bookDao.GetBookAsync(userId, bookId);

@@ -4,7 +4,6 @@ using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
-using Intellishelf.Domain.Files.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +15,21 @@ namespace Intellishelf.Api.Controllers;
 public class BooksController(
     IBookMapper mapper,
     IAiService aiService,
-    IBookService bookService,
-    IFileStorageService fileStorageService) : ApiControllerBase
+    IBookService bookService) : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<Book>>> GetBooks()
+    public async Task<ActionResult<PagedResult<Book>>> GetBooks([FromQuery] BookQueryParameters queryParameters)
+    {
+        var result = await bookService.TryGetPagedBooksAsync(CurrentUserId, queryParameters);
+
+        if (!result.IsSuccess)
+            return HandleErrorResponse(result.Error);
+            
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("all")]
+    public async Task<ActionResult<IReadOnlyCollection<Book>>> GetAllBooks()
     {
         var result = await bookService.TryGetBooksAsync(CurrentUserId);
 

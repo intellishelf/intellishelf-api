@@ -6,6 +6,8 @@ namespace Intellishelf.Domain.Books.DataAccess;
 public interface IBookDao
 {
     Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId);
+    
+    Task<TryResult<PagedResult<Book>>> GetPagedBooksAsync(string userId, BookQueryParameters queryParameters);
 
     Task<TryResult<Book>> GetBookAsync(string userId, string bookId);
 

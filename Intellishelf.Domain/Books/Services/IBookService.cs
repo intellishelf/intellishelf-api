@@ -6,6 +6,8 @@ namespace Intellishelf.Domain.Books.Services;
 public interface IBookService
 {
     Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId);
+    
+    Task<TryResult<PagedResult<Book>>> TryGetPagedBooksAsync(string userId, BookQueryParameters queryParameters);
 
     Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId);
 

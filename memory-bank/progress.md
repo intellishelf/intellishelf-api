@@ -7,6 +7,7 @@
 - [x] File Storage Integration
 - [x] AI-Powered Metadata Extraction
 - [x] Advanced authentication (refresh tokens)
+- [x] Book pagination and ordering
 - [ ] Advanced authentication (SSO)
 - [ ] AI-Powered chatting capabilities
 - [ ] Advanced Search Capabilities
@@ -17,6 +18,10 @@
 4. Data Access Layers
 5. Error Handling Mechanisms
 6. Background Service for Token Cleanup
+7. Book Pagination and Ordering
+   - Implemented paging with configurable page size
+   - Added sorting by Title, Author, Publication date, and Creation date
+   - Support for ascending/descending order
 
 ## Pending Features
 

@@ -29,6 +29,7 @@
 - Mapper Pattern - each layer has its data transfer object and mapping capabilities when necessary. API has contracts, Domain has models, Data has entities.
 - Service Layer Pattern
 - Background Service Pattern - for scheduled tasks like token cleanup
+- Pagination Pattern - for efficient data retrieval with large datasets
 
 ## Key Architectural Decisions
 - Separation of Concerns
@@ -43,6 +44,12 @@
 - MongoDB storage for refresh tokens
 - Automatic cleanup of expired tokens via background service
 - Token revocation capabilities
+
+## Book Collection Management
+- Efficient pagination with configurable page size
+- Multiple sorting options (Title, Author, Publication date, Creation date)
+- Support for ascending/descending order
+- MongoDB query optimization for large collections
 
 ## Dependency Flow
 Domain Layer → Data Layer (Unidirectional)

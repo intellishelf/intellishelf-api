@@ -22,6 +22,68 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         return result;
     }
+    
+    public async Task<TryResult<PagedResult<Book>>> GetPagedBooksAsync(string userId, BookQueryParameters queryParameters)
+    {
+        var filter = Builders<BookEntity>.Filter.Eq(b => b.UserId, userId);
+        
+        // Get total count for pagination
+        var totalCount = await _booksCollection.CountDocumentsAsync(filter);
+        
+        // Build sort definition based on orderBy parameter
+        var sortDefinition = BuildSortDefinition(queryParameters.OrderBy, queryParameters.Ascending);
+        
+        // Get paged data
+        var books = await _booksCollection
+            .Find(filter)
+            .Sort(sortDefinition)
+            .Skip((queryParameters.Page - 1) * queryParameters.PageSize)
+            .Limit(queryParameters.PageSize)
+            .ToListAsync();
+        
+        var mappedBooks = books.Select(mapper.Map).ToList();
+        
+        var pagedResult = new PagedResult<Book>(
+            mappedBooks, 
+            (int)totalCount, 
+            queryParameters.Page, 
+            queryParameters.PageSize);
+        
+        return pagedResult;
+    }
+    
+    private SortDefinition<BookEntity> BuildSortDefinition(BookOrderBy orderBy, bool ascending)
+    {
+        SortDefinition<BookEntity> sortDefinition;
+        
+        switch (orderBy)
+        {
+            case BookOrderBy.Title:
+                sortDefinition = ascending 
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.Title) 
+                    : Builders<BookEntity>.Sort.Descending(b => b.Title);
+                break;
+            case BookOrderBy.Author:
+                // Sort by the last author in the array if it exists
+                sortDefinition = ascending 
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.Last() : string.Empty) 
+                    : Builders<BookEntity>.Sort.Descending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.Last() : string.Empty);
+                break;
+            case BookOrderBy.Published:
+                sortDefinition = ascending 
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.PublicationDate) 
+                    : Builders<BookEntity>.Sort.Descending(b => b.PublicationDate);
+                break;
+            case BookOrderBy.Added:
+            default:
+                sortDefinition = ascending 
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.CreatedDate) 
+                    : Builders<BookEntity>.Sort.Descending(b => b.CreatedDate);
+                break;
+        }
+        
+        return sortDefinition;
+    }
 
     public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
     {
