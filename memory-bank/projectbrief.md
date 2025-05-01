@@ -10,13 +10,13 @@ Intellishelf is a comprehensive digital bookshelf management application powered
 - Implement AI-assisted capabilites: book parsing, chatting to a bookshelf
 
 ## Key Components
-- this project
+- intellishelf-api (this project)
     - Intellishelf.Api: Web API layer
     - Intellishelf.Domain: Business logic and services
     - Intellishelf.Data: Data access and persistence
     - Intellishelf.Common: Shared utilities and error handling
-- MAUI mobile app (different project)
-- Web frontend on React (different project)
+- intellishelf-mobile (MAUI mobile app - different project)
+- intellishelf-web (Web frontend on React - different project)
 
 ## Primary Features
 - User Registration and Authentication
