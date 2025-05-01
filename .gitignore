@@ -14,6 +14,7 @@
 *.sln.docstates
 .DS_Store
 .idea/
+.vscode/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

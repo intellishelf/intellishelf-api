@@ -9,7 +9,7 @@ public class Book
     public required string UserId { get; init; }
     
     public string? Annotation { get; init; }
-    public string[]? Authors { get; init; }
+    public string? Authors { get; init; }
     public string? Description { get; init; }
     public string? FileName { get; init; }
     public string? Isbn { get; init; }
