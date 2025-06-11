@@ -1,0 +1,123 @@
+### ===== INTELLISHELF API TESTS =====
+### Run "Get Auth Token" first, then any other endpoint will work automatically
+
+### Variables
+@base_url = http://localhost:8080/api
+### ===== AUTHENTICATION =====
+
+### Get Auth Token (Run this first!)
+# @name login
+POST {{base_url}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "TestPassword123!"
+}
+
+### Set token from login response
+@token = {{login.response.body.accessToken}}
+
+### Get Current User Info
+GET {{base_url}}/auth/me
+Authorization: Bearer {{token}}
+
+### ===== BOOKS =====
+
+### Get All Books
+GET {{base_url}}/books/all
+Authorization: Bearer {{token}}
+
+### Get Books (Paged)
+GET {{base_url}}/books?page=1&pageSize=10&orderBy=Title&Ascending=true
+Authorization: Bearer {{token}}
+
+### Add New Book (Run this first to create a book for testing)
+# @name createBook
+POST {{base_url}}/books
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="title"
+
+The Great Gatsby
+--boundary123
+Content-Disposition: form-data; name="authors"
+
+F. Scott Fitzgerald
+--boundary123
+Content-Disposition: form-data; name="isbn"
+
+978-0-7432-7356-5
+--boundary123
+Content-Disposition: form-data; name="description"
+
+A classic American novel about the Jazz Age
+--boundary123
+Content-Disposition: form-data; name="pages"
+
+180
+--boundary123--
+
+### Get Single Book (uses ID from created book)
+GET {{base_url}}/books/{{createBook.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Update Book (uses ID from created book)
+PUT {{base_url}}/books/{{createBook.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="title"
+
+The Great Gatsby - Updated Edition
+--boundary123
+Content-Disposition: form-data; name="description"
+
+An updated description of this classic novel
+--boundary123--
+
+### Delete Book (uses ID from created book)
+DELETE {{base_url}}/books/{{createBook.response.body.id}}
+Authorization: Bearer {{token}}
+
+### ===== AI FEATURES =====
+
+### Parse Book from Text
+# @name parseBook
+POST {{base_url}}/books/parse-text
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Mock-Ai: true
+
+{
+    "text": "The Great Gatsby by F. Scott Fitzgerald. Published in 1925. ISBN: 978-0-7432-7356-5. A classic American novel set in the Jazz Age of the 1920s."
+}
+
+### Parse Book from Image (replace with real image path)
+POST {{base_url}}/books/parse-image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="book-cover.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/your/book-image.jpg
+--boundary123--
+
+### ===== FILES =====
+
+### Get User File (uses current user ID from auth)
+GET {{base_url}}/users/{{login.response.body.id}}/files/YOUR_FILE_ID.jpg
+Authorization: Bearer {{token}}
+Accept: image/jpeg
+
+### ===== QUICK START GUIDE =====
+### 1. Make sure Docker is running: docker-compose up -d
+### 2. Click "Send Request" on "Get Auth Token" 
+### 3. Click "Send Request" on "Add New Book" to create a test book
+### 4. Now all other book operations use the created book's ID automatically
+### 5. When token expires (~30 min), just re-run "Get Auth Token"

@@ -1,0 +1,39 @@
+services:
+  intellishelf-api:
+    build:
+      context: .
+      dockerfile: Intellishelf.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Database__ConnectionString=mongodb://admin:admin@mongodb:27017/intellishelf?authSource=admin
+      - Database__DatabaseName=intellishelf
+      - Auth__Key=your-super-secret-jwt-key-that-should-be-at-least-32-characters-long
+      - Ai__OpenAiApiKey=sk-test-key
+      - Azure__StorageConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+    depends_on:
+      - mongodb
+      - azurite
+
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: intellishelf
+    volumes:
+      - mongodb_data:/data/db
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    ports:
+      - "10000:10000"
+    volumes:
+      - azurite_data:/data
+
+volumes:
+  mongodb_data:
+  azurite_data:
