@@ -32,8 +32,8 @@ Authorization: Bearer {{token}}
 GET {{base_url}}/books?page=1&pageSize=10&orderBy=Title&Ascending=true
 Authorization: Bearer {{token}}
 
-### Add New Book (Run this first to create a book for testing)
-# @name createBook
+### Add New Book Without Image (Empty file field to test)
+# @name createBookNoImage
 POST {{base_url}}/books
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=boundary123
@@ -41,23 +41,28 @@ Content-Type: multipart/form-data; boundary=boundary123
 --boundary123
 Content-Disposition: form-data; name="title"
 
-The Great Gatsby
+The Art of Testing
 --boundary123
 Content-Disposition: form-data; name="authors"
 
-F. Scott Fitzgerald
+Quality Assurance
 --boundary123
 Content-Disposition: form-data; name="isbn"
 
-978-0-7432-7356-5
+000-0-0000-0000-0
 --boundary123
 Content-Disposition: form-data; name="description"
 
-A classic American novel about the Jazz Age
+Testing empty file upload scenario
 --boundary123
 Content-Disposition: form-data; name="pages"
 
-180
+100
+--boundary123
+Content-Disposition: form-data; name="imageFile"; filename="foo.jpg"
+Content-Type: application/octet-stream
+
+
 --boundary123--
 
 ### Get Single Book (uses ID from created book)

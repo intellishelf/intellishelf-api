@@ -4,10 +4,11 @@
 - [x] Project Architecture Setup
 - [x] Basic Book CRUD Operations
 - [x] Basic User Authentication System
-- [x] File Storage Integration
+- [x] File Storage Integration (Public Azure Blob)
 - [x] AI-Powered Metadata Extraction
 - [x] Advanced authentication (refresh tokens)
 - [x] Book pagination and ordering
+- [x] Direct URL-based file access
 - [ ] Advanced authentication (SSO)
 - [ ] AI-Powered chatting capabilities
 - [ ] Advanced Search Capabilities

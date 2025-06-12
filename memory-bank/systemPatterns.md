@@ -37,6 +37,9 @@
 - Dependency Inversion
 - Error Handling Consistency
 - Token-based Authentication with Refresh Tokens
+- **Controller-Level File Processing** - File uploads handled at API layer before domain processing
+- **Immutable Domain Models** - All models use `init` accessors for thread safety and data integrity
+- **URL-Based Resource Management** - Store full public URLs instead of internal file paths for external resources
 
 ## Authentication System
 - JWT-based authentication with short-lived access tokens (30 minutes)
@@ -55,8 +58,16 @@
 Domain Layer → Data Layer (Unidirectional)
 Api Layer → Domain Layer → Data Layer
 
+## File Storage Architecture
+- **Public Azure Blob Storage** - Direct client access via public URLs
+- **Controller-Level Upload Processing** - Files processed at API boundary before domain logic
+- **URL Extraction for Deletion** - Parse blob paths from stored URLs for cleanup operations
+- **Immutable URL Storage** - Store complete public URLs in domain models and entities
+- **Unique File Naming** - GUID-based filenames to prevent conflicts and ensure uniqueness
+
 ## Cross-Cutting Concerns
 - Logging
 - Authentication
 - Error Handling
 - Configuration Management
+- File Processing and Storage

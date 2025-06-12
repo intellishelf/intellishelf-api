@@ -108,7 +108,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Description = request.Description,
             Publisher = request.Publisher,
             Pages = request.Pages,
-            FileName = request.BookCover?.FileName,
+            CoverImageUrl = request.CoverImageUrl,
             CreatedDate = DateTime.UtcNow,
             ModifiedDate = DateTime.UtcNow
         };
@@ -137,12 +137,12 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Builders<BookEntity>.Update.CurrentDate(b => b.ModifiedDate)
         };
 
-        if (request.BookCover != null)
+        if (request.CoverImageUrl != null)
         {
             updates.Add(
                 Builders<BookEntity>
                     .Update
-                    .Set(b => b.FileName, request.BookCover.FileName));
+                    .Set(b => b.CoverImageUrl, request.CoverImageUrl));
         }
 
         var combinedUpdate = Builders<BookEntity>.Update.Combine(updates);

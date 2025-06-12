@@ -5,7 +5,7 @@ namespace Intellishelf.Api.Mappers.Books;
 
 public class BookMapper : IBookMapper
 {
-    public AddBookRequest MapAdd(string userId, BookRequestContractBase contract) =>
+    public AddBookRequest MapAdd(string userId, BookRequestContractBase contract, string? coverImageUrl) =>
         new()
         {
             UserId = userId,
@@ -18,12 +18,10 @@ public class BookMapper : IBookMapper
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
             Tags = contract.Tags,
-            BookCover = contract.ImageFile == null
-                ? null
-                : new BookCover(GetUniqueFileName(contract.ImageFile.FileName), contract.ImageFile.OpenReadStream())
+            CoverImageUrl = coverImageUrl
         };
 
-    public UpdateBookRequest MapUpdate(string userId, string bookId, BookRequestContractBase contract) =>
+    public UpdateBookRequest MapUpdate(string userId, string bookId, BookRequestContractBase contract, string? coverImageUrl) =>
         new()
         {
             Id = bookId,
@@ -37,9 +35,7 @@ public class BookMapper : IBookMapper
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
             Tags = contract.Tags,
-            BookCover = contract.ImageFile == null
-                ? null
-                : new BookCover(GetUniqueFileName(contract.ImageFile.FileName), contract.ImageFile.OpenReadStream())
+            CoverImageUrl = coverImageUrl
         };
 
     public DeleteBookRequest MapDelete(string userId, string bookId) =>

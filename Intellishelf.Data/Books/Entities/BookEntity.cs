@@ -18,7 +18,7 @@ public class BookEntity
     public string? Isbn { get; init; }
     public string? Publisher { get; init; }
     public int? Pages { get; init; }
-    public string? FileName { get; init; }
+    public string? CoverImageUrl { get; init; }
     public string? Annotation { get; init; }
     public string? Description { get; init; }
     public string[]? Tags { get; init; }

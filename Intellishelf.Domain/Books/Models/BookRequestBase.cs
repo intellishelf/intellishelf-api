@@ -13,5 +13,5 @@ public class BookRequestBase
     public DateTime? PublicationDate { get; init; }
     public string? Publisher { get; init; }
     public string[]? Tags { get; init; }
-    public BookCover? BookCover { get; init; }
+    public string? CoverImageUrl { get; init; }
 }

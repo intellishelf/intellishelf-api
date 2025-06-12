@@ -18,65 +18,31 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
 
     public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request)
     {
-        var result = await bookDao.AddBookAsync(request);
-
-        if (result.IsSuccess && request.BookCover != null)
-        {
-            var uploadResult = await fileStorageService.UploadFileAsync(
-                request.UserId,
-                request.BookCover.Content,
-                request.BookCover.FileName);
-
-            if (!uploadResult.IsSuccess)
-            {
-                await TryDeleteBookAsync(new DeleteBookRequest(request.UserId, result.Value.Id));
-
-                return uploadResult.Error;
-            }
-        }
-
-        return result;
+        return await bookDao.AddBookAsync(request);
     }
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
     {
         var existingBook = await TryGetBookAsync(request.UserId, request.Id);
 
-        if (request.BookCover != null)
+        // Delete old cover image if we're setting a new one
+        if (request.CoverImageUrl != null && existingBook.IsSuccess && 
+            !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {
-            var uploadResult = await fileStorageService.UploadFileAsync(
-                request.UserId,
-                request.BookCover.Content,
-                request.BookCover.FileName);
-
-            if (!uploadResult.IsSuccess)
-            {
-                return uploadResult;
-            }
+            await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
         }
 
-        var result = await bookDao.TryUpdateBookAsync(request);
-
-        if (result.IsSuccess && !string.IsNullOrEmpty(existingBook.Value?.FileName) && request.BookCover != null)
-        {
-            await fileStorageService.DeleteFileAsync(request.UserId, existingBook.Value.FileName);
-        }
-
-        if (!result.IsSuccess && request.BookCover != null)
-        {
-            await fileStorageService.DeleteFileAsync(request.UserId, request.BookCover.FileName);
-        }
-
-        return result;
+        return await bookDao.TryUpdateBookAsync(request);
     }
 
     public async Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request)
     {
         var existingBook = await TryGetBookAsync(request.UserId, request.BookId);
 
-        if (existingBook.IsSuccess && !string.IsNullOrEmpty(existingBook.Value.FileName))
+        // Delete cover image if it exists
+        if (existingBook.IsSuccess && !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {
-            await fileStorageService.DeleteFileAsync(request.UserId, existingBook.Value.FileName);
+            await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
         }
 
         return await bookDao.DeleteBookAsync(request);
