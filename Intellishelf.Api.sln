@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Domain", "Inte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Common", "Intellishelf.Common\Intellishelf.Common.csproj", "{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Unit.Tests", "Tests\Intellishelf.Unit.Tests\Intellishelf.Unit.Tests.csproj", "{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +29,12 @@ Global
 		{6B95A5DC-0413-43F7-8152-199AEFC48139}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B95A5DC-0413-43F7-8152-199AEFC48139}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
+{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}.Release|Any CPU.Build.0 = Release|Any CPU
+EndGlobalSection
 EndGlobal

@@ -9,24 +9,21 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
 {
     public async Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId) =>
         await bookDao.GetBooksAsync(userId);
-        
+
     public async Task<TryResult<PagedResult<Book>>> TryGetPagedBooksAsync(string userId, BookQueryParameters queryParameters) =>
         await bookDao.GetPagedBooksAsync(userId, queryParameters);
 
     public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
         await bookDao.GetBookAsync(userId, bookId);
 
-    public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request)
-    {
-        return await bookDao.AddBookAsync(request);
-    }
+    public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request) =>
+        await bookDao.AddBookAsync(request);
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
     {
         var existingBook = await TryGetBookAsync(request.UserId, request.Id);
 
-        // Delete old cover image if we're setting a new one
-        if (request.CoverImageUrl != null && existingBook.IsSuccess && 
+        if (request.CoverImageUrl != null && existingBook.IsSuccess &&
             !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {
             await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
@@ -39,7 +36,6 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
     {
         var existingBook = await TryGetBookAsync(request.UserId, request.BookId);
 
-        // Delete cover image if it exists
         if (existingBook.IsSuccess && !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {
             await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
