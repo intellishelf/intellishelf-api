@@ -5,7 +5,18 @@
 @base_url = http://localhost:8080/api
 ### ===== AUTHENTICATION =====
 
-### Get Auth Token (Run this first!)
+### Register User (Run this first if user doesn't exist!)
+# @name register
+POST {{base_url}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "TestPassword123!",
+    "name": "Test User"
+}
+
+### Get Auth Token (Run this after registration!)
 # @name login
 POST {{base_url}}/auth/login
 Content-Type: application/json
@@ -66,26 +77,26 @@ Content-Type: application/octet-stream
 --boundary123--
 
 ### Get Single Book (uses ID from created book)
-GET {{base_url}}/books/{{createBook.response.body.id}}
+GET {{base_url}}/books/{{createBookNoImage.response.body.id}}
 Authorization: Bearer {{token}}
 
 ### Update Book (uses ID from created book)
-PUT {{base_url}}/books/{{createBook.response.body.id}}
+PUT {{base_url}}/books/{{createBookNoImage.response.body.id}}
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=boundary123
 
 --boundary123
 Content-Disposition: form-data; name="title"
 
-The Great Gatsby - Updated Edition
+The Art of Testing - Updated Edition
 --boundary123
 Content-Disposition: form-data; name="description"
 
-An updated description of this classic novel
+An updated description of this testing book
 --boundary123--
 
 ### Delete Book (uses ID from created book)
-DELETE {{base_url}}/books/{{createBook.response.body.id}}
+DELETE {{base_url}}/books/{{createBookNoImage.response.body.id}}
 Authorization: Bearer {{token}}
 
 ### ===== AI FEATURES =====
@@ -121,8 +132,9 @@ Authorization: Bearer {{token}}
 Accept: image/jpeg
 
 ### ===== QUICK START GUIDE =====
-### 1. Make sure Docker is running: docker-compose up -d
-### 2. Click "Send Request" on "Get Auth Token" 
-### 3. Click "Send Request" on "Add New Book" to create a test book
-### 4. Now all other book operations use the created book's ID automatically
-### 5. When token expires (~30 min), just re-run "Get Auth Token"
+### 1. Make sure Docker is running: nerdctl compose up -d
+### 2. Click "Send Request" on "Register User" (only needed first time)
+### 3. Click "Send Request" on "Get Auth Token" to login
+### 4. Click "Send Request" on "Add New Book" to create a test book
+### 5. Now all other book operations use the created book's ID automatically
+### 6. When token expires (~30 min), just re-run "Get Auth Token"
