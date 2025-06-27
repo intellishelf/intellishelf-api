@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevPolicy", policy =>
@@ -35,4 +36,5 @@ app.UseAuthentication();
 app.UseStatusCodePages();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 app.Run();
