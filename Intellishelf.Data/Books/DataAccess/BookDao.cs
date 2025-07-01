@@ -87,9 +87,17 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
     {
+        // First check if the book exists at all
         var bookEntity = await _booksCollection
-            .Find(b => b.UserId == userId && b.Id == bookId)
+            .Find(b => b.Id == bookId)
             .FirstOrDefaultAsync();
+
+        if (bookEntity == null)
+            return new Error(BookErrorCodes.BookNotFound, "Book not found");
+
+        // Then check if the user has access to it
+        if (bookEntity.UserId != userId)
+            return new Error(BookErrorCodes.AccessDenied, "Access denied to this book");
 
         return mapper.Map(bookEntity);
     }
@@ -156,8 +164,10 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult> DeleteBookAsync(DeleteBookRequest request)
     {
-        await _booksCollection.DeleteOneAsync(b => b.Id == request.BookId && b.UserId == request.UserId);
+        var result = await _booksCollection.DeleteOneAsync(b => b.Id == request.BookId && b.UserId == request.UserId);
 
-        return TryResult.Success();
+        return result.DeletedCount == 0
+            ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to delete")
+            : TryResult.Success();
     }
 }

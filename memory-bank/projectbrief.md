@@ -1,7 +1,7 @@
 # Intellishelf Project Brief
 
 ## Project Overview
-Intellishelf is a comprehensive digital bookshelf management application powered with AI and built with a .NET.
+Intellishelf is a comprehensive digital bookshelf management application (similar to Libib) powered with AI and built with a .NET.
 
 ## Core Objectives
 - Provide a robust bookshelf management system

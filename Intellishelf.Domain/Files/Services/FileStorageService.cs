@@ -8,16 +8,23 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
 {
     public async Task<TryResult<string>> UploadFileAsync(string userId, Stream fileStream, string originalFileName)
     {
-        // Ensure the container exists (create if it doesn't)
-        await containerClient.CreateIfNotExistsAsync();
- 
-        // Generate a unique filename inside the service
-        var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(originalFileName)}";
-        var blobClient = containerClient.GetBlobClient(GetUserFilePath(userId, uniqueFileName));
- 
-        await blobClient.UploadAsync(fileStream, true);
- 
-        return blobClient.Uri.ToString();
+        try
+        {
+            // Ensure the container exists (create if it doesn't)
+            await containerClient.CreateIfNotExistsAsync();
+     
+            // Generate a unique filename inside the service
+            var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(originalFileName)}";
+            var blobClient = containerClient.GetBlobClient(GetUserFilePath(userId, uniqueFileName));
+     
+            await blobClient.UploadAsync(fileStream, true);
+     
+            return blobClient.Uri.ToString();
+        }
+        catch (Exception ex)
+        {
+            return new Error(FileErrorCodes.UploadFailed, $"File upload failed: {ex.Message}");
+        }
     }
 
     public async Task<TryResult<bool>> DeleteFileFromUrlAsync(string url)
@@ -31,7 +38,7 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
         }
         catch (Exception)
         {
-            return new Error(FileErrorCodes.DownloadingFailed, "The file couldn't be deleted");
+            return new Error(FileErrorCodes.DeletionFailed, "The file couldn't be deleted");
         }
     }
 

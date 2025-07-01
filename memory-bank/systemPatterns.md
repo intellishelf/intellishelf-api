@@ -30,6 +30,7 @@
 - Service Layer Pattern
 - Background Service Pattern - for scheduled tasks like token cleanup
 - Pagination Pattern - for efficient data retrieval with large datasets
+- **Data Annotations Validation** - Use attributes like `[EmailAddress]`, `[MinLength]` on API contracts for input validation when relevant
 
 ## Key Architectural Decisions
 - Separation of Concerns
@@ -65,9 +66,28 @@ Api Layer → Domain Layer → Data Layer
 - **Immutable URL Storage** - Store complete public URLs in domain models and entities
 - **Unique File Naming** - GUID-based filenames to prevent conflicts and ensure uniqueness
 
+## Error Handling Patterns
+### Error Code Organization
+- **Domain-Based Namespacing**: Each domain has its own error codes (Books, Users, Files, AI)
+- **Consistent Naming**: Error codes follow pattern `Domain.ErrorType` (e.g., `Books.NotFound`, `User.Unauthorized`)
+- **HTTP Status Mapping**: Centralized in `ApiControllerBase.MapErrorToStatusCode()`
+
+### Error Code Lifecycle Management
+- **Adding New Error Codes**: Always update `ApiControllerBase.MapErrorToStatusCode()` method
+- **Testing**: Run full test suite after error code changes to verify no regressions
+
 ## Cross-Cutting Concerns
 - Logging
 - Authentication
 - Error Handling
 - Configuration Management
 - File Processing and Storage
+
+## Implementation Examples
+- **TryResult Pattern**: `BookService.AddBookAsync()` returns `TryResult<Book>`
+- **Mapper Pattern**: `BookMapper.ToModel()` in API layer, `BookEntityMapper.ToEntity()` in Data layer
+- **Background Service**: `RefreshTokenCleanupService` runs scheduled cleanup every 24 hours
+- **Pagination**: `BookQueryParameters` with Skip/Take implemented in `BookDao`
+- **File Storage**: `FileStorageService` handles Azure Blob operations with GUID-based naming
+- **Authentication Flow**: `AuthController` → `AuthService` → `UserDao` with JWT + refresh token rotation
+- **Error Handling**: `ApiControllerBase.HandleErrorResponse()` maps domain error codes to appropriate HTTP status codes
