@@ -26,7 +26,7 @@
 ## Design Patterns
 - Result Pattern (TryResult) - no exception thrown, only TryResult with status and error code
 - Dependency Injection
-- Mapper Pattern - each layer has its data transfer object and mapping capabilities when necessary. API has contracts, Domain has models, Data has entities.
+- Mapper Pattern - each layer has its data transfer object and mapping capabilities when necessary. API has contracts, Domain has models, Data has entities. Use dedicated mapper classes instead of inline mapping within methods.
 - Service Layer Pattern
 - Background Service Pattern - for scheduled tasks like token cleanup
 - Pagination Pattern - for efficient data retrieval with large datasets
