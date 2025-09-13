@@ -37,15 +37,15 @@ public abstract class ApiControllerBase : ControllerBase
         _ => StatusCodes.Status500InternalServerError
     };
 
-    protected ObjectResult HandleErrorResponse(Error error)
+    protected static ObjectResult HandleErrorResponse(Error error)
     {
         var statusCode = MapErrorToStatusCode(error.Code);
 
         var problem = new ProblemDetails
         {
-            Title = error.Code,
-            Detail = error.Message,
-            Status = statusCode
+            Title = error.Message,
+            Status = statusCode,
+            Type = error.Code
         };
 
         return new ObjectResult(problem)

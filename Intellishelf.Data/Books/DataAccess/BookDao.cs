@@ -45,7 +45,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         
         var pagedResult = new PagedResult<Book>(
             mappedBooks, 
-            (int)totalCount, 
+            totalCount,
             queryParameters.Page, 
             queryParameters.PageSize);
         
