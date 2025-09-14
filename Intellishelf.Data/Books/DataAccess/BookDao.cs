@@ -52,7 +52,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         return pagedResult;
     }
     
-    private SortDefinition<BookEntity> BuildSortDefinition(BookOrderBy orderBy, bool ascending)
+    private static SortDefinition<BookEntity> BuildSortDefinition(BookOrderBy orderBy, bool ascending)
     {
         SortDefinition<BookEntity> sortDefinition;
         
@@ -66,8 +66,8 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             case BookOrderBy.Author:
                 // Sort by the last author in the array if it exists
                 sortDefinition = ascending 
-                    ? Builders<BookEntity>.Sort.Ascending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.Last() : string.Empty) 
-                    : Builders<BookEntity>.Sort.Descending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.Last() : string.Empty);
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.FirstOrDefault() : string.Empty)
+                    : Builders<BookEntity>.Sort.Descending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.FirstOrDefault() : string.Empty);
                 break;
             case BookOrderBy.Published:
                 sortDefinition = ascending 
@@ -87,7 +87,6 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
     {
-        // First check if the book exists at all
         var bookEntity = await _booksCollection
             .Find(b => b.Id == bookId)
             .FirstOrDefaultAsync();
@@ -95,7 +94,6 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         if (bookEntity == null)
             return new Error(BookErrorCodes.BookNotFound, "Book not found");
 
-        // Then check if the user has access to it
         if (bookEntity.UserId != userId)
             return new Error(BookErrorCodes.AccessDenied, "Access denied to this book");
 
