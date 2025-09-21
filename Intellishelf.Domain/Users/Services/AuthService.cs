@@ -1,7 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
@@ -13,9 +16,12 @@ using Microsoft.IdentityModel.Tokens;
 namespace Intellishelf.Domain.Users.Services;
 
 public class AuthService(
-    IOptions<AuthConfig> options, 
+    IOptions<AuthConfig> options,
     IUserDao userDao,
-    IRefreshTokenDao refreshTokenDao) : IAuthService
+    IRefreshTokenDao refreshTokenDao,
+    //TODO: move this out of domain service
+    HttpClient httpClient)
+    : IAuthService
 {
     public async Task<TryResult<User>> TryFindByIdAsync(string id) =>
         await userDao.TryFindByIdAsync(id);
@@ -29,7 +35,11 @@ public class AuthService(
 
         CreatePasswordHash(request.Password, out var passwordHash, out var passwordSalt);
 
-        var result = await userDao.TryAdd(new NewUser(request.Email, passwordHash, passwordSalt));
+        var result = await userDao.TryAdd(new NewUser(
+            Email: request.Email,
+            PasswordHash: passwordHash,
+            PasswordSalt: passwordSalt,
+            AuthProvider: AuthProvider.Email));
 
         if(!result.IsSuccess)
             return result.Error;
@@ -44,13 +54,20 @@ public class AuthService(
         if (!result.IsSuccess)
             return result.Error;
 
-        var verifyHashResult =
-            VerifyPasswordHash(request.Password, result.Value.PasswordHash, result.Value.PasswordSalt);
+        var user = result.Value;
+        
+        if (user.AuthProvider != AuthProvider.Email)
+            return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
+
+        if (user.PasswordHash == null || user.PasswordSalt == null)
+            return new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
+
+        var verifyHashResult = VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
 
         if (!verifyHashResult)
             return new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
 
-        return await GenerateTokensAsync(result.Value);
+        return await GenerateTokensAsync(user);
     }
 
     public async Task<TryResult<LoginResult>> TryRefreshTokenAsync(RefreshTokenRequest request)
@@ -95,6 +112,81 @@ public class AuthService(
         
         refreshToken = refreshToken with { IsRevoked = true };
         return await refreshTokenDao.TryUpdateAsync(refreshToken);
+    }
+
+
+
+    public async Task<TryResult<LoginResult>> TryExchangeGoogleCodeAsync(ExchangeCodeRequest request)
+    {
+        var tokenRequest = new Dictionary<string, string>
+        {
+            ["code"] = request.Code,
+            ["client_id"] = options.Value.Google.ClientId,
+            ["client_secret"] = options.Value.Google.ClientSecret,
+            ["redirect_uri"] = request.RedirectUri,
+            ["grant_type"] = "authorization_code"
+        };
+
+        var tokenResponse = await httpClient.PostAsync(
+            "https://oauth2.googleapis.com/token",
+            new FormUrlEncodedContent(tokenRequest));
+
+        if (!tokenResponse.IsSuccessStatusCode)
+            return new Error(UserErrorCodes.OAuthError, "Failed to exchange code with Google");
+
+        var tokenResult = await tokenResponse.Content.ReadFromJsonAsync<GoogleTokenResponse>(new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (tokenResult?.IdToken == null)
+            return new Error(UserErrorCodes.OAuthError, "Invalid response from Google");
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(tokenResult.IdToken);
+
+        var email = jwt.Claims.First(c => c.Type == "email").Value;
+        var sub = jwt.Claims.First(c => c.Type == "sub").Value;
+
+        return await GetOrCreateOAuthUserAsync(email, sub, AuthProvider.Google);
+    }
+
+    private async Task<TryResult<LoginResult>> GetOrCreateOAuthUserAsync(string email, string externalId, AuthProvider provider)
+    {
+        // Try to find existing user by email
+        var existingUserResult = await userDao.TryFindByEmailAsync(email);
+        
+        if (existingUserResult.IsSuccess)
+        {
+            var user = existingUserResult.Value;
+            
+            // Check if user trying to login with different provider
+            if (user.AuthProvider != provider)
+                return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
+
+            // Check if externalId matches
+            if (user.ExternalId != externalId)
+                return new Error(UserErrorCodes.Unauthorized, "Invalid OAuth credentials");
+
+            return await GenerateTokensAsync(user);
+        }
+
+        // Create new user if not found
+        if (existingUserResult.Error.Code != UserErrorCodes.UserNotFound)
+            return existingUserResult.Error;
+
+        var newUser = new NewUser(
+            Email: email,
+            PasswordHash: null,
+            PasswordSalt: null,
+            AuthProvider: provider,
+            ExternalId: externalId);
+
+        var createResult = await userDao.TryAdd(newUser);
+        if (!createResult.IsSuccess)
+            return createResult.Error;
+
+        return await GenerateTokensAsync(createResult.Value);
     }
 
     private async Task<LoginResult> GenerateTokensAsync(User user)
@@ -164,4 +256,6 @@ public class AuthService(
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         return computedHash.SequenceEqual(Convert.FromBase64String(storedHash));
     }
+
+    private record GoogleTokenResponse([property: JsonPropertyName("id_token")] string IdToken);
 }

@@ -1,8 +1,10 @@
 using Intellishelf.Api.Contracts.Auth;
 using Intellishelf.Api.Mappers.Users;
+using Intellishelf.Domain.Users.Models;
 using Intellishelf.Domain.Users.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Intellishelf.Api.Controllers;
 
@@ -62,5 +64,16 @@ public class AuthController(IUserMapper mapper, IAuthService authService) : ApiC
         return result.IsSuccess
             ? Ok(mapper.MapUser(result.Value))
             : HandleErrorResponse(result.Error);
+    }
+
+    [HttpPost("google/exchange")]
+    [AllowAnonymous]
+    public async Task<ActionResult<LoginResultContract>> ExchangeGoogleCode([FromBody] ExchangeCodeRequest request)
+    {
+        var result = await authService.TryExchangeGoogleCodeAsync(request);
+        
+        return !result.IsSuccess
+            ? HandleErrorResponse(result.Error)
+            : Ok(result.Value);
     }
 }

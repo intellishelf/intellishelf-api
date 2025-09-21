@@ -1,3 +1,4 @@
+using Intellishelf.Domain.Users.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -11,7 +12,11 @@ public class UserEntity
 
     public required string Email { get; init; }
 
-    public required string PasswordHash { get; init; }
+    public string? PasswordHash { get; init; }
 
-    public required string PasswordSalt { get; init; }
+    public string? PasswordSalt { get; init; }
+
+    public required AuthProvider AuthProvider { get; init; }
+
+    public string? ExternalId { get; init; }
 }

@@ -23,7 +23,8 @@ public abstract class ApiControllerBase : ControllerBase
         BookErrorCodes.AccessDenied or 
         UserErrorCodes.Unauthorized or 
         UserErrorCodes.RefreshTokenExpired or 
-        UserErrorCodes.RefreshTokenRevoked => StatusCodes.Status401Unauthorized,
+        UserErrorCodes.RefreshTokenRevoked or
+        UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
         
         // 409 Conflict
         UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,

@@ -6,13 +6,21 @@ namespace Intellishelf.Data.Users.Mappers;
 public class UserMapper : IUserMapper
 {
     public User Map(UserEntity entity) =>
-        new(entity.Id, entity.Email, entity.PasswordHash, entity.PasswordSalt);
+        new(
+            Id: entity.Id, 
+            Email: entity.Email, 
+            PasswordHash: entity.PasswordHash, 
+            PasswordSalt: entity.PasswordSalt,
+            AuthProvider: entity.AuthProvider,
+            ExternalId: entity.ExternalId);
 
-    public UserEntity MapNewUser(NewUser model) =>
+    public UserEntity MapNewUser(NewUser newUser) =>
         new()
         {
-            Email = model.Email,
-            PasswordHash = model.PasswordHash,
-            PasswordSalt = model.PasswordSalt
+            Email = newUser.Email,
+            PasswordHash = newUser.PasswordHash,
+            PasswordSalt = newUser.PasswordSalt,
+            AuthProvider = newUser.AuthProvider,
+            ExternalId = newUser.ExternalId
         };
 }
