@@ -12,7 +12,11 @@ public class RefreshTokenMapper : IRefreshTokenMapper
             entity.UserId,
             entity.ExpiryDate,
             entity.IsRevoked,
-            entity.CreatedAt);
+            entity.CreatedAt,
+            entity.CreatedByToken,
+            entity.ReplacedByToken,
+            entity.RevokedAt,
+            entity.RevokedReason);
 
     public RefreshTokenEntity Map(RefreshToken model) =>
         new()
@@ -22,6 +26,10 @@ public class RefreshTokenMapper : IRefreshTokenMapper
             UserId = model.UserId,
             ExpiryDate = model.ExpiryDate,
             IsRevoked = model.IsRevoked,
-            CreatedAt = model.CreatedAt
+            CreatedAt = model.CreatedAt,
+            CreatedByToken = model.CreatedByToken,
+            ReplacedByToken = model.ReplacedByToken,
+            RevokedAt = model.RevokedAt,
+            RevokedReason = model.RevokedReason
         };
 }

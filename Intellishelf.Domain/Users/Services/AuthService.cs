@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Linq;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -19,7 +21,6 @@ public class AuthService(
     IOptions<AuthConfig> options,
     IUserDao userDao,
     IRefreshTokenDao refreshTokenDao,
-    //TODO: move this out of domain service
     HttpClient httpClient)
     : IAuthService
 {
@@ -41,7 +42,7 @@ public class AuthService(
             PasswordSalt: passwordSalt,
             AuthProvider: AuthProvider.Email));
 
-        if(!result.IsSuccess)
+        if (!result.IsSuccess)
             return result.Error;
 
         return await GenerateTokensAsync(result.Value);
@@ -55,7 +56,7 @@ public class AuthService(
             return result.Error;
 
         var user = result.Value;
-        
+
         if (user.AuthProvider != AuthProvider.Email)
             return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
 
@@ -70,51 +71,66 @@ public class AuthService(
         return await GenerateTokensAsync(user);
     }
 
+    public async Task<TryResult<LoginResult>> TrySignInExternalAsync(ExternalLoginRequest request) =>
+        await GetOrCreateOAuthUserAsync(request.Email, request.ExternalId, request.Provider);
+
     public async Task<TryResult<LoginResult>> TryRefreshTokenAsync(RefreshTokenRequest request)
     {
         var refreshTokenResult = await refreshTokenDao.TryFindByTokenAsync(request.RefreshToken);
-        
+
         if (!refreshTokenResult.IsSuccess)
             return refreshTokenResult.Error;
-        
+
         var refreshToken = refreshTokenResult.Value;
-        
-        // Check if token is expired
-        if (refreshToken.ExpiryDate < DateTime.UtcNow)
+
+        if (refreshToken.ExpiryDate <= DateTime.UtcNow)
+        {
+            var revokeExpiredResult = await RevokeTokenAsync(refreshToken, "Refresh token expired");
+            if (!revokeExpiredResult.IsSuccess)
+                return revokeExpiredResult.Error;
+
             return new Error(UserErrorCodes.RefreshTokenExpired, "Refresh token has expired");
-        
-        // Check if token is revoked
+        }
+
         if (refreshToken.IsRevoked)
+        {
+            var revokeReuseResult = await RevokeTokenFamilyAsync(refreshToken, "Refresh token reuse detected");
+            if (!revokeReuseResult.IsSuccess)
+                return revokeReuseResult.Error;
+
             return new Error(UserErrorCodes.RefreshTokenRevoked, "Refresh token has been revoked");
-        
-        // Get user from the token
+        }
+
         var userResult = await userDao.TryFindByIdAsync(refreshToken.UserId);
-        
+
         if (!userResult.IsSuccess)
             return userResult.Error;
-        
-        // Revoke the current refresh token
-        refreshToken = refreshToken with { IsRevoked = true };
-        await refreshTokenDao.TryUpdateAsync(refreshToken);
-        
-        // Generate new tokens
-        return await GenerateTokensAsync(userResult.Value);
+
+        var user = userResult.Value;
+        var newRefreshToken = GenerateRefreshToken(user.Id, refreshToken.Token);
+
+        var revokeResult = await RevokeTokenAsync(refreshToken, "Replaced by new refresh token", newRefreshToken.Token);
+
+        if (!revokeResult.IsSuccess)
+            return revokeResult.Error;
+
+        return await GenerateTokensAsync(user, newRefreshToken);
     }
 
     public async Task<TryResult<bool>> TryRevokeRefreshTokenAsync(RefreshTokenRequest request)
     {
         var refreshTokenResult = await refreshTokenDao.TryFindByTokenAsync(request.RefreshToken);
-        
+
         if (!refreshTokenResult.IsSuccess)
             return refreshTokenResult.Error;
-        
-        var refreshToken = refreshTokenResult.Value;
-        
-        refreshToken = refreshToken with { IsRevoked = true };
-        return await refreshTokenDao.TryUpdateAsync(refreshToken);
+
+        var revokeResult = await RevokeTokenFamilyAsync(refreshTokenResult.Value, "Refresh token revoked by user");
+
+        if (!revokeResult.IsSuccess)
+            return revokeResult.Error;
+
+        return true;
     }
-
-
 
     public async Task<TryResult<LoginResult>> TryExchangeGoogleCodeAsync(ExchangeCodeRequest request)
     {
@@ -153,25 +169,21 @@ public class AuthService(
 
     private async Task<TryResult<LoginResult>> GetOrCreateOAuthUserAsync(string email, string externalId, AuthProvider provider)
     {
-        // Try to find existing user by email
         var existingUserResult = await userDao.TryFindByEmailAsync(email);
-        
+
         if (existingUserResult.IsSuccess)
         {
             var user = existingUserResult.Value;
-            
-            // Check if user trying to login with different provider
+
             if (user.AuthProvider != provider)
                 return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
 
-            // Check if externalId matches
             if (user.ExternalId != externalId)
                 return new Error(UserErrorCodes.Unauthorized, "Invalid OAuth credentials");
 
             return await GenerateTokensAsync(user);
         }
 
-        // Create new user if not found
         if (existingUserResult.Error.Code != UserErrorCodes.UserNotFound)
             return existingUserResult.Error;
 
@@ -189,16 +201,83 @@ public class AuthService(
         return await GenerateTokensAsync(createResult.Value);
     }
 
-    private async Task<LoginResult> GenerateTokensAsync(User user)
+    private async Task<TryResult<LoginResult>> GenerateTokensAsync(User user, RefreshToken? refreshToken = null)
     {
+        var tokenToPersist = refreshToken ?? GenerateRefreshToken(user.Id);
+        var addResult = await refreshTokenDao.TryAddAsync(tokenToPersist);
+
+        if (!addResult.IsSuccess)
+            return addResult.Error;
+
+        var persistedRefreshToken = addResult.Value;
         var accessToken = GenerateAccessToken(user);
         var accessTokenExpiry = DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpirationMinutes);
-        
-        var refreshToken = GenerateRefreshToken(user.Id);
-        
-        await refreshTokenDao.TryAddAsync(refreshToken);
-        
-        return new LoginResult(accessToken, refreshToken.Token, accessTokenExpiry);
+
+        return new LoginResult(accessToken, persistedRefreshToken.Token, accessTokenExpiry, persistedRefreshToken.ExpiryDate);
+    }
+
+    private async Task<TryResult<RefreshToken>> RevokeTokenAsync(RefreshToken token, string reason, string? replacedByToken = null)
+    {
+        var needsUpdate = !token.IsRevoked || token.RevokedAt is null ||
+            (replacedByToken is not null && !string.Equals(token.ReplacedByToken, replacedByToken, StringComparison.Ordinal));
+
+        if (!needsUpdate)
+            return token;
+
+        var updatedToken = token with
+        {
+            IsRevoked = true,
+            ReplacedByToken = replacedByToken ?? token.ReplacedByToken,
+            RevokedAt = DateTime.UtcNow,
+            RevokedReason = reason
+        };
+
+        var updateResult = await refreshTokenDao.TryUpdateAsync(updatedToken);
+        return updateResult.IsSuccess ? updatedToken : updateResult.Error;
+    }
+
+    private async Task<TryResult<bool>> RevokeTokenFamilyAsync(RefreshToken rootToken, string reason)
+    {
+        var tokensResult = await refreshTokenDao.TryFindByUserIdAsync(rootToken.UserId);
+
+        if (!tokensResult.IsSuccess)
+            return tokensResult.Error;
+
+        var tokensByValue = tokensResult.Value.ToDictionary(t => t.Token, StringComparer.Ordinal);
+        var stack = new Stack<RefreshToken>();
+
+        if (tokensByValue.TryGetValue(rootToken.Token, out var persistedRoot))
+            stack.Push(persistedRoot);
+        else
+            stack.Push(rootToken);
+
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+
+            if (!visited.Add(current.Token))
+                continue;
+
+            var revokeResult = await RevokeTokenAsync(current, reason);
+            if (!revokeResult.IsSuccess)
+                return revokeResult.Error;
+
+            var updated = revokeResult.Value ?? current;
+            tokensByValue[updated.Token] = updated;
+
+            var descendants = tokensByValue.Values
+                .Where(t => string.Equals(t.CreatedByToken, updated.Token, StringComparison.Ordinal))
+                .ToList();
+
+            foreach (var descendant in descendants)
+            {
+                stack.Push(descendant);
+            }
+        }
+
+        return true;
     }
 
     private string GenerateAccessToken(User user)
@@ -227,19 +306,23 @@ public class AuthService(
         return tokenHandler.WriteToken(token);
     }
 
-    private RefreshToken GenerateRefreshToken(string userId)
+    private RefreshToken GenerateRefreshToken(string userId, string? createdByToken = null)
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
-        
+
         return new RefreshToken(
-            Id: string.Empty, // MongoDB will generate this
+            Id: string.Empty,
             Token: Convert.ToBase64String(randomBytes),
             UserId: userId,
             ExpiryDate: DateTime.UtcNow.AddDays(options.Value.RefreshTokenExpirationDays),
             IsRevoked: false,
-            CreatedAt: DateTime.UtcNow
+            CreatedAt: DateTime.UtcNow,
+            CreatedByToken: createdByToken,
+            ReplacedByToken: null,
+            RevokedAt: null,
+            RevokedReason: null
         );
     }
 

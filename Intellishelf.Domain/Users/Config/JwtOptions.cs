@@ -4,13 +4,22 @@ public class AuthConfig
 {
     public const string SectionName = "Auth";
     public const string Scheme = "JwtBearer";
-    
+    public const string ExternalCookieScheme = "External";
+
     // Access token settings
     public int AccessTokenExpirationMinutes { get; init; } = 30;
-    
+
     // Refresh token settings
     public int RefreshTokenExpirationDays { get; init; } = 7;
-    
+
+    public string RefreshTokenCookieName { get; init; } = "__intellishelf_refresh";
+    public bool RefreshTokenCookieSecure { get; init; } = true;
+    public string? RefreshTokenCookieDomain { get; init; }
+        = null;
+
+    public string ExternalCookieName { get; init; } = "__intellishelf_external";
+    public int ExternalCookieLifetimeMinutes { get; init; } = 5;
+
     public required string Key { get; init; }
 
     public required GoogleAuthConfig Google { get; init; }
