@@ -6,8 +6,4 @@ public record RefreshToken(
     string UserId,
     DateTime ExpiryDate,
     bool IsRevoked,
-    DateTime CreatedAt,
-    string? CreatedByToken,
-    string? ReplacedByToken,
-    DateTime? RevokedAt,
-    string? RevokedReason);
+    DateTime CreatedAt);

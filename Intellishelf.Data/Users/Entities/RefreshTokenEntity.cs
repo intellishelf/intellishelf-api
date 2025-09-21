@@ -14,8 +14,4 @@ public class RefreshTokenEntity
     public required DateTime ExpiryDate { get; init; }
     public required bool IsRevoked { get; init; }
     public required DateTime CreatedAt { get; init; }
-    public string? CreatedByToken { get; init; }
-    public string? ReplacedByToken { get; init; }
-    public DateTime? RevokedAt { get; init; }
-    public string? RevokedReason { get; init; }
 }
