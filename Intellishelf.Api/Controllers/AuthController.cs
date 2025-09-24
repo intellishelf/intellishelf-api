@@ -8,50 +8,47 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 
 namespace Intellishelf.Api.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = $"{AuthConfig.CookieScheme}, {GoogleDefaults.AuthenticationScheme}")]
 [Route("auth")]
 public class AuthController(
     IUserMapper mapper,
     IAuthService authService,
     IOptions<AuthConfig> authOptions) : ApiControllerBase
 {
-    private readonly IUserMapper _mapper = mapper;
-    private readonly IAuthService _authService = authService;
     private readonly AuthConfig _authConfig = authOptions.Value;
 
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginResultContract>> Login([FromBody] LoginRequestContract loginRequest)
     {
-        var result = await _authService.TrySignInAsync(_mapper.MapLoginRequest(loginRequest));
+        var result = await authService.TrySignInAsync(mapper.MapLoginRequest(loginRequest));
 
         if (!result.IsSuccess)
             return HandleErrorResponse(result.Error);
 
         SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
 
-        return Ok(_mapper.MapLoginResult(result.Value));
+        return Ok(mapper.MapLoginResult(result.Value));
     }
 
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult> Register([FromBody] RegisterUserRequestContract registerRequest)
     {
-        var result = await _authService.TryRegisterAsync(_mapper.MapRegisterUserRequest(registerRequest));
+        var result = await authService.TryRegisterAsync(mapper.MapRegisterUserRequest(registerRequest));
 
         if (!result.IsSuccess)
             return HandleErrorResponse(result.Error);
 
         SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
 
-        return Ok(_mapper.MapLoginResult(result.Value));
+        return Ok(mapper.MapLoginResult(result.Value));
     }
 
     [HttpPost("refresh")]
@@ -59,12 +56,12 @@ public class AuthController(
     public async Task<ActionResult<LoginResultContract>> RefreshToken([FromBody] RefreshTokenRequestContract? request)
     {
         var refreshToken = Request.Cookies[_authConfig.RefreshTokenCookieName]
-            ?? request?.RefreshToken;
+                           ?? request?.RefreshToken;
 
         if (string.IsNullOrWhiteSpace(refreshToken))
             return Unauthorized();
 
-        var result = await _authService.TryRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
+        var result = await authService.TryRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
 
         if (!result.IsSuccess)
         {
@@ -74,13 +71,13 @@ public class AuthController(
 
         SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
 
-        return Ok(_mapper.MapLoginResult(result.Value));
+        return Ok(mapper.MapLoginResult(result.Value));
     }
 
     [HttpPost("revoke")]
     public async Task<ActionResult> RevokeToken([FromBody] RefreshTokenRequestContract request)
     {
-        var result = await _authService.TryRevokeRefreshTokenAsync(_mapper.MapRefreshTokenRequest(request));
+        var result = await authService.TryRevokeRefreshTokenAsync(mapper.MapRefreshTokenRequest(request));
 
         return !result.IsSuccess
             ? HandleErrorResponse(result.Error)
@@ -99,7 +96,7 @@ public class AuthController(
             return NoContent();
         }
 
-        var result = await _authService.TryRevokeRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
+        var result = await authService.TryRevokeRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
 
         ClearRefreshCookie();
 
@@ -111,33 +108,18 @@ public class AuthController(
     [HttpGet("me")]
     public async Task<ActionResult<UserResponseContract>> Me()
     {
-        var result = await _authService.TryFindByIdAsync(CurrentUserId);
+        var result = await authService.TryFindByIdAsync(CurrentUserId);
 
         return result.IsSuccess
-            ? Ok(_mapper.MapUser(result.Value))
+            ? Ok(mapper.MapUser(result.Value))
             : HandleErrorResponse(result.Error);
-    }
-
-    [HttpPost("google/exchange")]
-    [AllowAnonymous]
-    public async Task<ActionResult<LoginResultContract>> ExchangeGoogleCode([FromBody] ExchangeCodeRequest request)
-    {
-        var result = await _authService.TryExchangeGoogleCodeAsync(request);
-
-        if (!result.IsSuccess)
-            return HandleErrorResponse(result.Error);
-
-        SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
-
-        return Ok(_mapper.MapLoginResult(result.Value));
     }
 
     [HttpGet("google")]
     [AllowAnonymous]
     public IActionResult SignInWithGoogle([FromQuery] string? returnUrl = null)
     {
-        var redirectUri = Url.Action(nameof(FinalizeGoogleLogin), "Auth", new { returnUrl })
-            ?? "/api/auth/finalize";
+        var redirectUri = Url.Action(nameof(GoogleLoginCallback), new { returnUrl });
 
         var properties = new AuthenticationProperties
         {
@@ -147,86 +129,78 @@ public class AuthController(
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
     }
 
-    [HttpGet("finalize")]
+    [HttpGet("google/callback")]
     [AllowAnonymous]
-    public async Task<IActionResult> FinalizeGoogleLogin([FromQuery] string? returnUrl = null)
+    public async Task<IActionResult> GoogleLoginCallback([FromQuery] string? returnUrl = null)
     {
-        var authenticateResult = await HttpContext.AuthenticateAsync(AuthConfig.ExternalCookieScheme);
+        var auth = await HttpContext.AuthenticateAsync(AuthConfig.CookieScheme);
 
-        if (!authenticateResult.Succeeded || authenticateResult.Principal is null)
+        if (!auth.Succeeded || auth.Principal is null)
         {
-            ClearRefreshCookie();
             return Unauthorized();
         }
 
-        var principal = authenticateResult.Principal;
-        var email = principal.FindFirstValue(ClaimTypes.Email);
-        var externalId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-                         ?? principal.FindFirstValue("sub");
-
-        await HttpContext.SignOutAsync(AuthConfig.ExternalCookieScheme);
+        var email = auth.Principal.FindFirstValue(ClaimTypes.Email);
+        var externalId = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(externalId))
         {
-            ClearRefreshCookie();
             return Unauthorized();
         }
 
-        var result = await _authService.TrySignInExternalAsync(
+        await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
+
+        var signInResult = await authService.TrySignInExternalAsync(
             new ExternalLoginRequest(email, externalId, AuthProvider.Google));
 
-        if (!result.IsSuccess)
+        if (!signInResult.IsSuccess)
         {
-            ClearRefreshCookie();
-            return HandleErrorResponse(result.Error);
+            return HandleErrorResponse(signInResult.Error);
         }
 
-        SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
+        await ReplaceUserIdentifier(auth.Principal, signInResult.Value.UserId);
 
-        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            return Redirect(returnUrl);
+        SetRefreshCookie(signInResult.Value.RefreshToken, signInResult.Value.RefreshTokenExpiry);
 
-        return Ok(new ExternalLoginResultContract(result.Value.AccessToken, result.Value.AccessTokenExpiry));
+        return Redirect(!string.IsNullOrWhiteSpace(returnUrl) ? returnUrl : "/");
     }
 
-    private void SetRefreshCookie(string refreshToken, DateTime expiry)
+    private async Task ReplaceUserIdentifier(ClaimsPrincipal principal, string userId)
     {
-        if (string.IsNullOrWhiteSpace(refreshToken))
-            return;
+        var claims = principal.Claims.ToList();
 
-        var options = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = _authConfig.RefreshTokenCookieSecure,
-            SameSite = SameSiteMode.Lax,
-            Path = "/",
-            IsEssential = true
-        };
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
 
-        var expiresUtc = DateTime.SpecifyKind(expiry, DateTimeKind.Utc);
-        options.Expires = new DateTimeOffset(expiresUtc);
+        if (userIdClaim != null) claims.Remove(userIdClaim);
 
-        if (!string.IsNullOrEmpty(_authConfig.RefreshTokenCookieDomain))
-            options.Domain = _authConfig.RefreshTokenCookieDomain;
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, userId));
 
-        Response.Cookies.Append(_authConfig.RefreshTokenCookieName, refreshToken, options);
+        await HttpContext.SignInAsync(
+            AuthConfig.CookieScheme,
+            new ClaimsPrincipal(new ClaimsIdentity(claims, AuthConfig.CookieScheme))
+          );
     }
 
-    private void ClearRefreshCookie()
+    private void SetRefreshCookie(string refreshToken, DateTime expiry) => SetCookie(refreshToken, expiry);
+
+    private void ClearRefreshCookie() => SetCookie(string.Empty, DateTimeOffset.UnixEpoch);
+
+    private void SetCookie(string value, DateTimeOffset expiry)
     {
         var options = new CookieOptions
         {
             HttpOnly = true,
-            Secure = _authConfig.RefreshTokenCookieSecure,
+            Secure = true,
             SameSite = SameSiteMode.Lax,
             Path = "/",
-            Expires = DateTimeOffset.UnixEpoch,
+            Expires = expiry,
             IsEssential = true
         };
 
-        if (!string.IsNullOrEmpty(_authConfig.RefreshTokenCookieDomain))
-            options.Domain = _authConfig.RefreshTokenCookieDomain;
-
-        Response.Cookies.Append(_authConfig.RefreshTokenCookieName, string.Empty, options);
+        Response.Cookies.Append(_authConfig.RefreshTokenCookieName, value, options);
     }
+
+
+
+
 }

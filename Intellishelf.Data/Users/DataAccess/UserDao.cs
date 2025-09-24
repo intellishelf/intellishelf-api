@@ -32,6 +32,13 @@ public class UserDao(IMongoDatabase database, IUserMapper mapper) : IUserDao
         return mapper.Map(user);
     }
 
+    public async Task<TryResult<bool>> TryUserExists(string email)
+    {
+        var user = await _usersCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+        return user != null;
+    }
+
     public async Task<TryResult<User>> TryAdd(NewUser user)
     {
         var entity = mapper.MapNewUser(user);

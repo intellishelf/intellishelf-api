@@ -30,4 +30,3 @@ Intellishelf is a comprehensive digital bookshelf management application (simila
 ## Technical Stack
 - .NET Core
 - C#
-- JWT Authentication

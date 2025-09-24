@@ -11,5 +11,4 @@ public interface IAuthService
     Task<TryResult<LoginResult>> TryRefreshTokenAsync(RefreshTokenRequest request);
     Task<TryResult<bool>> TryRevokeRefreshTokenAsync(RefreshTokenRequest request);
     Task<TryResult<User>> TryFindByIdAsync(string id);
-    Task<TryResult<LoginResult>> TryExchangeGoogleCodeAsync(ExchangeCodeRequest request);
 }

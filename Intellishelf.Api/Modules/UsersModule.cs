@@ -5,9 +5,7 @@ using Intellishelf.Data.Users.Mappers;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
 using Intellishelf.Domain.Users.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Intellishelf.Api.Modules;
@@ -19,56 +17,46 @@ public static class UsersModule
         builder.Services.Configure<AuthConfig>(
             builder.Configuration.GetSection(AuthConfig.SectionName));
 
-        var jwtOptions = builder.Configuration
+        var authConfig = builder.Configuration
             .GetSection(AuthConfig.SectionName)
             .Get<AuthConfig>() ?? throw new InvalidOperationException("Auth configuration is missing");
 
         builder.Services
             .AddAuthentication(options =>
             {
-                options.DefaultScheme = AuthConfig.Scheme;
-                options.DefaultAuthenticateScheme = AuthConfig.Scheme;
-                options.DefaultChallengeScheme = AuthConfig.Scheme;
-                options.DefaultSignInScheme = AuthConfig.ExternalCookieScheme;
+                options.DefaultSignInScheme = null;
             })
-            .AddJwtBearer(AuthConfig.Scheme, options =>
+            .AddJwtBearer(AuthConfig.JwtScheme, options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.Key)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero // Remove default 5 minute clock skew to ensure tokens expire exactly when they should
                 };
             })
-            .AddCookie(AuthConfig.ExternalCookieScheme, options =>
+            .AddCookie(AuthConfig.CookieScheme, options =>
             {
-                options.Cookie.Name = jwtOptions.ExternalCookieName;
+                options.Cookie.Name = authConfig.AuthCookieName;
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.Path = "/";
-                options.Cookie.IsEssential = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(jwtOptions.ExternalCookieLifetimeMinutes);
-                options.SlidingExpiration = false;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(authConfig.AuthExpirationMinutes);
             })
             .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
             {
-                options.ClientId = jwtOptions.Google.ClientId;
-                options.ClientSecret = jwtOptions.Google.ClientSecret;
-                options.CallbackPath = "/signin-google";
+                options.ClientId = authConfig.Google.ClientId;
+                options.ClientSecret = authConfig.Google.ClientSecret;
                 options.SaveTokens = false;
-                options.SignInScheme = AuthConfig.ExternalCookieScheme;
+                options.SignInScheme = AuthConfig.CookieScheme;
                 options.UsePkce = true;
-                options.Scope.Clear();
-                options.Scope.Add("openid");
-                options.Scope.Add("email");
             });
 
         // Mappers
-        builder.Services.AddSingleton<Data.Users.Mappers.IUserMapper, Data.Users.Mappers.UserMapper>();
+        builder.Services.AddSingleton<IUserMapper, UserMapper>();
         builder.Services.AddSingleton<Mappers.Users.IUserMapper, Mappers.Users.UserMapper>();
         builder.Services.AddSingleton<IRefreshTokenMapper, RefreshTokenMapper>();
         

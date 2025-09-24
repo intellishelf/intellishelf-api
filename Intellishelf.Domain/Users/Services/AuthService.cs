@@ -1,11 +1,7 @@
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Users.Config;
@@ -20,8 +16,7 @@ namespace Intellishelf.Domain.Users.Services;
 public class AuthService(
     IOptions<AuthConfig> options,
     IUserDao userDao,
-    IRefreshTokenDao refreshTokenDao,
-    HttpClient httpClient)
+    IRefreshTokenDao refreshTokenDao)
     : IAuthService
 {
     public async Task<TryResult<User>> TryFindByIdAsync(string id) =>
@@ -71,8 +66,47 @@ public class AuthService(
         return await GenerateTokensAsync(user);
     }
 
-    public async Task<TryResult<LoginResult>> TrySignInExternalAsync(ExternalLoginRequest request) =>
-        await GetOrCreateOAuthUserAsync(request.Email, request.ExternalId, request.Provider);
+    public async Task<TryResult<LoginResult>> TrySignInExternalAsync(ExternalLoginRequest request)
+    {
+        var (email, externalId, provider) = request;
+
+        var userExistsResult = await userDao.TryUserExists(email);
+
+        if (userExistsResult.IsSuccess)
+        {
+
+            if (userExistsResult.Value)
+            {
+                var existingUserResult = await userDao.TryFindByEmailAsync(email);
+
+                var user = existingUserResult.Value!;
+
+                if (user.AuthProvider != provider)
+                    return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
+
+                if (user.ExternalId != externalId)
+                    return new Error(UserErrorCodes.Unauthorized, "Invalid OAuth credentials");
+
+                return await GenerateTokensAsync(user);
+            }
+
+            var newUser = new NewUser(
+                Email: email,
+                PasswordHash: null,
+                PasswordSalt: null,
+                AuthProvider: provider,
+                ExternalId: externalId);
+
+            var createResult = await userDao.TryAdd(newUser);
+
+            if (!createResult.IsSuccess)
+                return createResult.Error;
+
+            return await GenerateTokensAsync(createResult.Value);
+        }
+
+        return userExistsResult.Error;
+    }
 
     public async Task<TryResult<LoginResult>> TryRefreshTokenAsync(RefreshTokenRequest request)
     {
@@ -113,75 +147,6 @@ public class AuthService(
         return await refreshTokenDao.TryUpdateAsync(refreshToken with { IsRevoked = true });
     }
 
-    public async Task<TryResult<LoginResult>> TryExchangeGoogleCodeAsync(ExchangeCodeRequest request)
-    {
-        var tokenRequest = new Dictionary<string, string>
-        {
-            ["code"] = request.Code,
-            ["client_id"] = options.Value.Google.ClientId,
-            ["client_secret"] = options.Value.Google.ClientSecret,
-            ["redirect_uri"] = request.RedirectUri,
-            ["grant_type"] = "authorization_code"
-        };
-
-        var tokenResponse = await httpClient.PostAsync(
-            "https://oauth2.googleapis.com/token",
-            new FormUrlEncodedContent(tokenRequest));
-
-        if (!tokenResponse.IsSuccessStatusCode)
-            return new Error(UserErrorCodes.OAuthError, "Failed to exchange code with Google");
-
-        var tokenResult = await tokenResponse.Content.ReadFromJsonAsync<GoogleTokenResponse>(new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (tokenResult?.IdToken == null)
-            return new Error(UserErrorCodes.OAuthError, "Invalid response from Google");
-
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(tokenResult.IdToken);
-
-        var email = jwt.Claims.First(c => c.Type == "email").Value;
-        var sub = jwt.Claims.First(c => c.Type == "sub").Value;
-
-        return await GetOrCreateOAuthUserAsync(email, sub, AuthProvider.Google);
-    }
-
-    private async Task<TryResult<LoginResult>> GetOrCreateOAuthUserAsync(string email, string externalId, AuthProvider provider)
-    {
-        var existingUserResult = await userDao.TryFindByEmailAsync(email);
-
-        if (existingUserResult.IsSuccess)
-        {
-            var user = existingUserResult.Value;
-
-            if (user.AuthProvider != provider)
-                return new Error(UserErrorCodes.Unauthorized, $"Please sign in with {user.AuthProvider}");
-
-            if (user.ExternalId != externalId)
-                return new Error(UserErrorCodes.Unauthorized, "Invalid OAuth credentials");
-
-            return await GenerateTokensAsync(user);
-        }
-
-        if (existingUserResult.Error.Code != UserErrorCodes.UserNotFound)
-            return existingUserResult.Error;
-
-        var newUser = new NewUser(
-            Email: email,
-            PasswordHash: null,
-            PasswordSalt: null,
-            AuthProvider: provider,
-            ExternalId: externalId);
-
-        var createResult = await userDao.TryAdd(newUser);
-        if (!createResult.IsSuccess)
-            return createResult.Error;
-
-        return await GenerateTokensAsync(createResult.Value);
-    }
-
     private async Task<TryResult<LoginResult>> GenerateTokensAsync(User user)
     {
         var refreshToken = GenerateRefreshToken(user.Id);
@@ -192,9 +157,9 @@ public class AuthService(
 
         var persistedRefreshToken = addResult.Value;
         var accessToken = GenerateAccessToken(user);
-        var accessTokenExpiry = DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpirationMinutes);
+        var accessTokenExpiry = DateTime.UtcNow.AddMinutes(options.Value.AuthExpirationMinutes);
 
-        return new LoginResult(accessToken, persistedRefreshToken.Token, accessTokenExpiry, persistedRefreshToken.ExpiryDate);
+        return new LoginResult(user.Id, accessToken, persistedRefreshToken.Token, accessTokenExpiry, persistedRefreshToken.ExpiryDate);
     }
 
     private string GenerateAccessToken(User user)
@@ -215,7 +180,7 @@ public class AuthService(
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(options.Value.AccessTokenExpirationMinutes),
+            Expires = DateTime.UtcNow.AddMinutes(options.Value.AuthExpirationMinutes),
             SigningCredentials = credentials
         };
 
@@ -252,6 +217,4 @@ public class AuthService(
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         return computedHash.SequenceEqual(Convert.FromBase64String(storedHash));
     }
-
-    private record GoogleTokenResponse([property: JsonPropertyName("id_token")] string IdToken);
 }

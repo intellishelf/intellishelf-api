@@ -7,5 +7,6 @@ public interface IUserDao
 {
     Task<TryResult<User>> TryFindByIdAsync(string id);
     Task<TryResult<User>> TryFindByEmailAsync(string email);
+    Task<TryResult<bool>> TryUserExists(string email);
     Task<TryResult<User>> TryAdd(NewUser user);
 }

@@ -4,13 +4,15 @@ using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
 using Intellishelf.Domain.Files.Services;
+using Intellishelf.Domain.Users.Config;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Intellishelf.Api.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = $"{AuthConfig.CookieScheme}, {GoogleDefaults.AuthenticationScheme}")]
 [Route("books")]
 public class BooksController(
     IBookMapper mapper,
