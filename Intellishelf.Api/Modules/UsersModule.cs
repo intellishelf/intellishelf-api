@@ -24,7 +24,16 @@ public static class UsersModule
         builder.Services
             .AddAuthentication(options =>
             {
-                options.DefaultSignInScheme = null;
+                options.DefaultScheme = "Custom";
+                options.DefaultChallengeScheme = "Custom";
+            })
+            .AddPolicyScheme("Custom", "JWT or Cookie", options =>
+            {
+                options.ForwardDefaultSelector = ctx =>
+                {
+                    var auth = ctx.Request.Headers.Authorization.ToString();
+                    return !string.IsNullOrEmpty(auth) ? AuthConfig.JwtScheme : AuthConfig.CookieScheme;
+                };
             })
             .AddJwtBearer(AuthConfig.JwtScheme, options =>
             {
@@ -35,7 +44,7 @@ public static class UsersModule
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero // Remove default 5 minute clock skew to ensure tokens expire exactly when they should
+                    ClockSkew = TimeSpan.Zero // Remove default 5-minute clock skew to ensure tokens expire exactly when they should
                 };
             })
             .AddCookie(AuthConfig.CookieScheme, options =>

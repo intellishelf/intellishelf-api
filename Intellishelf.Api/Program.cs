@@ -1,4 +1,7 @@
+using System.Runtime.CompilerServices;
 using Intellishelf.Api.Modules;
+
+[assembly: InternalsVisibleTo("Intellishelf.Integration.Tests")]
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -15,14 +15,14 @@ public abstract class ApiControllerBase : ControllerBase
     private static int MapErrorToStatusCode(string code) => code switch
     {
         // 404 Not Found
-        BookErrorCodes.BookNotFound or 
-        UserErrorCodes.UserNotFound or 
-        UserErrorCodes.RefreshTokenNotFound => StatusCodes.Status404NotFound,
+        BookErrorCodes.BookNotFound => StatusCodes.Status404NotFound,
         
         // 401 Unauthorized
+        UserErrorCodes.UserNotFound or
         BookErrorCodes.AccessDenied or 
         UserErrorCodes.Unauthorized or 
-        UserErrorCodes.RefreshTokenExpired or 
+        UserErrorCodes.RefreshTokenExpired or
+        UserErrorCodes.RefreshTokenNotFound  or
         UserErrorCodes.RefreshTokenRevoked or
         UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
         

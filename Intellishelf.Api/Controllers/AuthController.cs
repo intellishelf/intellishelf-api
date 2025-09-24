@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 namespace Intellishelf.Api.Controllers;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = $"{AuthConfig.CookieScheme}, {GoogleDefaults.AuthenticationScheme}")]
+[Authorize]
 [Route("auth")]
 public class AuthController(
     IUserMapper mapper,
