@@ -8,11 +8,13 @@ public static class DbModule
 {
     public static void Register(IHostApplicationBuilder builder)
     {
-        builder.Services.Configure<DatabaseConfig>(
-            builder.Configuration.GetSection(DatabaseConfig.SectionName));
+        var dbSections = builder
+            .Configuration
+            .GetSection(DatabaseConfig.SectionName);
 
-        var dbOptions = builder.Configuration
-            .GetSection(DatabaseConfig.SectionName)
+        builder.Services.Configure<DatabaseConfig>(dbSections);
+
+        var dbOptions = dbSections
             .Get<DatabaseConfig>() ?? throw new InvalidOperationException("Database configuration is missing");
 
         var mongoClient = new MongoClient(dbOptions.ConnectionString);

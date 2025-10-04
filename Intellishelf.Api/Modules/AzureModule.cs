@@ -8,11 +8,11 @@ public static class AzureModule
 {
     public static void Register(IHostApplicationBuilder builder)
     {
-        builder.Services.Configure<AzureConfig>(
-            builder.Configuration.GetSection(AzureConfig.SectionName));
+        var azureSection = builder.Configuration.GetSection(AzureConfig.SectionName);
 
-        var azureConfig = builder.Configuration
-            .GetSection(AzureConfig.SectionName)
+        builder.Services.Configure<AzureConfig>(azureSection);
+
+        var azureConfig = azureSection
             .Get<AzureConfig>() ?? throw new InvalidOperationException("Azure configuration is missing");
 
         builder.Services.AddSingleton(_ =>

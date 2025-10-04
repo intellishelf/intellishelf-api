@@ -8,11 +8,11 @@ public static class AiModule
 {
     public static void Register(IHostApplicationBuilder builder)
     {
-        builder.Services.Configure<AiConfig>(
-            builder.Configuration.GetSection(AiConfig.SectionName));
+        var aiSection = builder.Configuration.GetSection(AiConfig.SectionName);
 
-        var aiConfig = builder.Configuration
-            .GetSection(AiConfig.SectionName)
+        builder.Services.Configure<AiConfig>(aiSection);
+
+        var aiConfig = aiSection
             .Get<AiConfig>() ?? throw new InvalidOperationException("AI configuration is missing");
 
         builder.Services.AddSingleton(_ => new ChatClient("gpt-4o-mini", aiConfig.OpenAiApiKey));
