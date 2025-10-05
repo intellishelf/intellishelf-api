@@ -10,7 +10,7 @@ namespace Intellishelf.Data.Users.DataAccess;
 
 public class UserDao(IMongoDatabase database, IUserMapper mapper) : IUserDao
 {
-    private readonly IMongoCollection<UserEntity> _usersCollection = database.GetCollection<UserEntity>("Users");
+    private readonly IMongoCollection<UserEntity> _usersCollection = database.GetCollection<UserEntity>(UserEntity.CollectionName);
 
     public async Task<TryResult<User>> TryFindByIdAsync(string id)
     {

@@ -2,11 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json.Serialization;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
 using Intellishelf.Domain.Users.ErrorCodes;
+using Intellishelf.Domain.Users.Helpers;
 using Intellishelf.Domain.Users.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -22,17 +22,20 @@ public class AuthService(
     public async Task<TryResult<User>> TryFindByIdAsync(string id) =>
         await userDao.TryFindByIdAsync(id);
 
-    public async Task<TryResult<LoginResult>> TryRegisterAsync(RegisterUserRequest request)
+    public async Task<TryResult<LoginResult>> TryRegisterAsync(string email, string password)
     {
-        var existingUserResult = await userDao.TryFindByEmailAsync(request.Email);
+        var existingUserResult = await userDao.TryUserExists(email);
 
-        if (existingUserResult.IsSuccess || existingUserResult.Error.Code != UserErrorCodes.UserNotFound)
-            return new Error(UserErrorCodes.AlreadyExists, $"User with email {request.Email} already exists.");
+        if (!existingUserResult.IsSuccess)
+            return existingUserResult.Error;
 
-        CreatePasswordHash(request.Password, out var passwordHash, out var passwordSalt);
+        if (existingUserResult.Value)
+            return new Error(UserErrorCodes.AlreadyExists, $"User with email {email} already exists.");
+
+        var (passwordHash, passwordSalt) = AuthHelper.CreatePasswordHash(password);
 
         var result = await userDao.TryAdd(new NewUser(
-            Email: request.Email,
+            Email: email,
             PasswordHash: passwordHash,
             PasswordSalt: passwordSalt,
             AuthProvider: AuthProvider.Email));
@@ -58,7 +61,7 @@ public class AuthService(
         if (user.PasswordHash == null || user.PasswordSalt == null)
             return new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
 
-        var verifyHashResult = VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
+        var verifyHashResult = AuthHelper.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
 
         if (!verifyHashResult)
             return new Error(UserErrorCodes.Unauthorized, "Invalid credentials.");
@@ -202,19 +205,5 @@ public class AuthService(
             IsRevoked: false,
             CreatedAt: DateTime.UtcNow
         );
-    }
-
-    private static void CreatePasswordHash(string password, out string hash, out string salt)
-    {
-        using var hmac = new HMACSHA512();
-        salt = Convert.ToBase64String(hmac.Key);
-        hash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
-    }
-
-    private static bool VerifyPasswordHash(string password, string storedHash, string storedSalt)
-    {
-        using var hmac = new HMACSHA512(Convert.FromBase64String(storedSalt));
-        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return computedHash.SequenceEqual(Convert.FromBase64String(storedHash));
     }
 }

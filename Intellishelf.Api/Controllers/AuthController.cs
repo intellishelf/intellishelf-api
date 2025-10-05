@@ -23,11 +23,11 @@ public class AuthController(
 {
     private readonly AuthConfig _authConfig = authOptions.Value;
 
-    [HttpPost("login")]
+    [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<ActionResult<LoginResultContract>> Login([FromBody] LoginRequestContract loginRequest)
+    public async Task<ActionResult<LoginResultContract>> Register([FromBody] RegisterUserRequestContract registerRequest)
     {
-        var result = await authService.TrySignInAsync(mapper.MapLoginRequest(loginRequest));
+        var result = await authService.TryRegisterAsync(registerRequest.Email, registerRequest.Password);
 
         if (!result.IsSuccess)
             return HandleErrorResponse(result.Error);
@@ -37,11 +37,11 @@ public class AuthController(
         return Ok(mapper.MapLoginResult(result.Value));
     }
 
-    [HttpPost("register")]
+    [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult> Register([FromBody] RegisterUserRequestContract registerRequest)
+    public async Task<ActionResult<LoginResultContract>> Login([FromBody] LoginRequestContract loginRequest)
     {
-        var result = await authService.TryRegisterAsync(mapper.MapRegisterUserRequest(registerRequest));
+        var result = await authService.TrySignInAsync(mapper.MapLoginRequest(loginRequest));
 
         if (!result.IsSuccess)
             return HandleErrorResponse(result.Error);

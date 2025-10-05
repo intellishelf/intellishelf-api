@@ -13,9 +13,6 @@ public class UserMapper : IUserMapper
 
     public UserResponseContract MapUser(User contract) =>
         new(contract.Id, contract.Email);
-
-    public RegisterUserRequest MapRegisterUserRequest(RegisterUserRequestContract contract) =>
-        new(contract.Email, contract.Password);
         
     public RefreshTokenRequest MapRefreshTokenRequest(RefreshTokenRequestContract contract) =>
         new(contract.RefreshToken);

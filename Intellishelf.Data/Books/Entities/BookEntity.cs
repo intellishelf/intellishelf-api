@@ -3,11 +3,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Intellishelf.Data.Books.Entities;
 
-public class BookEntity
+public class BookEntity : EntityBase
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; init; } = null!;
+    public const string CollectionName = "Books";
 
     [BsonRepresentation(BsonType.ObjectId)]
     public required string UserId { get; init; }

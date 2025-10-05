@@ -4,11 +4,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Intellishelf.Data.Users.Entities;
 
-public class UserEntity
+public class UserEntity : EntityBase
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; init; } = null!;
+    public static string CollectionName => "Users";
 
     public required string Email { get; init; }
 

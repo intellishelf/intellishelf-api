@@ -16,8 +16,8 @@ internal class TestAuthHandler(
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "123"),
-            new Claim(ClaimTypes.Email, "test@example.com")
+            new Claim(ClaimTypes.NameIdentifier, "67ce0050034e9ade4072526d"),
+            new Claim(ClaimTypes.Email, "test@intellishelf.com")
         };
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);

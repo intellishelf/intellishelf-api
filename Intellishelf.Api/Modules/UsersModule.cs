@@ -14,11 +14,11 @@ public static class UsersModule
 {
     public static void Register(IHostApplicationBuilder builder)
     {
-        builder.Services.Configure<AuthConfig>(
-            builder.Configuration.GetSection(AuthConfig.SectionName));
+        var authSection = builder.Configuration.GetSection(AuthConfig.SectionName);
 
-        var authConfig = builder.Configuration
-            .GetSection(AuthConfig.SectionName)
+        builder.Services.Configure<AuthConfig>(authSection);
+
+        var authConfig = authSection
             .Get<AuthConfig>() ?? throw new InvalidOperationException("Auth configuration is missing");
 
         builder.Services

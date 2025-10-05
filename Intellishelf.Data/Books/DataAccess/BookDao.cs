@@ -10,7 +10,7 @@ namespace Intellishelf.Data.Books.DataAccess;
 
 public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookDao
 {
-    private readonly IMongoCollection<BookEntity> _booksCollection = database.GetCollection<BookEntity>("Books");
+    private readonly IMongoCollection<BookEntity> _booksCollection = database.GetCollection<BookEntity>(BookEntity.CollectionName);
 
     public async Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId)
     {
@@ -22,7 +22,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         return result;
     }
-    
+
     public async Task<TryResult<PagedResult<Book>>> GetPagedBooksAsync(string userId, BookQueryParameters queryParameters)
     {
         var filter = Builders<BookEntity>.Filter.Eq(b => b.UserId, userId);

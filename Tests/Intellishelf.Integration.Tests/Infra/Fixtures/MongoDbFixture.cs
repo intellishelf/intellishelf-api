@@ -2,7 +2,7 @@ using MongoDB.Driver;
 using Testcontainers.MongoDb;
 using Xunit;
 
-namespace Intellishelf.Integration.Tests.Infra;
+namespace Intellishelf.Integration.Tests.Infra.Fixtures;
 
 public class MongoDbFixture : IAsyncLifetime
 {
