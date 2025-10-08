@@ -13,7 +13,7 @@ public static class AzureModule
         builder.Services.Configure<AzureConfig>(azureSection);
 
         var azureConfig = azureSection
-            .Get<AzureConfig>() ?? throw new InvalidOperationException("Azure configuration is missing");
+            .Get<AzureConfig>() ?? throw new InvalidOperationException("Azure  configuration is missing");
 
         builder.Services.AddSingleton(_ =>
             new BlobContainerClient(azureConfig.StorageConnectionString, azureConfig.StorageContainer));

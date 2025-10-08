@@ -14,14 +14,10 @@ internal class TestAuthHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, "67ce0050034e9ade4072526d"),
-            new Claim(ClaimTypes.Email, "test@intellishelf.com")
-        };
-        var identity = new ClaimsIdentity(claims, "Test");
+        var claims = DefaultTestUsers.Authenticated.ToClaims();
+        var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, "Test");
+        var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }

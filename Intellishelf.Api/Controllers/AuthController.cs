@@ -92,7 +92,6 @@ public class AuthController(
 
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
-            ClearRefreshCookie();
             return NoContent();
         }
 

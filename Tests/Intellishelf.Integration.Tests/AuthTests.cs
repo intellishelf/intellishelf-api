@@ -1,9 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using Intellishelf.Api.Contracts.Auth;
-using Intellishelf.Data.Users.Entities;
-using Intellishelf.Domain.Users.Helpers;
-using Intellishelf.Domain.Users.Models;
 using Intellishelf.Integration.Tests.Infra;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +9,14 @@ using Xunit;
 namespace Intellishelf.Integration.Tests;
 
 [Collection("Integration Tests")]
-public sealed class AuthTests : IDisposable
+public sealed class AuthTests : IAsyncLifetime, IDisposable
 {
     private readonly TestWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private readonly MongoDbFixture _mongoDbFixture;
 
-    private const string TestUserEmail = "user@test.com";
-    private const string TestUserPassword = "SecurePassword123!";
+    private static readonly DefaultTestUsers.TestUser DefaultUser = DefaultTestUsers.Authenticated;
+    private const string WeakPassword = "123";
 
     public AuthTests(MongoDbFixture mongoDbFixture, AzuriteFixture azuriteFixture)
     {
@@ -28,11 +25,15 @@ public sealed class AuthTests : IDisposable
         _mongoDbFixture = mongoDbFixture;
     }
 
+    public Task InitializeAsync() => _mongoDbFixture.SeedDefaultUserAsync();
+
+    public Task DisposeAsync() => Task.CompletedTask;
+
     [Fact]
     private async Task GivenValidUserData_WhenRegisteringUser_ThenUserIsCreated()
     {
         // Arrange
-        var registerRequest = new RegisterUserRequestContract("newuser@test.com", TestUserPassword);
+        var registerRequest = new RegisterUserRequestContract("newuser@test.com", DefaultUser.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
@@ -47,7 +48,7 @@ public sealed class AuthTests : IDisposable
     private async Task GivenInvalidUserData_WhenRegisteringUser_ThenErrorIsReturned()
     {
         // Arrange
-        var registerRequest = new RegisterUserRequestContract(TestUserEmail, "123");
+        var registerRequest = new RegisterUserRequestContract(DefaultUser.Email, WeakPassword);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
@@ -62,7 +63,7 @@ public sealed class AuthTests : IDisposable
     private async Task GivenNonExistingUser_WhenTryToLogin_ThenUnauthorized()
     {
         // Arrange
-        var loginRequest = new LoginRequestContract("nonexistinguser@test.com", TestUserPassword);
+        var loginRequest = new LoginRequestContract("nonexistinguser@test.com", DefaultUser.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
@@ -75,20 +76,7 @@ public sealed class AuthTests : IDisposable
     private async Task GivenExistingUser_WhenTryToLogin_ThenAuthorized()
     {
         // Arrange
-        var (hash, salt) = AuthHelper.CreatePasswordHash(TestUserPassword);
-
-        await _mongoDbFixture
-            .Database
-            .GetCollection<UserEntity>(UserEntity.CollectionName)
-            .InsertOneAsync(new UserEntity
-            {
-                AuthProvider = AuthProvider.Email,
-                Email = TestUserEmail,
-                PasswordHash = hash,
-                PasswordSalt = salt
-            });
-
-        var loginRequest = new LoginRequestContract(TestUserEmail, TestUserPassword);
+        var loginRequest = new LoginRequestContract(DefaultUser.Email, DefaultUser.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
@@ -97,6 +85,22 @@ public sealed class AuthTests : IDisposable
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var responseContent = await response.Content.ReadFromJsonAsync<LoginResultContract>();
         Assert.NotNull(responseContent?.AccessToken);
+    }
+
+    [Fact]
+    private async Task GivenAuthenticatedUser_WhenRequestingProfile_ThenUserDetailsReturned()
+    {
+        // Arrange
+        // Act
+        var response = await _client.GetAsync("/api/auth/me");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var responseContent = await response.Content.ReadFromJsonAsync<UserResponseContract>();
+        Assert.NotNull(responseContent);
+        Assert.Equal(DefaultUser.Id, responseContent.Id);
+        Assert.Equal(DefaultUser.Email, responseContent.Email);
     }
 
     public void Dispose() => _factory.Dispose();
