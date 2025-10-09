@@ -14,8 +14,6 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
     private readonly TestWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private readonly MongoDbFixture _mongoDbFixture;
-
-    private static readonly DefaultTestUsers.TestUser DefaultUser = DefaultTestUsers.Authenticated;
     private const string WeakPassword = "123";
 
     public AuthTests(MongoDbFixture mongoDbFixture, AzuriteFixture azuriteFixture)
@@ -25,15 +23,11 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         _mongoDbFixture = mongoDbFixture;
     }
 
-    public Task InitializeAsync() => _mongoDbFixture.SeedDefaultUserAsync();
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
     [Fact]
     private async Task GivenValidUserData_WhenRegisteringUser_ThenUserIsCreated()
     {
         // Arrange
-        var registerRequest = new RegisterUserRequestContract("newuser@test.com", DefaultUser.Password);
+        var registerRequest = new RegisterUserRequestContract("newuser@test.com", DefaultTestUsers.Authenticated.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
@@ -48,7 +42,7 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
     private async Task GivenInvalidUserData_WhenRegisteringUser_ThenErrorIsReturned()
     {
         // Arrange
-        var registerRequest = new RegisterUserRequestContract(DefaultUser.Email, WeakPassword);
+        var registerRequest = new RegisterUserRequestContract(DefaultTestUsers.Authenticated.Email, WeakPassword);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
@@ -63,7 +57,7 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
     private async Task GivenNonExistingUser_WhenTryToLogin_ThenUnauthorized()
     {
         // Arrange
-        var loginRequest = new LoginRequestContract("nonexistinguser@test.com", DefaultUser.Password);
+        var loginRequest = new LoginRequestContract("nonexistinguser@test.com", DefaultTestUsers.Authenticated.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
@@ -76,7 +70,7 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
     private async Task GivenExistingUser_WhenTryToLogin_ThenAuthorized()
     {
         // Arrange
-        var loginRequest = new LoginRequestContract(DefaultUser.Email, DefaultUser.Password);
+        var loginRequest = new LoginRequestContract(DefaultTestUsers.Authenticated.Email, DefaultTestUsers.Authenticated.Password);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
@@ -99,9 +93,12 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
 
         var responseContent = await response.Content.ReadFromJsonAsync<UserResponseContract>();
         Assert.NotNull(responseContent);
-        Assert.Equal(DefaultUser.Id, responseContent.Id);
-        Assert.Equal(DefaultUser.Email, responseContent.Email);
+        Assert.Equal(DefaultTestUsers.Authenticated.Id, responseContent.Id);
+        Assert.Equal(DefaultTestUsers.Authenticated.Email, responseContent.Email);
     }
 
     public void Dispose() => _factory.Dispose();
+
+    public Task DisposeAsync() => Task.CompletedTask;
+    public Task InitializeAsync() => _mongoDbFixture.SeedDefaultUserAsync();
 }

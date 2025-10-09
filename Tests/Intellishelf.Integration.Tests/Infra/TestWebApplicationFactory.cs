@@ -1,5 +1,6 @@
 using Intellishelf.Api.Configuration;
 using Intellishelf.Domain.Users.Config;
+using Intellishelf.Integration.Tests;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -28,7 +29,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
                     [$"{AuthConfig.SectionName}:Google:ClientSecret"] = "fake",
                     [$"{AiConfig.SectionName}:OpenAiApiKey"] = "fake",
                     [$"{AzureConfig.SectionName}:StorageConnectionString"] = azuriteFixture.ConnectionString,
-                    [$"{AzureConfig.SectionName}:StorageContainer"] = "fake",
+                    [$"{AzureConfig.SectionName}:StorageContainer"] = TestConstants.StorageContainerName,
                     [$"{AuthConfig.SectionName}:Key"] = "1234567890123456789012345678901234567890"
                 };
                 cfg.AddInMemoryCollection(testConfig);

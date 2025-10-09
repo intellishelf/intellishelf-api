@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Testcontainers.Azurite;
 using Xunit;
 
@@ -20,5 +21,37 @@ public class AzuriteFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _azuriteContainer.DisposeAsync();
+    }
+
+    public async Task<string> SeedBlobAsync(string blobPath, byte[] content)
+    {
+        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName);
+        await containerClient.CreateIfNotExistsAsync();
+
+        using var stream = new MemoryStream(content);
+        var blobClient = containerClient.GetBlobClient(blobPath);
+        await blobClient.UploadAsync(stream, overwrite: true);
+
+        return blobClient.Uri.ToString();
+    }
+
+    public async Task<bool> BlobExistsAsync(string blobPath)
+    {
+        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName);
+        var blobClient = containerClient.GetBlobClient(blobPath);
+        var exists = await blobClient.ExistsAsync();
+        return exists.Value;
+    }
+
+    public Task<bool> BlobExistsFromUrlAsync(string blobUrl)
+    {
+        var blobPath = GetBlobPathFromUrl(blobUrl);
+        return BlobExistsAsync(blobPath);
+    }
+
+    private static string GetBlobPathFromUrl(string blobUrl)
+    {
+        var builder = new BlobUriBuilder(new Uri(blobUrl));
+        return builder.BlobName;
     }
 }

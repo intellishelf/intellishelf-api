@@ -44,11 +44,8 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
 
     private string ExtractBlobPathFromUrl(string url)
     {
-        var uri = new Uri(url);
-        // Extract path after container name
-        // URL format: https://storage.blob.core.windows.net/container/userFiles/userId/filename.jpg
-        var segments = uri.AbsolutePath.TrimStart('/').Split('/');
-        return string.Join("/", segments.Skip(1)); // Skip container name
+        var builder = new BlobUriBuilder(new Uri(url));
+        return builder.BlobName;
     }
 
     private static string GetUserFilePath(string userId, string fileName) => $"userFiles/{userId}/{fileName}";

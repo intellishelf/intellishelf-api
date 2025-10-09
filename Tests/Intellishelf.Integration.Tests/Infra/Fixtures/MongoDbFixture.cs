@@ -1,6 +1,5 @@
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
-using Intellishelf.Integration.Tests.Infra;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 using Xunit;
@@ -25,14 +24,12 @@ public class MongoDbFixture : IAsyncLifetime
         Database = client.GetDatabase("intellishelf-test");
     }
 
-    public async Task DisposeAsync()
-    {
+    public async Task DisposeAsync() =>
         await _mongoContainer.DisposeAsync();
-    }
 
     private Task SeedUserAsync(UserEntity user)
     {
-        var collection = Database.GetCollection<UserEntity>(UserEntity.CollectionName);
+        var collection = Database!.GetCollection<UserEntity>(UserEntity.CollectionName);
         return collection.ReplaceOneAsync(
             u => u.Id == user.Id,
             user,
@@ -41,20 +38,12 @@ public class MongoDbFixture : IAsyncLifetime
 
     public Task SeedDefaultUserAsync() => SeedUserAsync(DefaultTestUsers.Authenticated.ToEntity());
 
-    public async Task SeedBooksAsync(params BookEntity[] books)
-    {
-        if (books.Length == 0)
-        {
-            return;
-        }
+    public async Task SeedBooksAsync(params BookEntity[] books) =>
+        await Database.GetCollection<BookEntity>(BookEntity.CollectionName).InsertManyAsync(books);
 
-        var collection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
-        await collection.InsertManyAsync(books);
-    }
+    public async Task ClearBooksAsync() =>
+        await Database.GetCollection<BookEntity>(BookEntity.CollectionName).DeleteManyAsync(FilterDefinition<BookEntity>.Empty);
 
-    public Task ClearBooksAsync()
-    {
-        var books = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
-        return books.DeleteManyAsync(FilterDefinition<BookEntity>.Empty);
-    }
+    public async Task<BookEntity?> FindBookByIdAsync(string bookId) =>
+        await Database.GetCollection<BookEntity>(BookEntity.CollectionName).Find(b => b.Id == bookId).FirstOrDefaultAsync();
 }
