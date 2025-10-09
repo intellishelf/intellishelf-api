@@ -226,6 +226,51 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
+    private async Task GivenUnsupportedImageFile_WhenPostNewBook_ThenReturnsBadRequest()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Invalid Cover Book"), "Title");
+        content.Add(new StringContent("Author"), "Authors[0]");
+
+        var invalidFile = new ByteArrayContent("pdf"u8.ToArray());
+        invalidFile.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        content.Add(invalidFile, "ImageFile", "cover.pdf");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.Equal(FileErrorCodes.InvalidFileType, problem.Type);
+    }
+
+    [Fact]
+    private async Task GivenTooLargeImageFile_WhenPostNewBook_ThenReturnsBadRequest()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Large Cover Book"), "Title");
+        content.Add(new StringContent("Author"), "Authors[0]");
+
+        var oversizedBytes = new byte[3 * 1024 * 1024 + 1];
+        var oversizedContent = new ByteArrayContent(oversizedBytes);
+        oversizedContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        content.Add(oversizedContent, "ImageFile", "cover.jpg");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.Equal(FileErrorCodes.FileTooLarge, problem.Type);
+    }
+
+    [Fact]
     private async Task GivenExistingBook_WhenDeleteBook_ThenRemovesBookAndCoverImage()
     {
         // Arrange

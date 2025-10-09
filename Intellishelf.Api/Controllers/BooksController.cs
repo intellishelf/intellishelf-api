@@ -1,5 +1,6 @@
 using Intellishelf.Api.Contracts.Books;
 using Intellishelf.Api.Mappers.Books;
+using Intellishelf.Api.Validators;
 using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
@@ -16,7 +17,8 @@ public class BooksController(
     IBookMapper mapper,
     IAiService aiService,
     IBookService bookService,
-    IFileStorageService fileStorageService) : ApiControllerBase
+    IFileStorageService fileStorageService,
+    IImageFileValidator imageFileValidator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<Book>>> GetBooks([FromQuery] BookQueryParameters queryParameters)
@@ -49,6 +51,10 @@ public class BooksController(
         string? coverImageUrl = null;
         if (contract.ImageFile != null)
         {
+            var validationResult = imageFileValidator.Validate(contract.ImageFile);
+            if (!validationResult.IsSuccess)
+                return HandleErrorResponse(validationResult.Error);
+
             var uploadResult = await fileStorageService.UploadFileAsync(
                 CurrentUserId,
                 contract.ImageFile.OpenReadStream(),
@@ -73,12 +79,18 @@ public class BooksController(
         string? coverImageUrl = null;
         if (contract.ImageFile != null)
         {
+            var validationResult = imageFileValidator.Validate(contract.ImageFile);
+            if (!validationResult.IsSuccess)
+                return HandleErrorResponse(validationResult.Error);
+
             var uploadResult = await fileStorageService.UploadFileAsync(
                 CurrentUserId,
                 contract.ImageFile.OpenReadStream(),
                 contract.ImageFile.FileName);
+
             if (!uploadResult.IsSuccess)
                 return HandleErrorResponse(uploadResult.Error);
+
             coverImageUrl = uploadResult.Value;
         }
 

@@ -4,6 +4,7 @@ using Intellishelf.Domain.Ai.Errors;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Files.ErrorCodes;
 using Intellishelf.Domain.Users.ErrorCodes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Intellishelf.Api.Controllers;
@@ -28,7 +29,11 @@ public abstract class ApiControllerBase : ControllerBase
         
         // 409 Conflict
         UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,
-        
+
+        // 400 Bad Request
+        FileErrorCodes.InvalidFileType or
+        FileErrorCodes.FileTooLarge => StatusCodes.Status400BadRequest,
+
         // 500 Internal Server Error
         FileErrorCodes.UploadFailed or 
         FileErrorCodes.DeletionFailed or 

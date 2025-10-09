@@ -1,4 +1,5 @@
 using Intellishelf.Api.Mappers.Books;
+using Intellishelf.Api.Validators;
 using Intellishelf.Data.Books.DataAccess;
 using Intellishelf.Data.Books.Mappers;
 using Intellishelf.Domain.Books.DataAccess;
@@ -14,5 +15,6 @@ public static class BooksModule
         services.AddSingleton<IBookMapper, BookMapper>();
         services.AddTransient<IBookDao, BookDao>();
         services.AddTransient<IBookService, BookService>();
+        services.AddSingleton<IImageFileValidator, ImageFileValidator>();
     }
 }
