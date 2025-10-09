@@ -1,16 +1,14 @@
-using System.IO;
-using Intellishelf.Api.Services;
-using Intellishelf.Api.Validators;
+using Intellishelf.Api.ImageProcessing;
 using Intellishelf.Domain.Files.ErrorCodes;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace Intellishelf.Unit.Tests.Files;
+namespace Intellishelf.Unit.Tests.ImageProcessing;
 
 public class ImageFileValidatorTests
 {
-    private const int ThreeMegabytes = 3 * 1024 * 1024;
-    private readonly IImageFileValidator _validator = new ImageFileValidator();
+    private const int TenMegabytes = 10 * 1024 * 1024;
+    private readonly ImageFileValidator _validator = new();
 
     [Fact]
     public void Validate_WithValidJpegUnderLimit_ReturnsSuccess()
@@ -36,7 +34,7 @@ public class ImageFileValidatorTests
     [Fact]
     public void Validate_WithTooLargeFile_ReturnsFileTooLarge()
     {
-        var file = CreateFormFile("cover.jpg", "image/jpeg", ThreeMegabytes + 1);
+        var file = CreateFormFile("cover.jpg", "image/jpeg", TenMegabytes + 1);
 
         var result = _validator.Validate(file);
 

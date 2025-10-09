@@ -45,13 +45,7 @@ public class AzuriteFixture : IAsyncLifetime
 
     public Task<bool> BlobExistsFromUrlAsync(string blobUrl)
     {
-        var blobPath = GetBlobPathFromUrl(blobUrl);
-        return BlobExistsAsync(blobPath);
-    }
-
-    private static string GetBlobPathFromUrl(string blobUrl)
-    {
         var builder = new BlobUriBuilder(new Uri(blobUrl));
-        return builder.BlobName;
+        return BlobExistsAsync(builder.BlobName);
     }
 }

@@ -26,4 +26,10 @@
         <PackageReference Include="Testcontainers.Azurite" Version="3.8.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="Infra\Fixtures\sample.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

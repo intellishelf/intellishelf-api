@@ -1,7 +1,7 @@
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Files.ErrorCodes;
 
-namespace Intellishelf.Api.Validators;
+namespace Intellishelf.Api.ImageProcessing;
 
 public interface IImageFileValidator
 {
@@ -10,24 +10,20 @@ public interface IImageFileValidator
 
 public sealed class ImageFileValidator : IImageFileValidator
 {
-    private const long MaxFileSizeBytes = 3 * 1024 * 1024; // 3 MB
+    private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
 
     private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
         "image/jpg",
-        "image/png",
-        "image/gif",
-        "image/webp"
+        "image/png"
     };
 
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
         ".jpeg",
-        ".png",
-        ".gif",
-        ".webp"
+        ".png"
     };
 
     public TryResult Validate(IFormFile file)
@@ -39,7 +35,7 @@ public sealed class ImageFileValidator : IImageFileValidator
 
         if (file.Length > MaxFileSizeBytes)
         {
-            return new Error(FileErrorCodes.FileTooLarge, "Cover image must be 3 MB or smaller.");
+            return new Error(FileErrorCodes.FileTooLarge, "Cover image must be 10 MB or smaller.");
         }
 
         var contentTypeAllowed = !string.IsNullOrWhiteSpace(file.ContentType) && AllowedContentTypes.Contains(file.ContentType);
@@ -48,7 +44,7 @@ public sealed class ImageFileValidator : IImageFileValidator
 
         if (!contentTypeAllowed || !extensionAllowed)
         {
-            return new Error(FileErrorCodes.InvalidFileType, "Only images are supported.");
+            return new Error(FileErrorCodes.InvalidFileType, $"Only images are supported.");
         }
 
         return TryResult.Success();

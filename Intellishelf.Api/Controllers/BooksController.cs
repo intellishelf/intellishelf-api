@@ -1,6 +1,7 @@
 using Intellishelf.Api.Contracts.Books;
+using Intellishelf.Api.ImageProcessing;
 using Intellishelf.Api.Mappers.Books;
-using Intellishelf.Api.Validators;
+using Intellishelf.Api.Services;
 using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
@@ -18,7 +19,8 @@ public class BooksController(
     IAiService aiService,
     IBookService bookService,
     IFileStorageService fileStorageService,
-    IImageFileValidator imageFileValidator) : ApiControllerBase
+    IImageFileValidator imageFileValidator,
+    IImageFileProcessor imageFileProcessor) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<Book>>> GetBooks([FromQuery] BookQueryParameters queryParameters)
@@ -55,9 +57,11 @@ public class BooksController(
             if (!validationResult.IsSuccess)
                 return HandleErrorResponse(validationResult.Error);
 
+            await using var processedStream = await imageFileProcessor.ProcessAsync(contract.ImageFile, HttpContext.RequestAborted);
+
             var uploadResult = await fileStorageService.UploadFileAsync(
                 CurrentUserId,
-                contract.ImageFile.OpenReadStream(),
+                processedStream,
                 contract.ImageFile.FileName);
             if (!uploadResult.IsSuccess)
                 return HandleErrorResponse(uploadResult.Error);
@@ -83,9 +87,11 @@ public class BooksController(
             if (!validationResult.IsSuccess)
                 return HandleErrorResponse(validationResult.Error);
 
+            await using var processedStream = await imageFileProcessor.ProcessAsync(contract.ImageFile, HttpContext.RequestAborted);
+
             var uploadResult = await fileStorageService.UploadFileAsync(
                 CurrentUserId,
-                contract.ImageFile.OpenReadStream(),
+                processedStream,
                 contract.ImageFile.FileName);
 
             if (!uploadResult.IsSuccess)

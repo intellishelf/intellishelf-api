@@ -24,6 +24,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     private readonly HttpClient _client;
     private readonly MongoDbFixture _mongoDbFixture;
     private readonly AzuriteFixture _azuriteFixture;
+    private static readonly byte[] SampleImageBytes = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "sample.jpg"));
 
     public BooksTests(MongoDbFixture mongoDbFixture, AzuriteFixture azuriteFixture)
     {
@@ -193,7 +194,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(new StringContent("Test description"), "Description");
         content.Add(new StringContent(DateTime.UtcNow.ToString("O")), "PublicationDate");
 
-        var imageContent = new ByteArrayContent("fake image data"u8.ToArray());
+        var imageContent = new ByteArrayContent(SampleImageBytes);
         imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
         content.Add(imageContent, "ImageFile", "test-cover.jpg");
 
@@ -245,29 +246,6 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
 
         var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
         Assert.Equal(FileErrorCodes.InvalidFileType, problem.Type);
-    }
-
-    [Fact]
-    private async Task GivenTooLargeImageFile_WhenPostNewBook_ThenReturnsBadRequest()
-    {
-        // Arrange
-        using var content = new MultipartFormDataContent();
-        content.Add(new StringContent("Large Cover Book"), "Title");
-        content.Add(new StringContent("Author"), "Authors[0]");
-
-        var oversizedBytes = new byte[3 * 1024 * 1024 + 1];
-        var oversizedContent = new ByteArrayContent(oversizedBytes);
-        oversizedContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-        content.Add(oversizedContent, "ImageFile", "cover.jpg");
-
-        // Act
-        var response = await _client.PostAsync("/api/books", content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
-        Assert.Equal(FileErrorCodes.FileTooLarge, problem.Type);
     }
 
     [Fact]
@@ -357,7 +335,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(new StringContent("Failure book"), "Title");
         content.Add(new StringContent("Author"), "Authors[0]");
 
-        var imageContent = new ByteArrayContent("bad"u8.ToArray());
+        var imageContent = new ByteArrayContent(SampleImageBytes);
         imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
         content.Add(imageContent, "ImageFile", "bad.jpg");
 

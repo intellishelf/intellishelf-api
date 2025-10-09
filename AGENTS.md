@@ -12,7 +12,12 @@ Intellishelf.Api hosts the ASP.NET Core entry point and feature modules in `Cont
 - `docker-compose up intellishelf-api` is optional for local manual testing; automated suites rely on Testcontainers instead.
 
 ## Coding Style & Naming Conventions
-Stick to .NET defaults: 4-space indentation, braces on new lines for types, expression-bodied members when clearer. Use `PascalCase` for public types and members, `camelCase` locals, `_camelCase` private fields. Keep single-responsibility files and place API contracts under `Intellishelf.Api/Contracts`. Run `dotnet format` before a PR.
+- Stick to .NET defaults: 4-space indentation, file-scoped namespaces, and braces on new lines for types/methods. Favour expression-bodied members when they keep intent obvious.
+- Rely on primary constructors for services, controllers, records, and simple data carriers whenever dependency injection is straightforward. Fall back to explicit constructors only when additional setup logic is required.
+- Use `PascalCase` for public types and members, `camelCase` for locals/parameters, and `_camelCase` for private fields. Mark fields `readonly` whenever viable.
+- Keep single-responsibility files; place API contracts under `Intellishelf.Api/Contracts` and cross-cutting helpers in the shared projects (`Intellishelf.Common`, etc.).
+- Mirror existing nullability annotations, prefer guard clauses over deep nesting, and favour immutability (records or `init` properties) for DTOs.
+- Run `dotnet format` before pushing or raising a PR to enforce analyzers and style rules.
 
 ## Error Handling
 Service and DAO layers return `TryResult<T>` from `Intellishelf.Common.TryResult` to model success and rich errors. Prefer propagating the `Error` payload rather than throwing; controllers convert errors into `ProblemDetails` responses with explicit status codes so API clients get actionable messages.
