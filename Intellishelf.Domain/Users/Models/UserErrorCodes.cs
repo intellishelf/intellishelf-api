@@ -1,4 +1,4 @@
-namespace Intellishelf.Domain.Users.ErrorCodes;
+namespace Intellishelf.Domain.Users.Models;
 
 public static class UserErrorCodes
 {

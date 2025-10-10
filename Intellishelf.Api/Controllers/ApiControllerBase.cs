@@ -3,8 +3,7 @@ using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Ai.Errors;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Files.ErrorCodes;
-using Intellishelf.Domain.Users.ErrorCodes;
-using Microsoft.AspNetCore.Http;
+using Intellishelf.Domain.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Intellishelf.Api.Controllers;

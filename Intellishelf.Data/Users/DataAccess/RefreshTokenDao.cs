@@ -2,7 +2,6 @@ using Intellishelf.Common.TryResult;
 using Intellishelf.Data.Users.Entities;
 using Intellishelf.Data.Users.Mappers;
 using Intellishelf.Domain.Users.DataAccess;
-using Intellishelf.Domain.Users.ErrorCodes;
 using Intellishelf.Domain.Users.Models;
 using MongoDB.Driver;
 

@@ -5,7 +5,6 @@ using System.Text;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
-using Intellishelf.Domain.Users.ErrorCodes;
 using Intellishelf.Domain.Users.Helpers;
 using Intellishelf.Domain.Users.Models;
 using Microsoft.Extensions.Options;
