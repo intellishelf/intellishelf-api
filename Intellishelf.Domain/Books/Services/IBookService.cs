@@ -15,5 +15,5 @@ public interface IBookService
 
     Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request);
 
-    Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request);
+    Task<TryResult> TryDeleteBookAsync(string userId, string bookId);
 }

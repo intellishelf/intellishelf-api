@@ -37,10 +37,4 @@ public class BookMapper : IBookMapper
             Tags = contract.Tags,
             CoverImageUrl = coverImageUrl
         };
-
-    public DeleteBookRequest MapDelete(string userId, string bookId) =>
-        new(userId, bookId);
-        
-
-    private static string GetUniqueFileName(string fileName) => $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
 }

@@ -160,9 +160,9 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             : TryResult.Success();
     }
 
-    public async Task<TryResult> DeleteBookAsync(DeleteBookRequest request)
+    public async Task<TryResult> DeleteBookAsync(string userId, string bookId)
     {
-        var result = await _booksCollection.DeleteOneAsync(b => b.Id == request.BookId && b.UserId == request.UserId);
+        var result = await _booksCollection.DeleteOneAsync(b => b.Id == bookId && b.UserId == userId);
 
         return result.DeletedCount == 0
             ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to delete")

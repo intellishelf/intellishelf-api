@@ -111,7 +111,7 @@ public class BooksController(
     [HttpDelete("{bookId}")]
     public async Task<IActionResult> DeleteBook(string bookId)
     {
-        var result = await bookService.TryDeleteBookAsync(mapper.MapDelete(CurrentUserId, bookId));
+        var result = await bookService.TryDeleteBookAsync(CurrentUserId, bookId);
         return result.IsSuccess
             ? NoContent()
             : HandleErrorResponse(result.Error);

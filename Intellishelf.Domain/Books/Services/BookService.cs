@@ -32,15 +32,15 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
         return await bookDao.TryUpdateBookAsync(request);
     }
 
-    public async Task<TryResult> TryDeleteBookAsync(DeleteBookRequest request)
+    public async Task<TryResult> TryDeleteBookAsync(string userId, string bookId)
     {
-        var existingBook = await TryGetBookAsync(request.UserId, request.BookId);
+        var existingBook = await TryGetBookAsync(userId, userId);
 
         if (existingBook.IsSuccess && !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {
             await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
         }
 
-        return await bookDao.DeleteBookAsync(request);
+        return await bookDao.DeleteBookAsync(userId, bookId);
     }
 }
