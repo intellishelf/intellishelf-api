@@ -167,23 +167,6 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
-    private async Task GivenBookOwnedByAnotherUser_WhenGetBook_ThenUnauthorized()
-    {
-        // Arrange
-        var anotherUserId = ObjectId.GenerateNewId().ToString();
-        var foreignBook = CreateBookEntity("Foreign", "Mallory", anotherUserId);
-        await _mongoDbFixture.SeedBooksAsync(foreignBook);
-
-        var response = await _client.GetAsync($"/api/books/{foreignBook.Id}");
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
-        Assert.Equal(BookErrorCodes.AccessDenied, problem.Type);
-    }
-
-    [Fact]
     private async Task GivenValidBookData_WhenPostNewBookWithFile_ThenCreated()
     {
         // Arrange

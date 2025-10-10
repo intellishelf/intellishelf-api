@@ -34,7 +34,7 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
 
     public async Task<TryResult> TryDeleteBookAsync(string userId, string bookId)
     {
-        var existingBook = await TryGetBookAsync(userId, userId);
+        var existingBook = await TryGetBookAsync(userId, bookId);
 
         if (existingBook.IsSuccess && !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
         {

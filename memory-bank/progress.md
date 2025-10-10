@@ -40,6 +40,8 @@
 
 ### Immediate Priorities
 1. **ISBN Search** - External API integration for book lookup
+   1. Add sort title (without the, a, an, hardcoded list of them)
+   2. Use two separate ISBNs
 2. **Integration Tests** - Comprehensive API testing
 3. **Code Quality** - Review and refactor where needed
 

@@ -88,14 +88,11 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
     public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
     {
         var bookEntity = await _booksCollection
-            .Find(b => b.Id == bookId)
+            .Find(b => b.Id == bookId && b.UserId == userId)
             .FirstOrDefaultAsync();
 
         if (bookEntity == null)
             return new Error(BookErrorCodes.BookNotFound, "Book not found");
-
-        if (bookEntity.UserId != userId)
-            return new Error(BookErrorCodes.AccessDenied, "Access denied to this book");
 
         return mapper.Map(bookEntity);
     }
@@ -108,7 +105,8 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Title = request.Title,
             Authors = request.Authors,
             PublicationDate = request.PublicationDate,
-            Isbn = request.Isbn,
+            Isbn10 = request.Isbn10,
+            Isbn13 = request.Isbn13,
             Tags = request.Tags,
             Annotation = request.Annotation,
             Description = request.Description,
@@ -134,7 +132,8 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Builders<BookEntity>.Update.Set(b => b.Title, request.Title),
             Builders<BookEntity>.Update.Set(b => b.Authors, request.Authors),
             Builders<BookEntity>.Update.Set(b => b.PublicationDate, request.PublicationDate),
-            Builders<BookEntity>.Update.Set(b => b.Isbn, request.Isbn),
+            Builders<BookEntity>.Update.Set(b => b.Isbn10, request.Isbn10),
+            Builders<BookEntity>.Update.Set(b => b.Isbn13, request.Isbn13),
             Builders<BookEntity>.Update.Set(b => b.Tags, request.Tags),
             Builders<BookEntity>.Update.Set(b => b.Annotation, request.Annotation),
             Builders<BookEntity>.Update.Set(b => b.Description, request.Description),

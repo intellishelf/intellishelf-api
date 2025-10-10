@@ -19,8 +19,7 @@ public abstract class ApiControllerBase : ControllerBase
         
         // 401 Unauthorized
         UserErrorCodes.UserNotFound or
-        BookErrorCodes.AccessDenied or 
-        UserErrorCodes.Unauthorized or 
+        UserErrorCodes.Unauthorized or
         UserErrorCodes.RefreshTokenExpired or
         UserErrorCodes.RefreshTokenNotFound  or
         UserErrorCodes.RefreshTokenRevoked or

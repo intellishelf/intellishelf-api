@@ -9,7 +9,7 @@ namespace Intellishelf.Domain.Ai.Services;
 public class AiService(ChatClient chatClient) : IAiService
 {
     private const string Prompt =
-        "You are a book page parser. You are given a verso book page which may include all information about book. I want to add it to my personal library. Extract content language, title, authors (via CSV if multiple), publisher, publicationYear, pages, isbn, description. Language of content may be any so find out yourself. Don't translate content, don't rephrase content, just parse. If you can't determine property, set null instead of improvising";
+        "You are a book page parser. You are given a verso book page which may include all information about book. I want to add it to my personal library. Extract content language, title, authors (via CSV if multiple), publisher, publicationYear, pages, isbn10, isbn13, description. Language of content may be any so find out yourself. Don't translate content, don't rephrase content, just parse. If you can't determine property, set null instead of improvising";
 
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
@@ -34,7 +34,10 @@ public class AiService(ChatClient chatClient) : IAiService
                                                      "publisher": {
                                                          "type": ["string", "null"]
                                                      },
-                                                     "isbn": {
+                                                     "isbn10": {
+                                                         "type": ["string", "null"]
+                                                     },
+                                                     "isbn13": {
                                                          "type": ["string", "null"]
                                                      },
                                                      "pages": {
@@ -45,7 +48,7 @@ public class AiService(ChatClient chatClient) : IAiService
                                                      }
                                                  },
                                                  "required": [
-                                                     "title", "authors","publicationYear","publisher","isbn","pages", "description"
+                                                     "title", "authors","publicationYear","publisher","isbn10","isbn13","pages", "description"
                                                  ],
                                                  "additionalProperties": false
                                              }
@@ -63,7 +66,8 @@ public class AiService(ChatClient chatClient) : IAiService
                 Publisher = "Sample Publisher",
                 PublicationYear = DateTime.UtcNow.Year,
                 Pages = 100,
-                Isbn = "1234567890",
+                Isbn10 = "1234567890",
+                Isbn13 = "1234567890123",
                 Description = "Sample description"
             };
 
