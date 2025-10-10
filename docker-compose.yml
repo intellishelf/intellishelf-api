@@ -10,6 +10,8 @@ services:
       - Database__ConnectionString=mongodb://admin:admin@mongodb:27017/intellishelf?authSource=admin
       - Database__DatabaseName=intellishelf
       - Auth__Key=your-super-secret-jwt-key-that-should-be-at-least-32-characters-long
+      - Auth__Google__ClientId=your-google-client-id
+      - Auth__Google__ClientSecret=your-google-client-secret
       - Ai__OpenAiApiKey=sk-test-key
       - Azure__StorageConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
     depends_on:

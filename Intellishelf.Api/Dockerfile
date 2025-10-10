@@ -9,6 +9,7 @@ COPY Intellishelf.Data/Intellishelf.Data.csproj ./Intellishelf.Data/
 COPY Intellishelf.Domain/Intellishelf.Domain.csproj ./Intellishelf.Domain/
 COPY Intellishelf.Common/Intellishelf.Common.csproj ./Intellishelf.Common/
 COPY Tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj ./Tests/Intellishelf.Unit.Tests/
+COPY Tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj ./Tests/Intellishelf.Integration.Tests/
 
 # Restore dependencies
 RUN dotnet restore
