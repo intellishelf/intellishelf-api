@@ -18,8 +18,5 @@ public static class DbModule
             .Get<DatabaseConfig>() ?? throw new InvalidOperationException("Database configuration is missing");
 
         builder.Services.AddSingleton<IMongoDatabase>(_ => new MongoClient(dbOptions.ConnectionString).GetDatabase(dbOptions.DatabaseName));
-
-        var conventionPack = new ConventionPack { new IgnoreExtraElementsConvention(true) };
-        ConventionRegistry.Register("IgnoreExtraElements", conventionPack, _ => true);
     }
 }

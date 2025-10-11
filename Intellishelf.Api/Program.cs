@@ -10,10 +10,10 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevPolicy", policy =>
+    options.AddPolicy("LocalhostPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .SetIsOriginAllowed(origin => origin.StartsWith("http://localhost") || origin.StartsWith("https://localhost"))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -30,7 +30,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors("DevPolicy");
+    app.UseCors("LocalhostPolicy");
 }
 
 app.UsePathBase(new PathString("/api"));

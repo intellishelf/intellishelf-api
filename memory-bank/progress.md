@@ -41,8 +41,9 @@
 ### Immediate Priorities
 1. **ISBN Search** - External API integration for book lookup
    1. Add sort title (without the, a, an, hardcoded list of them)
-   2. Use two separate ISBNs
+   2. ✅ Use two separate ISBNs (API/domain now expose ISBN-10 & ISBN-13)
 2. **Integration Tests** - Comprehensive API testing
+   - Add coverage for the new ISBN-10/ISBN-13 fields in book flows
 3. **Code Quality** - Review and refactor where needed
 
 ### Future Considerations
