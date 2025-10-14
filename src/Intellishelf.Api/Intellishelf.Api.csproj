@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Intellishelf.Data\Intellishelf.Data.csproj" />
+      <ProjectReference Include="../Intellishelf.Data/Intellishelf.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>

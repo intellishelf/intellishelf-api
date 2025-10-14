@@ -12,8 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Intellishelf.Common\Intellishelf.Common.csproj" />
-      <ProjectReference Include="..\Intellishelf.Domain\Intellishelf.Domain.csproj" />
+      <ProjectReference Include="../Intellishelf.Common/Intellishelf.Common.csproj" />
+      <ProjectReference Include="../Intellishelf.Domain/Intellishelf.Domain.csproj" />
     </ItemGroup>
 
 </Project>

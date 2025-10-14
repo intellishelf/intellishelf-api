@@ -2,7 +2,7 @@ services:
   intellishelf-api:
     build:
       context: .
-      dockerfile: Intellishelf.Api/Dockerfile
+      dockerfile: src/Intellishelf.Api/Dockerfile
     ports:
       - "8080:8080"
     environment:

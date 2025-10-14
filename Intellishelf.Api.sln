@@ -1,20 +1,19 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Api", "Intellishelf.Api\Intellishelf.Api.csproj", "{60F4AE45-C565-4A22-A45F-707D1C60483B}"
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Api", "src\\Intellishelf.Api\\Intellishelf.Api.csproj", "{60F4AE45-C565-4A22-A45F-707D1C60483B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Data", "Intellishelf.Data\Intellishelf.Data.csproj", "{088470B3-694C-4FE2-B88E-CE32D2D71E48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Data", "src\\Intellishelf.Data\\Intellishelf.Data.csproj", "{088470B3-694C-4FE2-B88E-CE32D2D71E48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Domain", "Intellishelf.Domain\Intellishelf.Domain.csproj", "{6B95A5DC-0413-43F7-8152-199AEFC48139}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Domain", "src\\Intellishelf.Domain\\Intellishelf.Domain.csproj", "{6B95A5DC-0413-43F7-8152-199AEFC48139}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Common", "Intellishelf.Common\Intellishelf.Common.csproj", "{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Common", "src\\Intellishelf.Common\\Intellishelf.Common.csproj", "{4C5ADC05-70F2-4EC3-A01F-D4173B953DF4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3C1939F5-7466-4A4D-95FE-1F679C351142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Unit.Tests", "Tests\Intellishelf.Unit.Tests\Intellishelf.Unit.Tests.csproj", "{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A8C81B40-CAF5-4671-A630-0ADFBCDF0DF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Integration.Tests", "Tests\Intellishelf.Integration.Tests\Intellishelf.Integration.Tests.csproj", "{671EE7AB-2190-4004-B9B4-561C507CDCB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Unit.Tests", "tests\\Intellishelf.Unit.Tests\\Intellishelf.Unit.Tests.csproj", "{B8F7C1D2-8E3A-4F9B-9C5D-7A6E5F4B8C9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intellishelf.Integration.Tests", "tests\\Intellishelf.Integration.Tests\\Intellishelf.Integration.Tests.csproj", "{671EE7AB-2190-4004-B9B4-561C507CDCB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
