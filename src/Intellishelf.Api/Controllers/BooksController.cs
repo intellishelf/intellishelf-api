@@ -117,6 +117,17 @@ public class BooksController(
             : HandleErrorResponse(result.Error);
     }
 
+    [HttpPost]
+    [Route("search")]
+    public async Task<ActionResult<Book[]>> Search([FromBody] SearchRequestContract searchRequest)
+    {
+        var result = await bookService.SearchAsync(CurrentUserId, searchRequest.SearchTerm);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleErrorResponse(result.Error);
+    }
+
     [HttpPost("parse-text")]
     public async Task<ActionResult<ParsedBook>> ParseText([FromBody] ParseFromTextContract contract)
     {

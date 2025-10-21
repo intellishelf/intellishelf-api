@@ -167,4 +167,21 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to delete")
             : TryResult.Success();
     }
+
+    public async Task<TryResult<IReadOnlyCollection<Book>>> SearchAsync(string userId, string searchTerm)
+    {
+        var filter = Builders<BookEntity>
+            .Search
+            .Wildcard(
+                f => f.Title,
+                $"*{searchTerm}*",
+                allowAnalyzedField: true);
+
+        var result = await _booksCollection
+            .Aggregate()
+            .Search(filter)
+            .ToListAsync();
+
+        return result.Select(mapper.Map).ToList();
+    }
 }

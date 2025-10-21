@@ -235,7 +235,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     private async Task GivenExistingBook_WhenDeleteBook_ThenRemovesBookAndCoverImage()
     {
         // Arrange
-        var coverFileName = "cover.png";
+        const string coverFileName = "cover.png";
         var coverPath = $"userFiles/{DefaultTestUsers.Authenticated.Id}/{coverFileName}";
 
         var coverUrl = await _azuriteFixture.SeedBlobAsync(coverPath, "cover data"u8.ToArray());
