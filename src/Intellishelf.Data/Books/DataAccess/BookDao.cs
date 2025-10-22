@@ -4,6 +4,7 @@ using Intellishelf.Data.Books.Mappers;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Intellishelf.Data.Books.DataAccess;
@@ -14,8 +15,10 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId)
     {
+        var userIdObject = ObjectId.Parse(userId);
+
         var books = await _booksCollection
-            .Find(b => b.UserId == userId)
+            .Find(b => b.UserId == userIdObject)
             .ToListAsync();
 
         var result = books.Select(mapper.Map).ToList();
@@ -25,14 +28,14 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<PagedResult<Book>>> GetPagedBooksAsync(string userId, BookQueryParameters queryParameters)
     {
-        var filter = Builders<BookEntity>.Filter.Eq(b => b.UserId, userId);
-        
+        var filter = Builders<BookEntity>.Filter.Eq(b => b.UserId, ObjectId.Parse(userId));
+
         // Get total count for pagination
         var totalCount = await _booksCollection.CountDocumentsAsync(filter);
-        
+
         // Build sort definition based on orderBy parameter
         var sortDefinition = BuildSortDefinition(queryParameters.OrderBy, queryParameters.Ascending);
-        
+
         // Get paged data
         var books = await _booksCollection
             .Find(filter)
@@ -40,55 +43,57 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             .Skip((queryParameters.Page - 1) * queryParameters.PageSize)
             .Limit(queryParameters.PageSize)
             .ToListAsync();
-        
+
         var mappedBooks = books.Select(mapper.Map).ToList();
-        
+
         var pagedResult = new PagedResult<Book>(
-            mappedBooks, 
+            mappedBooks,
             totalCount,
-            queryParameters.Page, 
+            queryParameters.Page,
             queryParameters.PageSize);
-        
+
         return pagedResult;
     }
-    
+
     private static SortDefinition<BookEntity> BuildSortDefinition(BookOrderBy orderBy, bool ascending)
     {
         SortDefinition<BookEntity> sortDefinition;
-        
+
         switch (orderBy)
         {
             case BookOrderBy.Title:
-                sortDefinition = ascending 
-                    ? Builders<BookEntity>.Sort.Ascending(b => b.Title) 
+                sortDefinition = ascending
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.Title)
                     : Builders<BookEntity>.Sort.Descending(b => b.Title);
                 break;
             case BookOrderBy.Author:
                 // Sort by the last author in the array if it exists
-                sortDefinition = ascending 
+                sortDefinition = ascending
                     ? Builders<BookEntity>.Sort.Ascending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.FirstOrDefault() : string.Empty)
                     : Builders<BookEntity>.Sort.Descending(b => b.Authors != null && b.Authors.Length > 0 ? b.Authors.FirstOrDefault() : string.Empty);
                 break;
             case BookOrderBy.Published:
-                sortDefinition = ascending 
-                    ? Builders<BookEntity>.Sort.Ascending(b => b.PublicationDate) 
+                sortDefinition = ascending
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.PublicationDate)
                     : Builders<BookEntity>.Sort.Descending(b => b.PublicationDate);
                 break;
             case BookOrderBy.Added:
             default:
-                sortDefinition = ascending 
-                    ? Builders<BookEntity>.Sort.Ascending(b => b.CreatedDate) 
+                sortDefinition = ascending
+                    ? Builders<BookEntity>.Sort.Ascending(b => b.CreatedDate)
                     : Builders<BookEntity>.Sort.Descending(b => b.CreatedDate);
                 break;
         }
-        
+
         return sortDefinition;
     }
 
     public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
     {
+        var userIdObject = ObjectId.Parse(userId);
+
         var bookEntity = await _booksCollection
-            .Find(b => b.Id == bookId && b.UserId == userId)
+            .Find(b => b.Id == bookId && b.UserId == userIdObject)
             .FirstOrDefaultAsync();
 
         if (bookEntity == null)
@@ -101,7 +106,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
     {
         var book = new BookEntity
         {
-            UserId = request.UserId,
+            UserId = ObjectId.Parse(request.UserId),
             Title = request.Title,
             Authors = request.Authors,
             PublicationDate = request.PublicationDate,
@@ -124,8 +129,11 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
     {
-        var filter = Builders<BookEntity>.Filter
-            .Where(b => b.Id == request.Id && b.UserId == request.UserId);
+        var userIdObject = ObjectId.Parse(request.UserId);
+
+        var filter = Builders<BookEntity>
+            .Filter
+            .Where(b => b.Id == request.Id && b.UserId == userIdObject);
 
         var updates = new List<UpdateDefinition<BookEntity>>
         {
@@ -161,7 +169,9 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult> DeleteBookAsync(string userId, string bookId)
     {
-        var result = await _booksCollection.DeleteOneAsync(b => b.Id == bookId && b.UserId == userId);
+        var userIdObject = ObjectId.Parse(userId);
+
+        var result = await _booksCollection.DeleteOneAsync(b => b.Id == bookId && b.UserId == userIdObject);
 
         return result.DeletedCount == 0
             ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to delete")
@@ -170,16 +180,25 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<IReadOnlyCollection<Book>>> SearchAsync(string userId, string searchTerm)
     {
-        var filter = Builders<BookEntity>
+        var scoreBuilder = Builders<BookEntity>.SearchScore;
+
+        var searchFilter = Builders<BookEntity>
             .Search
-            .Wildcard(
-                f => f.Title,
-                $"*{searchTerm}*",
-                allowAnalyzedField: true);
+            .Compound()
+            .Filter(Builders<BookEntity>.Search.Equals(f => f.UserId, ObjectId.Parse(userId)))
+            .Should(
+                Builders<BookEntity>.Search.Text(f => f.Title, searchTerm, score: scoreBuilder.Constant(3.0)),
+                Builders<BookEntity>.Search.Text(f => f.Authors, searchTerm, score: scoreBuilder.Constant(3.0)),
+                Builders<BookEntity>.Search.Text(f => f.Tags, searchTerm, score: scoreBuilder.Constant(2.0)),
+                Builders<BookEntity>.Search.Text(f => f.Description, searchTerm, score: scoreBuilder.Constant(1.0)),
+                Builders<BookEntity>.Search.Text(f => f.Annotation, searchTerm, score: scoreBuilder.Constant(1.0)),
+                Builders<BookEntity>.Search.Text(f => f.Publisher, searchTerm, score: scoreBuilder.Constant(1.0))
+            )
+            .MinimumShouldMatch(1);
 
         var result = await _booksCollection
             .Aggregate()
-            .Search(filter)
+            .Search(searchFilter)
             .ToListAsync();
 
         return result.Select(mapper.Map).ToList();

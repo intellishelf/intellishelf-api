@@ -11,7 +11,7 @@ public class BookEntityMapper : IBookEntityMapper
             Id = bookEntity.Id,
             Title = bookEntity.Title,
             Authors = string.Join(", ", bookEntity.Authors ?? []),
-            UserId = bookEntity.UserId,
+            UserId = bookEntity.UserId.ToString(),
             Description = bookEntity.Description,
             Isbn10 = bookEntity.Isbn10,
             Isbn13 = bookEntity.Isbn13,
