@@ -347,7 +347,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             Authors = [author],
             CreatedDate = timestamp,
             ModifiedDate = timestamp,
-            UserId = ObjectId.Parse((userId ?? DefaultTestUsers.Authenticated.Id)),
+            UserId = ObjectId.Parse(userId ?? DefaultTestUsers.Authenticated.Id),
             CoverImageUrl = coverImageUrl
         };
     }
