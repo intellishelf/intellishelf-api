@@ -1,21 +1,22 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Amendment: Added architectural principles (MINOR version bump)
+- Version change: 1.1.0 → 1.2.0
+- Amendment: Added Anemic Domain Models principle (MINOR version bump)
 - Principles modified:
   1. Modern .NET Stack (unchanged)
   2. ProblemDetails Error Handling (unchanged)
   3. TryResult Pattern (unchanged)
   4. Integration-First Testing (unchanged)
   5. Pragmatic Testing Strategy (unchanged)
-  6. Layered Architecture (new)
-- Added sections: Architectural Layering section with dependency rules
+  6. Layered Architecture (unchanged)
+  7. Anemic Domain Models (new)
+- Added sections: Principle VII with entity/service separation guidance
 - Removed sections: None
 - Templates requiring updates:
-  ✅ plan-template.md - Constitution Check updated with layering validation
+  ✅ plan-template.md - Constitution Check updated with anemic model validation
   ✅ spec-template.md - Already aligned
   ✅ tasks-template.md - Already aligned with project structure
-- Follow-up TODOs: None
+- Follow-up TODOs: Update existing ISBN plan to move Isbn value object logic to service layer
 -->
 
 # Intellishelf API Constitution
@@ -85,6 +86,83 @@ Sync Impact Report:
 **MUST NOT** introduce circular dependencies between projects or features.
 
 **Rationale**: Layered architecture with dependency inversion enables independent domain logic testing, clear boundaries for persistence concerns, and flexibility to swap infrastructure. Separating interfaces from implementations supports mockability and testability. The Domain project's independence from Data prevents tight coupling to MongoDB or Azure-specific details, critical for potential future migrations or multi-tenancy scenarios.
+
+### VII. Anemic Domain Models
+
+**MUST** keep entities (database models in `Intellishelf.Data/{Feature}/Entities/`) as pure data containers with no business logic.
+
+**MUST** use simple properties with init-only setters (`init`) or getters/setters where appropriate.
+
+**MUST** place all validation, business rules, and domain logic in service classes (`Intellishelf.Domain/{Feature}/Services/`).
+
+**MUST NOT** create "value objects" or "domain entities" with embedded behavior, methods, or validation logic in the entity classes themselves.
+
+**MUST** use DTOs or records in `Intellishelf.Domain/{Feature}/Models/` for passing data between layers, not for encapsulating behavior.
+
+**MAY** use static factory methods or builder patterns in service classes (not entities) when complex object construction is needed.
+
+**Rationale**: This codebase follows a pragmatic, transaction-script style architecture rather than Domain-Driven Design (DDD). Entities are simple MongoDB documents mapped via the driver's serialization. Business logic lives in stateless service classes that orchestrate operations across entities and external APIs. This approach:
+- Reduces complexity for a startup-sized team (simpler mental model than rich domain objects)
+- Aligns with MongoDB's document-oriented nature (entities mirror database structure)
+- Keeps testable logic in services, not spread across multiple entity classes
+- Avoids impedance mismatch between OOP domain models and document storage
+- Enables straightforward serialization/deserialization without custom converters
+
+Example of **correct** approach:
+```csharp
+// Entity (Data layer) - Pure data container
+public class BookEntity : EntityBase
+{
+    public required string Title { get; init; }
+    public string? Isbn10 { get; init; }
+    public string? Isbn13 { get; init; }
+    // ... other properties, no methods
+}
+
+// Service (Domain layer) - Contains logic
+public class BookService : IBookService
+{
+    public Result<BookEntity> ValidateAndCreateBook(string isbn, ...)
+    {
+        // Validation logic here
+        if (!IsValidIsbnFormat(isbn))
+            return new Error(BookErrorCodes.InvalidIsbn, "...");
+        
+        // Business logic here
+        var normalizedIsbn = NormalizeIsbn(isbn);
+        
+        return new BookEntity
+        {
+            Isbn13 = normalizedIsbn,
+            // ... other fields
+        };
+    }
+    
+    private bool IsValidIsbnFormat(string isbn) { /* ... */ }
+    private string NormalizeIsbn(string isbn) { /* ... */ }
+}
+```
+
+Example of **incorrect** approach (do NOT do this):
+```csharp
+// ❌ BAD - Entity with behavior
+public record Isbn
+{
+    public string Value { get; }
+    
+    private Isbn(string value) => Value = value;
+    
+    public static Result<Isbn> Create(string input)
+    {
+        if (!IsValid(input))
+            return new Error(...);
+        return new Isbn(Normalize(input));
+    }
+    
+    private static bool IsValid(string input) { /* ... */ }
+    // ❌ Logic in entity/value object
+}
+```
 
 ## Technology Stack Requirements
 
@@ -184,4 +262,4 @@ This constitution supersedes all ad-hoc practices. All feature specifications, p
 - Complexity additions beyond startup scope MUST be challenged against YAGNI principle
 - Runtime development guidance lives in `AGENTS.md` and `.github/custom-instructions.md`
 
-**Version**: 1.1.0 | **Ratified**: 2025-10-29 | **Last Amended**: 2025-10-29
+**Version**: 1.2.0 | **Ratified**: 2025-10-29 | **Last Amended**: 2025-10-30

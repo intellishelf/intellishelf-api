@@ -1,0 +1,294 @@
+openapi: 3.0.3
+info:
+  title: Intellishelf API - ISBN Book Search
+  description: |
+    API contract for adding books to a user's collection by ISBN.
+    Supports both ISBN-10 and ISBN-13 formats.
+  version: 1.0.0
+  contact:
+    name: Intellishelf Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development
+  - url: https://intellishelf-api.azurewebsites.net/api
+    description: Production
+
+tags:
+  - name: books
+    description: Book management operations
+
+paths:
+  /books/isbn:
+    post:
+      summary: Add book by ISBN
+      description: |
+        Adds a book to the authenticated user's collection by ISBN.
+        
+        **Flow**:
+        1. Validates ISBN format (10 or 13 digits)
+        2. Checks for duplicates in user's collection
+        3. Fetches metadata from Google Books API (primary) or Amazon API (fallback)
+        4. Downloads cover image and stores in Azure Blob Storage
+        5. Persists book to MongoDB
+        
+        **Duplicate Detection**:
+        - Per-user scope (same ISBN can exist for different users)
+        - Checks both ISBN-10 and ISBN-13 (converted internally)
+        
+        **External API Priority**:
+        - Google Books API (primary)
+        - Amazon Product Advertising API (fallback if Google fails)
+      tags:
+        - books
+      security:
+        - cookieAuth: []      # Web clients (Google OAuth)
+        - bearerAuth: []      # Mobile clients (JWT)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddBookByIsbnRequest'
+            examples:
+              isbn10:
+                summary: ISBN-10 with hyphens
+                value:
+                  isbn: "0-306-40615-2"
+              isbn13:
+                summary: ISBN-13 without hyphens
+                value:
+                  isbn: "9780306406157"
+              isbn10NoHyphens:
+                summary: ISBN-10 without hyphens
+                value:
+                  isbn: "0306406152"
+      responses:
+        '201':
+          description: Book successfully added to collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddBookByIsbnResponse'
+              example:
+                bookId: "507f1f77bcf86cd799439011"
+                isbn10: "0306406152"
+                isbn13: "9780306406157"
+                title: "The Pragmatic Programmer"
+                authors:
+                  - "Andrew Hunt"
+                  - "David Thomas"
+                publisher: "Addison-Wesley"
+                publishedDate: "1999-10-30"
+                description: "Your journey to mastery..."
+                coverUrl: "https://intellishelf.blob.core.windows.net/book-covers/user123/books/507f1f77bcf86cd799439011.jpg"
+                source: "Google"
+                createdAt: "2025-01-29T10:30:00Z"
+        '400':
+          description: Invalid ISBN format
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidFormat:
+                  summary: Invalid ISBN format
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "Invalid Request"
+                    status: 400
+                    detail: "Invalid ISBN: Invalid ISBN-10 check digit: 0-306-40615-9"
+                emptyIsbn:
+                  summary: Missing ISBN
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                    title: "Invalid Request"
+                    status: 400
+                    detail: "Invalid ISBN: ISBN cannot be empty"
+        '401':
+          description: User not authenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: "https://tools.ietf.org/html/rfc7235#section-3.1"
+                title: "Unauthorized"
+                status: 401
+                detail: "Authentication required"
+        '404':
+          description: Book not found in external APIs
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+                title: "Not Found"
+                status: 404
+                detail: "Book not found in both Google Books and Amazon"
+        '409':
+          description: Book already exists in user's collection
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: "https://tools.ietf.org/html/rfc7231#section-6.5.8"
+                title: "Conflict"
+                status: 409
+                detail: "Duplicate book: Book already in your collection"
+        '503':
+          description: External API unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                googleTimeout:
+                  summary: Google Books API timeout
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.6.4"
+                    title: "Service Unavailable"
+                    status: 503
+                    detail: "External API failure (Google): Request timeout"
+                amazonRateLimit:
+                  summary: Amazon API rate limit
+                  value:
+                    type: "https://tools.ietf.org/html/rfc7231#section-6.6.4"
+                    title: "Service Unavailable"
+                    status: 503
+                    detail: "External API failure (Amazon): Rate limit exceeded"
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: .AspNetCore.Cookies
+      description: ASP.NET Core cookie authentication (Google OAuth for web clients)
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication (for mobile clients)
+
+  schemas:
+    AddBookByIsbnRequest:
+      type: object
+      required:
+        - isbn
+      properties:
+        isbn:
+          type: string
+          minLength: 10
+          maxLength: 17
+          pattern: '^[\dX\-]+$'
+          description: |
+            ISBN-10 or ISBN-13 identifier (with or without hyphens).
+            
+            **ISBN-10**: 10 characters (digits 0-9, last char may be 'X')
+            **ISBN-13**: 13 digits (must start with 978 or 979)
+            
+            Examples:
+            - `0-306-40615-2` (ISBN-10 with hyphens)
+            - `0306406152` (ISBN-10 without hyphens)
+            - `978-0-306-40615-7` (ISBN-13 with hyphens)
+            - `9780306406157` (ISBN-13 without hyphens)
+          example: "0-306-40615-2"
+
+    AddBookByIsbnResponse:
+      type: object
+      required:
+        - bookId
+        - isbn10
+        - isbn13
+        - title
+        - authors
+        - source
+        - createdAt
+      properties:
+        bookId:
+          type: string
+          description: MongoDB ObjectId of the created book
+          example: "507f1f77bcf86cd799439011"
+        isbn10:
+          type: string
+          description: Normalized ISBN-10 (without hyphens), empty if not available
+          example: "0306406152"
+        isbn13:
+          type: string
+          description: Normalized ISBN-13 (without hyphens)
+          example: "9780306406157"
+        title:
+          type: string
+          description: Book title
+          example: "The Pragmatic Programmer"
+        authors:
+          type: array
+          items:
+            type: string
+          description: List of author names
+          example: ["Andrew Hunt", "David Thomas"]
+        publisher:
+          type: string
+          nullable: true
+          description: Publisher name (may be null if not available)
+          example: "Addison-Wesley"
+        publishedDate:
+          type: string
+          nullable: true
+          description: |
+            Publication date in ISO 8601 format (YYYY-MM-DD, YYYY-MM, or YYYY).
+            Format varies by external API data quality.
+          example: "1999-10-30"
+        description:
+          type: string
+          nullable: true
+          description: Book description/summary (may be null if not available)
+          example: "Your journey to mastery..."
+        coverUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: |
+            Azure Blob Storage URL for cover image (may be null if download failed).
+            Image is persisted to avoid external API dependency.
+          example: "https://intellishelf.blob.core.windows.net/book-covers/user123/books/507f1f77bcf86cd799439011.jpg"
+        source:
+          type: string
+          enum: [Google, Amazon]
+          description: External API source used to fetch metadata
+          example: "Google"
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when book was added (ISO 8601 UTC)
+          example: "2025-01-29T10:30:00Z"
+
+    ProblemDetails:
+      type: object
+      description: RFC 7807 Problem Details for HTTP APIs
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI reference identifying the problem type
+          example: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+          example: "Invalid Request"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence
+          example: "Invalid ISBN: Invalid ISBN-10 check digit: 0-306-40615-9"
+        instance:
+          type: string
+          format: uri
+          description: URI reference identifying the specific occurrence
+          example: "/api/books/isbn"
