@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+        <PackageReference Include="Google.Apis.Books.v1" Version="1.68.0.3331" />
         <PackageReference Include="OpenAI" Version="2.1.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.3" />

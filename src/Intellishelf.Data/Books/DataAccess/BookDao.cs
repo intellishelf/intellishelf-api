@@ -12,6 +12,39 @@ namespace Intellishelf.Data.Books.DataAccess;
 public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookDao
 {
     private readonly IMongoCollection<BookEntity> _booksCollection = database.GetCollection<BookEntity>(BookEntity.CollectionName);
+    
+    /// <summary>
+    /// Creates MongoDB indexes for ISBN lookups.
+    /// Call this method during application startup to ensure indexes exist.
+    /// </summary>
+    public async Task EnsureIndexesAsync()
+    {
+        var indexKeysUserId = Builders<BookEntity>.IndexKeys
+            .Ascending(b => b.UserId)
+            .Ascending(b => b.Isbn13);
+        
+        var indexOptionsUnique = new CreateIndexOptions
+        {
+            Name = "idx_userId_isbn13_unique",
+            Unique = true,
+            Sparse = true // Allows null values for Isbn13
+        };
+        
+        var indexKeysIsbn10 = Builders<BookEntity>.IndexKeys
+            .Ascending(b => b.UserId)
+            .Ascending(b => b.Isbn10);
+        
+        var indexOptionsIsbn10 = new CreateIndexOptions
+        {
+            Name = "idx_userId_isbn10",
+            Sparse = true // Allows null values for Isbn10
+        };
+        
+        var indexModelUserId = new CreateIndexModel<BookEntity>(indexKeysUserId, indexOptionsUnique);
+        var indexModelIsbn10 = new CreateIndexModel<BookEntity>(indexKeysIsbn10, indexOptionsIsbn10);
+        
+        await _booksCollection.Indexes.CreateManyAsync([indexModelUserId, indexModelIsbn10]);
+    }
 
     public async Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId)
     {
@@ -202,5 +235,45 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             .ToListAsync();
 
         return result.Select(mapper.Map).ToList();
+    }
+    
+    public async Task<Book?> FindByIsbnAsync(string userId, string? isbn10, string? isbn13)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+        
+        // Build filter to match userId AND (isbn10 OR isbn13)
+        var filterBuilder = Builders<BookEntity>.Filter;
+        var userFilter = filterBuilder.Eq(b => b.UserId, userIdObject);
+        
+        FilterDefinition<BookEntity> isbnFilter;
+        
+        if (!string.IsNullOrEmpty(isbn10) && !string.IsNullOrEmpty(isbn13))
+        {
+            // Search for either ISBN-10 or ISBN-13
+            isbnFilter = filterBuilder.Or(
+                filterBuilder.Eq(b => b.Isbn10, isbn10),
+                filterBuilder.Eq(b => b.Isbn13, isbn13)
+            );
+        }
+        else if (!string.IsNullOrEmpty(isbn10))
+        {
+            isbnFilter = filterBuilder.Eq(b => b.Isbn10, isbn10);
+        }
+        else if (!string.IsNullOrEmpty(isbn13))
+        {
+            isbnFilter = filterBuilder.Eq(b => b.Isbn13, isbn13);
+        }
+        else
+        {
+            return null; // No ISBN provided
+        }
+        
+        var combinedFilter = filterBuilder.And(userFilter, isbnFilter);
+        
+        var bookEntity = await _booksCollection
+            .Find(combinedFilter)
+            .FirstOrDefaultAsync();
+        
+        return bookEntity != null ? mapper.Map(bookEntity) : null;
     }
 }

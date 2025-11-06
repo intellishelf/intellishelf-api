@@ -1,3 +1,4 @@
+using Intellishelf.Domain.Books;
 using MongoDB.Bson;
 
 namespace Intellishelf.Data.Books.Entities;
@@ -19,6 +20,13 @@ public class BookEntity : EntityBase
     public string? Annotation { get; init; }
     public string? Description { get; init; }
     public string[]? Tags { get; init; }
+    
+    /// <summary>
+    /// External API source for book metadata.
+    /// Used for analytics and debugging.
+    /// </summary>
+    public BookSource? Source { get; init; }
+    
     public required DateTime CreatedDate { get; init; }
     public required DateTime ModifiedDate { get; init; }
 }

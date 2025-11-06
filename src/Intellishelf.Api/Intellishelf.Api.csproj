@@ -8,6 +8,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Google.Apis.Books.v1" Version="1.68.0.3331" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.9" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
         <PackageReference Include="MongoDB.Driver" Version="3.2.1" />

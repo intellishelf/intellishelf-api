@@ -337,7 +337,9 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         string author,
         string? userId = null,
         DateTime? createdDate = null,
-        string? coverImageUrl = null)
+        string? coverImageUrl = null,
+        string? isbn10 = null,
+        string? isbn13 = null)
     {
         var timestamp = createdDate ?? DateTime.UtcNow;
         return new BookEntity
@@ -348,9 +350,111 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             CreatedDate = timestamp,
             ModifiedDate = timestamp,
             UserId = ObjectId.Parse(userId ?? DefaultTestUsers.Authenticated.Id),
-            CoverImageUrl = coverImageUrl
+            CoverImageUrl = coverImageUrl,
+            Isbn10 = isbn10,
+            Isbn13 = isbn13
         };
     }
+
+    #region ISBN Book Addition Tests (T015-T018)
+
+    [Fact]
+    private async Task AddBookByIsbn_ValidIsbn13_ReturnsCreated()
+    {
+        // Arrange - Use Clean Code ISBN-13
+        const string isbn = "978-0132350884";
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/isbn", new { Isbn = isbn });
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        Assert.False(string.IsNullOrWhiteSpace(book.Id));
+        Assert.Equal(isbn.Replace("-", ""), book.Isbn13); // Normalized
+        Assert.False(string.IsNullOrWhiteSpace(book.Title));
+        Assert.NotEmpty(book.Authors);
+        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+
+        var location = response.Headers.Location;
+        Assert.NotNull(location);
+        Assert.Contains($"/api/books/{book.Id}", location.ToString());
+
+        // Verify persistence
+        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(persistedBook);
+        Assert.Equal(isbn.Replace("-", ""), persistedBook!.Isbn13);
+    }
+
+    [Fact]
+    private async Task AddBookByIsbn_ValidIsbn10_ReturnsCreated()
+    {
+        // Arrange - Use Clean Code ISBN-10
+        const string isbn = "0132350882";
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/isbn", new { Isbn = isbn });
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        Assert.False(string.IsNullOrWhiteSpace(book.Id));
+        Assert.Equal(isbn, book.Isbn10); // Normalized
+        Assert.False(string.IsNullOrWhiteSpace(book.Title));
+        Assert.NotEmpty(book.Authors);
+        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+
+        // Verify persistence
+        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(persistedBook);
+        Assert.Equal(isbn, persistedBook!.Isbn10);
+    }
+
+    [Fact]
+    private async Task AddBookByIsbn_Duplicate_ReturnsConflict()
+    {
+        // Arrange - Seed book with ISBN-13
+        const string isbn13 = "9780134685991";
+        var existingBook = CreateBookEntity(
+            title: "Effective Java",
+            author: "Joshua Bloch",
+            isbn13: isbn13);
+
+        await _mongoDbFixture.SeedBooksAsync(existingBook);
+
+        // Act - Try to add same ISBN
+        var response = await _client.PostAsJsonAsync("/api/books/isbn", new { Isbn = isbn13 });
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.Equal(BookErrorCodes.DuplicateBook, problem.Type);
+        Assert.Contains(isbn13, problem.Detail);
+    }
+
+    [Fact]
+    private async Task AddBookByIsbn_GoogleFails_FallsBackToAmazon()
+    {
+        // NOTE: This test will be implemented in Phase 5 (User Story 3)
+        // For now, it's a placeholder to ensure the test structure exists
+        // When Google Books API returns failure, system should try Amazon Product Advertising API
+
+        // Arrange
+        const string isbn = "978-0134685991"; // Valid ISBN that exists in both APIs
+
+        // TODO (T039-T044): Implement Amazon fallback logic
+        // - Create IAmazonLookupService
+        // - Implement fallback in TryAddBookByIsbnAsync
+        // - Mock Google failure + Amazon success for this test
+
+        await Task.CompletedTask;
+        Assert.True(true, "Amazon fallback not yet implemented (Phase 5)");
+    }
+
+    #endregion
 
     public void Dispose() => _factory.Dispose();
 

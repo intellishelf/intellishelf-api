@@ -23,10 +23,13 @@ builder.Services.AddCors(options =>
 DbModule.Register(builder);
 AzureModule.Register(builder);
 UsersModule.Register(builder);
-BooksModule.Register(builder.Services);
+BooksModule.Register(builder.Services, builder.Configuration);
 AiModule.Register(builder);
 
 var app = builder.Build();
+
+// Initialize MongoDB indexes
+await DbModule.EnsureIndexesAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {

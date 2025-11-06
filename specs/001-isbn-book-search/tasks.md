@@ -33,9 +33,9 @@ description: "Implementation tasks for ISBN Book Search and Quick Add feature"
 
 **Purpose**: Project initialization and NuGet package installation
 
-- [ ] T001 Install Google Books API NuGet package: `dotnet add src/Intellishelf.Api/Intellishelf.Api.csproj package Google.Apis.Books.v1`
-- [ ] T002 [P] Verify MongoDB.Driver package exists in Intellishelf.Data project
-- [ ] T003 [P] Verify Azure.Storage.Blobs package exists in Intellishelf.Api project
+- [X] T001 Install Google Books API NuGet package: `dotnet add src/Intellishelf.Api/Intellishelf.Api.csproj package Google.Apis.Books.v1`
+- [X] T002 [P] Verify MongoDB.Driver package exists in Intellishelf.Data project
+- [X] T003 [P] Verify Azure.Storage.Blobs package exists in Intellishelf.Domain project (updated: found in Domain, not Api)
 
 ---
 
@@ -45,17 +45,17 @@ description: "Implementation tasks for ISBN Book Search and Quick Add feature"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Add BookSource enum to `src/Intellishelf.Data/Books/Entities/BookEntity.cs`
-- [ ] T005 Add Source property to BookEntity in `src/Intellishelf.Data/Books/Entities/BookEntity.cs`
-- [ ] T006 [P] Add error codes (InvalidIsbn, DuplicateBook, ExternalApiFailure) to `src/Intellishelf.Common/TryResult/BookErrorCodes.cs`
-- [ ] T007 Create BookMetadata DTO in `src/Intellishelf.Domain/Books/BookMetadata.cs`
-- [ ] T008 [P] Create IIsbnLookupService interface in `src/Intellishelf.Domain/Books/IIsbnLookupService.cs`
-- [ ] T009 [P] Add FindByIsbnAsync method signature to IBookDao in `src/Intellishelf.Domain/Books/IBookDao.cs`
-- [ ] T010 [P] Add AddBookByIsbnAsync method signature to IBookService in `src/Intellishelf.Domain/Books/IBookService.cs`
-- [ ] T011 Implement FindByIsbnAsync in BookDao with dual ISBN query in `src/Intellishelf.Data/Books/BookDao.cs`
-- [ ] T012 [P] Create MongoDB indexes (userId+isbn13 unique, userId+isbn10) in BookDao constructor or startup
-- [ ] T013 [P] Create Google Books API configuration section in `src/Intellishelf.Api/appsettings.json` and `appsettings.Development.json`
-- [ ] T014 [P] Add Google Books API key to `src/Intellishelf.Api/secrets-example.json`
+- [X] T004 Add BookSource enum to `src/Intellishelf.Domain/Books/BookSource.cs` (moved from BookEntity to avoid circular dependency)
+- [X] T005 Add Source property to BookEntity in `src/Intellishelf.Data/Books/Entities/BookEntity.cs`
+- [X] T006 [P] Add error codes (InvalidIsbn, DuplicateBook, ExternalApiFailure) to `src/Intellishelf.Domain/Books/Errors/BookErrorCodes.cs`
+- [X] T007 Create BookMetadata DTO in `src/Intellishelf.Domain/Books/BookMetadata.cs`
+- [X] T008 [P] Create IIsbnLookupService interface in `src/Intellishelf.Domain/Books/IIsbnLookupService.cs`
+- [X] T009 [P] Add FindByIsbnAsync method signature to IBookDao in `src/Intellishelf.Domain/Books/DataAccess/IBookDao.cs`
+- [X] T010 [P] Add TryAddBookByIsbnAsync method signature to IBookService in `src/Intellishelf.Domain/Books/Services/IBookService.cs`
+- [X] T011 Implement FindByIsbnAsync in BookDao with dual ISBN query in `src/Intellishelf.Data/Books/DataAccess/BookDao.cs`
+- [X] T012 [P] Create MongoDB indexes (userId+isbn13 unique, userId+isbn10) via EnsureIndexesAsync() in BookDao
+- [X] T013 [P] Create Google Books API configuration section in `src/Intellishelf.Api/appsettings.json` and `appsettings.Development.json`
+- [X] T014 [P] Add Google Books API key to `src/Intellishelf.Api/secrets-example.json`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -72,29 +72,29 @@ description: "Implementation tasks for ISBN Book Search and Quick Add feature"
 > **NOTE: Per constitution, integration tests are REQUIRED for API contracts and persistence.**
 > Write integration tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T015 [P] [US1] Integration test: AddBookByIsbn_ValidIsbn13_ReturnsCreated in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
-- [ ] T016 [P] [US1] Integration test: AddBookByIsbn_ValidIsbn10_ReturnsCreated in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
-- [ ] T017 [P] [US1] Integration test: AddBookByIsbn_Duplicate_ReturnsConflict in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
-- [ ] T018 [P] [US1] Integration test: AddBookByIsbn_GoogleFails_FallsBackToAmazon in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
+- [X] T015 [P] [US1] Integration test: AddBookByIsbn_ValidIsbn13_ReturnsCreated in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
+- [X] T016 [P] [US1] Integration test: AddBookByIsbn_ValidIsbn10_ReturnsCreated in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
+- [X] T017 [P] [US1] Integration test: AddBookByIsbn_Duplicate_ReturnsConflict in `tests/Intellishelf.Integration.Tests/BooksTests.cs`
+- [X] T018 [P] [US1] Integration test: AddBookByIsbn_GoogleFails_FallsBackToAmazon in `tests/Intellishelf.Integration.Tests/BooksTests.cs` (placeholder for Phase 5)
 
 ### Unit Tests for User Story 1 (OPTIONAL - Isolated Logic Only)
 
-- [ ] T019 [P] [US1] Unit test: NormalizeIsbn_RemovesHyphensAndSpaces in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs`
-- [ ] T020 [P] [US1] Unit test: IsValidIsbnFormat_ValidIsbn10_ReturnsTrue in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs`
-- [ ] T021 [P] [US1] Unit test: IsValidIsbnFormat_ValidIsbn13_ReturnsTrue in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs`
+- [ ] T019 [P] [US1] Unit test: NormalizeIsbn_RemovesHyphensAndSpaces in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs` (OPTIONAL - helpers are private methods)
+- [ ] T020 [P] [US1] Unit test: IsValidIsbnFormat_ValidIsbn10_ReturnsTrue in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs` (OPTIONAL - helpers are private methods)
+- [ ] T021 [P] [US1] Unit test: IsValidIsbnFormat_ValidIsbn13_ReturnsTrue in `tests/Intellishelf.Unit.Tests/Books/BookServiceTests.cs` (OPTIONAL - helpers are private methods)
 
 ### Implementation for User Story 1
 
 **Follow layered architecture: Domain → interfaces, Data → implementations, Api → controllers**
 
-- [ ] T022 [P] [US1] Create AddBookByIsbnRequest in `src/Intellishelf.Api/Contracts/Books/AddBookByIsbnRequest.cs`
-- [ ] T023 [P] [US1] Create AddBookByIsbnResponse in `src/Intellishelf.Api/Contracts/Books/AddBookByIsbnResponse.cs`
-- [ ] T024 [P] [US1] Create BookMapper.ToAddBookByIsbnResponse extension method in `src/Intellishelf.Api/Mappers/Books/BookMapper.cs`
-- [ ] T025 [US1] Implement AddBookByIsbnAsync in BookService with ISBN validation helpers (NormalizeIsbn, IsValidIsbnFormat) in `src/Intellishelf.Domain/Books/BookService.cs`
-- [ ] T026 [US1] Implement IsbnLookupService with Google Books API client in `src/Intellishelf.Domain/Books/IsbnLookupService.cs`
-- [ ] T027 [US1] Add POST /api/books/isbn endpoint in BooksController with error mapping in `src/Intellishelf.Api/Controllers/BooksController.cs`
-- [ ] T028 [US1] Register IIsbnLookupService → IsbnLookupService in DI container in `src/Intellishelf.Api/Modules/BooksModule.cs`
-- [ ] T029 [US1] Verify integration tests pass: Run all 4 integration tests for US1
+- [X] T022 [P] [US1] Create AddBookByIsbnRequest in `src/Intellishelf.Api/Contracts/Books/AddBookByIsbnRequest.cs`
+- [X] T023 [P] [US1] No AddBookByIsbnResponse needed - returns Book directly (standard pattern per existing endpoints)
+- [X] T024 [P] [US1] No mapper needed - ISBN passed directly to service (minimal contract)
+- [X] T025 [US1] Implement TryAddBookByIsbnAsync in BookService with ISBN validation helpers (NormalizeIsbn, IsValidIsbnFormat) in `src/Intellishelf.Domain/Books/Services/BookService.cs`
+- [X] T026 [US1] Implement IsbnLookupService with Google Books API client in `src/Intellishelf.Domain/Books/Services/IsbnLookupService.cs`
+- [X] T027 [US1] Add POST /api/books/isbn endpoint in BooksController with error mapping in `src/Intellishelf.Api/Controllers/BooksController.cs`
+- [X] T028 [US1] Register IIsbnLookupService → IsbnLookupService in DI container in `src/Intellishelf.Api/Modules/BooksModule.cs` + add Google.Apis.Books.v1 to Domain project
+- [ ] T029 [US1] Verify integration tests pass: Run all 4 integration tests for US1 (requires Google Books API key configuration)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

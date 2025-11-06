@@ -135,4 +135,19 @@ public class BooksController(
         var result = await aiService.ParseBookFromTextAsync(contract.Text, mockAi);
         return Ok(result.Value);
     }
+
+    /// <summary>
+    /// Adds a book to the user's collection by looking up metadata via ISBN.
+    /// </summary>
+    /// <param name="request">ISBN-10 or ISBN-13 (with or without hyphens)</param>
+    /// <returns>Created book with metadata from external API</returns>
+    [HttpPost("isbn")]
+    public async Task<ActionResult<Book>> AddBookByIsbn([FromBody] AddBookByIsbnRequest request)
+    {
+        var result = await bookService.TryAddBookByIsbnAsync(CurrentUserId, request.Isbn);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetBook), new { bookId = result.Value.Id }, result.Value)
+            : HandleErrorResponse(result.Error);
+    }
 }
