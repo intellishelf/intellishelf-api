@@ -117,11 +117,11 @@ public class BooksController(
             : HandleErrorResponse(result.Error);
     }
 
-    [HttpPost]
+    [HttpGet]
     [Route("search")]
-    public async Task<ActionResult<Book[]>> Search([FromBody] SearchRequestContract searchRequest)
+    public async Task<ActionResult<PagedResult<Book>>> Search([FromQuery] SearchQueryParameters queryParameters)
     {
-        var result = await bookService.SearchAsync(CurrentUserId, searchRequest.SearchTerm);
+        var result = await bookService.SearchAsync(CurrentUserId, queryParameters);
 
         return result.IsSuccess
             ? Ok(result.Value)

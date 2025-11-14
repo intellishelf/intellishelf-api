@@ -16,5 +16,5 @@ public interface IBookService
 
     Task<TryResult> TryDeleteBookAsync(string userId, string bookId);
 
-    Task<TryResult<IReadOnlyCollection<Book>>> SearchAsync(string userId, string searchTerm);
+    Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters);
 }

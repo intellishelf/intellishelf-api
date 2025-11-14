@@ -6,6 +6,7 @@ using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Search;
 
 namespace Intellishelf.Data.Books.DataAccess;
 
@@ -135,30 +136,28 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             .Filter
             .Where(b => b.Id == request.Id && b.UserId == userIdObject);
 
+        var update = Builders<BookEntity>.Update;
         var updates = new List<UpdateDefinition<BookEntity>>
         {
-            Builders<BookEntity>.Update.Set(b => b.Title, request.Title),
-            Builders<BookEntity>.Update.Set(b => b.Authors, request.Authors),
-            Builders<BookEntity>.Update.Set(b => b.PublicationDate, request.PublicationDate),
-            Builders<BookEntity>.Update.Set(b => b.Isbn10, request.Isbn10),
-            Builders<BookEntity>.Update.Set(b => b.Isbn13, request.Isbn13),
-            Builders<BookEntity>.Update.Set(b => b.Tags, request.Tags),
-            Builders<BookEntity>.Update.Set(b => b.Annotation, request.Annotation),
-            Builders<BookEntity>.Update.Set(b => b.Description, request.Description),
-            Builders<BookEntity>.Update.Set(b => b.Publisher, request.Publisher),
-            Builders<BookEntity>.Update.Set(b => b.Pages, request.Pages),
-            Builders<BookEntity>.Update.CurrentDate(b => b.ModifiedDate)
+            update.Set(b => b.Title, request.Title),
+            update.Set(b => b.Authors, request.Authors),
+            update.Set(b => b.PublicationDate, request.PublicationDate),
+            update.Set(b => b.Isbn10, request.Isbn10),
+            update.Set(b => b.Isbn13, request.Isbn13),
+            update.Set(b => b.Tags, request.Tags),
+            update.Set(b => b.Annotation, request.Annotation),
+            update.Set(b => b.Description, request.Description),
+            update.Set(b => b.Publisher, request.Publisher),
+            update.Set(b => b.Pages, request.Pages),
+            update.CurrentDate(b => b.ModifiedDate)
         };
 
         if (request.CoverImageUrl != null)
         {
-            updates.Add(
-                Builders<BookEntity>
-                    .Update
-                    .Set(b => b.CoverImageUrl, request.CoverImageUrl));
+            updates.Add(update.Set(b => b.CoverImageUrl, request.CoverImageUrl));
         }
 
-        var combinedUpdate = Builders<BookEntity>.Update.Combine(updates);
+        var combinedUpdate = update.Combine(updates);
 
         var result = await _booksCollection.UpdateOneAsync(filter, combinedUpdate);
 
@@ -178,29 +177,54 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             : TryResult.Success();
     }
 
-    public async Task<TryResult<IReadOnlyCollection<Book>>> SearchAsync(string userId, string searchTerm)
+    public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
         var scoreBuilder = Builders<BookEntity>.SearchScore;
+        var searchBuilder = Builders<BookEntity>.Search;
+        var userObjectId = ObjectId.Parse(userId);
 
-        var searchFilter = Builders<BookEntity>
-            .Search
+        var looseFuzzy = new SearchFuzzyOptions { MaxEdits = 1, PrefixLength = 2 };
+
+        var searchFilter = searchBuilder
             .Compound()
-            .Filter(Builders<BookEntity>.Search.Equals(f => f.UserId, ObjectId.Parse(userId)))
+            .Filter(searchBuilder.Equals(f => f.UserId, userObjectId))
             .Should(
-                Builders<BookEntity>.Search.Text(f => f.Title, searchTerm, score: scoreBuilder.Constant(3.0)),
-                Builders<BookEntity>.Search.Text(f => f.Authors, searchTerm, score: scoreBuilder.Constant(3.0)),
-                Builders<BookEntity>.Search.Text(f => f.Tags, searchTerm, score: scoreBuilder.Constant(2.0)),
-                Builders<BookEntity>.Search.Text(f => f.Description, searchTerm, score: scoreBuilder.Constant(1.0)),
-                Builders<BookEntity>.Search.Text(f => f.Annotation, searchTerm, score: scoreBuilder.Constant(1.0)),
-                Builders<BookEntity>.Search.Text(f => f.Publisher, searchTerm, score: scoreBuilder.Constant(1.0))
+                searchBuilder.Autocomplete(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+                searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+                searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+                searchBuilder.Autocomplete(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+                searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+                searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+                searchBuilder.Autocomplete(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+                searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+                searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+                searchBuilder.Text(f => f.Tags, queryParameters.SearchTerm, score: scoreBuilder.Boost(2.0)),
+                searchBuilder.Text(f => f.Description, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0)),
+                searchBuilder.Text(f => f.Annotation, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0))
             )
             .MinimumShouldMatch(1);
 
-        var result = await _booksCollection
+        var books = await _booksCollection
             .Aggregate()
             .Search(searchFilter)
+            .Skip((queryParameters.Page - 1) * queryParameters.PageSize)
+            .Limit(queryParameters.PageSize)
             .ToListAsync();
 
-        return result.Select(mapper.Map).ToList();
+        var totalCount = await _booksCollection
+            .Aggregate()
+            .Search(searchFilter)
+            .Count()
+            .FirstOrDefaultAsync();
+
+        var mappedBooks = books.Select(mapper.Map).ToList();
+
+        var pagedResult = new PagedResult<Book>(
+            mappedBooks,
+            totalCount?.Count ?? 0,
+            queryParameters.Page,
+            queryParameters.PageSize);
+
+        return pagedResult;
     }
 }

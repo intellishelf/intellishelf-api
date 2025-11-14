@@ -1,23 +1,4 @@
-const autocomplete = {
-  "$search": {"autocomplete": {
-    "query": "Di",
-    "path": "Title"
-  }}
-};
 
-const limit = {
-  "$limit": 5
-};
-
-const project = {
-  "$project": {
-    "Title": 1,
-    "UserId": 1,
-    "score": { $meta: "searchScore" }
-  }
-};
-
-db.Books.aggregate([autocomplete, limit, project]);
 
 
 const term = "boo";

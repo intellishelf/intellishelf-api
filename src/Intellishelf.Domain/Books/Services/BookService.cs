@@ -43,8 +43,8 @@ public class BookService(IBookDao bookDao, IFileStorageService fileStorageServic
         return await bookDao.DeleteBookAsync(userId, bookId);
     }
 
-    public async Task<TryResult<IReadOnlyCollection<Book>>> SearchAsync(string userId, string searchTerm)
+    public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
-       return await bookDao.SearchAsync(userId, searchTerm);
+       return await bookDao.SearchAsync(userId, queryParameters);
     }
 }
