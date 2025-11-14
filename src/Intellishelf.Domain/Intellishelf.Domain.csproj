@@ -14,7 +14,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="../Intellishelf.Common/Intellishelf.Common.csproj" />
+		<ProjectReference Include="../Intellishelf.Common/Intellishelf.Common.csproj" />
+		<Using Include="Intellishelf.Common.TryResult" />
     </ItemGroup>
 
     <ItemGroup>

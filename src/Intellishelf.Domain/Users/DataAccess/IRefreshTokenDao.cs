@@ -1,4 +1,3 @@
-using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Users.Models;
 
 namespace Intellishelf.Domain.Users.DataAccess;

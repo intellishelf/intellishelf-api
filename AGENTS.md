@@ -1,40 +1,351 @@
-# Repository Guidelines
+# CLAUDE.md
 
-## Project Structure & Module Organization
-Intellishelf.Api hosts the ASP.NET Core entry point and feature modules in `Controllers`, `Services`, `Modules`, and `Contracts`. Domain logic lives in `Intellishelf.Domain`; persistence adapters in `Intellishelf.Data`; cross-cutting helpers in `Intellishelf.Common`. Config templates sit in `Intellishelf.Api/appsettings.*.json` and `secrets-example.json`. Tests use `Tests/Intellishelf.Unit.Tests` for isolated coverage and `Tests/Intellishelf.Integration.Tests` (backed by Testcontainers). Supporting scripts are in `scripts/`; `docker-compose.yml` remains available for manually running the API and backing services but is no longer required for automated tests.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Build, Test, and Development Commands
-- `dotnet restore Intellishelf.Api.sln` primes dependencies.
-- `dotnet build Intellishelf.Api.sln -c Release` enforces a clean compile.
-- `ASPNETCORE_ENVIRONMENT=Development dotnet run --project Intellishelf.Api/Intellishelf.Api.csproj` serves the API at `http://localhost:8080/api`.
-- `dotnet test Tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj` covers isolated services.
-- `dotnet test Tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj` runs end-to-end scenarios. These tests spin up MongoDB and Azurite with Testcontainers—ensure Docker Desktop/daemon is running; no manual compose step is needed.
-- `docker-compose up intellishelf-api` is optional for local manual testing; automated suites rely on Testcontainers instead.
+## Build & Test Commands
 
-## Coding Style & Naming Conventions
-- Stick to .NET defaults: 4-space indentation, file-scoped namespaces, and braces on new lines for types/methods. Favour expression-bodied members when they keep intent obvious.
-- Rely on primary constructors for services, controllers, records, and simple data carriers whenever dependency injection is straightforward. Fall back to explicit constructors only when additional setup logic is required.
-- Use `PascalCase` for public types and members, `camelCase` for locals/parameters, and `_camelCase` for private fields. Mark fields `readonly` whenever viable.
-- Keep single-responsibility files; place API contracts under `Intellishelf.Api/Contracts` and cross-cutting helpers in the shared projects (`Intellishelf.Common`, etc.).
-- Mirror existing nullability annotations, prefer guard clauses over deep nesting, and favour immutability (records or `init` properties) for DTOs.
-- Run `dotnet format` before pushing or raising a PR to enforce analyzers and style rules.
+```bash
+# Restore dependencies
+dotnet restore Intellishelf.Api.sln
 
-## Error Handling
-Service and DAO layers return `TryResult<T>` from `Intellishelf.Common.TryResult` to model success and rich errors. Prefer propagating the `Error` payload rather than throwing; controllers convert errors into `ProblemDetails` responses with explicit status codes so API clients get actionable messages.
+# Build the solution
+dotnet build Intellishelf.Api.sln -c Release
 
-## Authentication & Authorization
-Web clients authenticate via Google OAuth and receive an ASP.NET cookie ticket; retain cookie middleware when adjusting the pipeline. Mobile clients use the JWT auth scheme with bearer tokens signed by our configured key. Keep both schemes registered and validate new endpoints against the correct policy before merging.
+# Run the API locally (requires MongoDB and Azure Storage configuration)
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/Intellishelf.Api/Intellishelf.Api.csproj
 
-## Testing Guidelines
-Tests use xUnit with Moq; name classes `*Tests` (e.g., `BooksControllerTests`). Cover new service logic with unit tests and add integration tests whenever contracts or persistence change. Integration suites boot dependencies with Testcontainers—avoid hard-coding credentials and keep fixtures deterministic. If Docker isn’t available, skip integration execution and report the limitation.
+# Run unit tests
+dotnet test tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj
 
-## Integration Test Infrastructure
-- `Tests/Intellishelf.Integration.Tests/Infra` hosts shared fixtures and helpers. `MongoDbFixture`/`AzuriteFixture` use Testcontainers to provision fresh instances per collection.
-- `DefaultTestUsers` defines the canonical authenticated user used across integration specs and the `TestAuthHandler`. When new tests need an authenticated context, prefer seeding via `MongoDbFixture.SeedDefaultUserAsync()` and reusing the baked login request/claims rather than duplicating literals.
-- `TestWebApplicationFactory` swaps in the test auth scheme and injects container-provided configuration for database and storage endpoints. Keep new tests within the `[Collection("Integration Tests")]` context so fixtures share container lifetimes.
+# Run integration tests (requires Docker running for Testcontainers)
+dotnet test tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj
 
-## Commit & Pull Request Guidelines
-Follow the imperative commit style (`Add …`, `Fix …`). PRs should link issues, summarize functional changes, call out new env vars, and note how you tested. Attach screenshots or HTTP samples for user-facing updates and request reviews from module owners.
+# Run a specific test class
+dotnet test --filter "FullyQualifiedName~BooksTests"
 
-## Configuration & Secrets
-Never commit real secrets. Update `secrets-example.json` when adding keys and load sensitive values via user secrets, environment variables, or Azure Key Vault. Override `appsettings.Development.json` locally without hardcoding credentials.
+# Format code
+dotnet format
+```
+
+## Architecture Overview
+
+This is a .NET 9 Web API following **Clean Architecture** with 4 main layers:
+
+```
+src/
+├── Intellishelf.Api/              Web API, Controllers, Modules (DI configuration)
+├── Intellishelf.Domain/           Business logic, Service interfaces, Domain models
+├── Intellishelf.Data/             Data access implementations, MongoDB repositories
+└── Intellishelf.Common/           Shared utilities (TryResult pattern)
+```
+
+**Dependency flow:** Api → Domain → Data ← Common
+
+**Key principle:** Domain defines interfaces (IBookDao, IBookService), Data implements them. Controllers depend only on Domain abstractions.
+
+## TryResult Pattern (Critical for Error Handling)
+
+**Location:** `src/Intellishelf.Common/TryResult/TryResult.cs`
+
+This codebase uses **railway-oriented programming** instead of exceptions for expected errors:
+
+```csharp
+// Service methods return TryResult<T>
+public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
+    await bookDao.GetBookAsync(userId, bookId);
+
+// TryResult has two states: Success with value, or Error
+public record TryResult<TResult> : TryResult
+{
+    [MemberNotNullWhen(false, nameof(Error))]
+    public virtual bool IsSuccess { get; protected init; }
+    public Error? Error { get; }
+    public TryResult? Value { get; }
+}
+
+// Errors are simple records with Code and Message
+public record Error(string Code, string Message);
+```
+
+**How to use in controllers:**
+```csharp
+var result = await bookService.TryGetBookAsync(userId, bookId);
+if (!result.IsSuccess)
+    return HandleErrorResponse(result.Error);  // Converts to ProblemDetails
+return Ok(result.Value);
+```
+
+**Implicit conversions allow clean DAO/Service implementations:**
+```csharp
+// Return an error directly
+if (book == null)
+    return new Error(BookErrorCodes.BookNotFound, "Book not found.");
+
+// Return a value (implicitly converted to TryResult<Book>)
+return mapper.Map(bookEntity);
+
+// Return void success
+return TryResult.Success();
+```
+
+**Error Codes:** Defined in static classes per domain:
+- `src/Intellishelf.Domain/Books/Errors/BookErrorCodes.cs`
+- `src/Intellishelf.Domain/Users/Models/UserErrorCodes.cs`
+- `src/Intellishelf.Domain/Files/ErrorCodes/FileErrorCodes.cs`
+- `src/Intellishelf.Domain/Ai/Errors/AiErrorCodes.cs`
+
+## Error to HTTP Status Mapping
+
+**Location:** `src/Intellishelf.Api/Controllers/ApiControllerBase.cs`
+
+Error codes map to HTTP status codes in `ApiControllerBase.MapErrorToStatusCode()`:
+
+```csharp
+private static int MapErrorToStatusCode(string code) => code switch
+{
+    BookErrorCodes.BookNotFound => StatusCodes.Status404NotFound,
+    UserErrorCodes.Unauthorized => StatusCodes.Status401Unauthorized,
+    UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,
+    FileErrorCodes.InvalidFileType => StatusCodes.Status400BadRequest,
+    _ => StatusCodes.Status500InternalServerError
+};
+```
+
+**When adding new error codes:**
+1. Add constant to appropriate `*ErrorCodes` class
+2. Update `MapErrorToStatusCode()` switch expression
+3. Use the error code in DAO/Service: `return new Error(YourErrorCodes.NewError, "Message");`
+
+## Module System (Dependency Injection)
+
+**Location:** `src/Intellishelf.Api/Modules/`
+
+Instead of massive `Program.cs`, DI is organized into modules per feature:
+
+- **DbModule:** MongoDB configuration and IMongoDatabase singleton
+- **UsersModule:** Authentication (JWT + Cookie + Google OAuth), user services, background cleanup
+- **BooksModule:** Book services, DAOs, mappers, image processors
+- **AzureModule:** Azure Blob Storage client
+- **AiModule:** OpenAI ChatClient configuration
+
+**Pattern:**
+```csharp
+// In Program.cs
+DbModule.Register(builder);
+UsersModule.Register(builder);
+BooksModule.Register(builder.Services);
+// ...
+
+// In each module
+public static class BooksModule
+{
+    public static void Register(IServiceCollection services)
+    {
+        services.AddSingleton<IBookEntityMapper, BookEntityMapper>();  // Stateless
+        services.AddTransient<IBookDao, BookDao>();                    // Per-request
+        services.AddTransient<IBookService, BookService>();
+    }
+}
+```
+
+**Lifecycle rules:**
+- `AddSingleton`: Mappers, validators, processors (stateless, thread-safe)
+- `AddTransient`: DAOs, Services (new instance per injection)
+- `AddScoped`: Services that need per-request state (e.g., FileStorageService)
+
+## Layer Communication Flow
+
+```
+HTTP Request
+    ↓
+[Authentication Middleware] → Validates JWT/Cookie/Google token
+    ↓
+[BooksController] → Extracts UserId from User.Claims
+    ↓
+[BookService] → Orchestrates business logic (e.g., delete old image before update)
+    ↓
+[BookDao] → Executes MongoDB queries with Builders API
+    ↓
+[MongoDB] → Returns BookEntity
+    ↓
+[Mapper] → BookEntity → Book (domain model)
+    ↓
+[TryResult<Book>] → Flows back up
+    ↓
+[Controller] → HandleErrorResponse() or Ok()
+    ↓
+ProblemDetails or JSON response
+```
+
+**Key point:** Services coordinate cross-cutting concerns (e.g., deleting files), DAOs focus purely on data access.
+
+## Integration Tests with Testcontainers
+
+**Location:** `tests/Intellishelf.Integration.Tests/`
+
+Integration tests use **real MongoDB and Azure Storage containers** (not mocks):
+
+```csharp
+// Fixtures spin up containers
+public class MongoDbFixture : IAsyncLifetime
+{
+    private MongoDbContainer _mongoContainer;
+    public string ConnectionString => _mongoContainer.GetConnectionString();
+
+    public async Task InitializeAsync()
+    {
+        _mongoContainer = new MongoDbBuilder().WithImage("mongo:7.0").Build();
+        await _mongoContainer.StartAsync();
+    }
+
+    // Helper methods for seeding test data
+    public Task SeedDefaultUserAsync() => ...;
+    public Task SeedBooksAsync(params BookEntity[] books) => ...;
+    public Task ClearBooksAsync() => ...;
+}
+```
+
+**Test structure:**
+```csharp
+[Collection("Integration Tests")]  // Share fixtures across tests in collection
+public sealed class BooksTests : IAsyncLifetime
+{
+    private readonly HttpClient _client;
+
+    public BooksTests(MongoDbFixture mongoDbFixture, AzuriteFixture azuriteFixture)
+    {
+        var factory = new TestWebApplicationFactory(mongoDbFixture, azuriteFixture);
+        _client = factory.CreateClient();
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _mongoDbFixture.ClearBooksAsync();
+        await _mongoDbFixture.SeedDefaultUserAsync();
+    }
+
+    [Fact]
+    public async Task GivenNoBooks_WhenGetBooks_ThenEmptyPagedResult() { ... }
+}
+```
+
+**TestWebApplicationFactory** swaps real MongoDB/Storage for containers and uses `TestAuthHandler` to bypass real authentication.
+
+**Requirements:**
+- Docker must be running for integration tests
+- Tests are isolated per collection with shared fixtures
+- Use `DefaultTestUsers.Authenticated` for seeding authenticated context
+
+## Data Access Patterns
+
+**Interfaces in Domain, Implementations in Data:**
+- Interface: `src/Intellishelf.Domain/Books/DataAccess/IBookDao.cs`
+- Implementation: `src/Intellishelf.Data/Books/DataAccess/BookDao.cs`
+
+**MongoDB specifics:**
+- Uses MongoDB.Driver fluent API (`Builders<T>.Filter`, `Builders<T>.Update`, `Builders<T>.Sort`)
+- ObjectId for user IDs, string IDs for entities
+- Entity classes inherit from `EntityBase` with `[BsonId]` attribute
+- Collections accessed via injected `IMongoDatabase`
+
+**Example DAO pattern:**
+```csharp
+public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookDao
+{
+    private readonly IMongoCollection<BookEntity> _booksCollection =
+        database.GetCollection<BookEntity>(BookEntity.CollectionName);
+
+    public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
+    {
+        var filter = Builders<BookEntity>.Filter.And(
+            Builders<BookEntity>.Filter.Eq(b => b.UserId, ObjectId.Parse(userId)),
+            Builders<BookEntity>.Filter.Eq(b => b.Id, bookId));
+
+        var book = await _booksCollection.Find(filter).FirstOrDefaultAsync();
+
+        if (book == null)
+            return new Error(BookErrorCodes.BookNotFound, "Book not found.");
+
+        return mapper.Map(book);  // Implicit conversion to TryResult<Book>
+    }
+}
+```
+
+## Authentication Architecture
+
+**Location:** `src/Intellishelf.Api/Modules/UsersModule.cs`
+
+The API supports **3 authentication schemes** routed by a policy scheme:
+
+1. **JWT Bearer** (`AuthConfig.JwtScheme`): For mobile clients, tokens in `Authorization: Bearer <token>` header
+2. **Cookie** (`AuthConfig.CookieScheme`): For web clients, cookie-based sessions
+3. **Google OAuth** (`GoogleDefaults.AuthenticationScheme`): External provider
+
+**Routing logic in Program.cs:**
+```csharp
+.AddPolicyScheme("Custom", "JWT or Cookie", options =>
+{
+    options.ForwardDefaultSelector = ctx =>
+    {
+        var auth = ctx.Request.Headers.Authorization.ToString();
+        return !string.IsNullOrEmpty(auth) ? AuthConfig.JwtScheme : AuthConfig.CookieScheme;
+    };
+})
+```
+
+**All API endpoints require `[Authorize]` by default** (via `ApiControllerBase`). Use `CurrentUserId` property to get authenticated user ID from claims.
+
+## AI Integration (OpenAI)
+
+**Location:** `src/Intellishelf.Domain/Ai/Services/AiService.cs`
+
+Books can be parsed from OCR text using OpenAI structured outputs:
+
+```csharp
+public class AiService(ChatClient chatClient) : IAiService
+{
+    // Uses JSON schema to enforce structured response
+    private static readonly ChatCompletionOptions ChatOptions = new()
+    {
+        Temperature = 0.0f,
+        ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+            jsonSchemaFormatName: "book_info",
+            jsonSchema: BinaryData.FromBytes(/* schema for ParsedBook */),
+            jsonSchemaIsStrict: true)
+    };
+
+    public async Task<TryResult<ParsedBook>> ParseBookFromTextAsync(string text, bool useMockedAi)
+    {
+        if (useMockedAi)
+            return new ParsedBook { Title = "Sample Book", ... };  // Mock for testing
+
+        var response = await chatClient.CompleteChatAsync(messages, ChatOptions);
+        var book = JsonSerializer.Deserialize<ParsedBook>(response.Value.Content[0].Text);
+
+        return book ?? new Error(AiErrorCodes.RequestFailed, "Response from AI could not be parsed.");
+    }
+}
+```
+
+**Endpoint:** `POST /books/parse-text` accepts OCR text and returns structured book data.
+
+## Important File Paths
+
+**Core abstractions:**
+- `src/Intellishelf.Common/TryResult/TryResult.cs` - Error handling pattern
+- `src/Intellishelf.Api/Controllers/ApiControllerBase.cs` - Base controller with error mapping
+- `src/Intellishelf.Data/EntityBase.cs` - MongoDB entity base class
+
+**Example implementations (reference these for patterns):**
+- `src/Intellishelf.Domain/Books/Services/BookService.cs` - Service layer with file cleanup
+- `src/Intellishelf.Data/Books/DataAccess/BookDao.cs` - MongoDB DAO implementation
+- `src/Intellishelf.Domain/Users/Services/AuthService.cs` - JWT + OAuth auth logic
+
+**Configuration:**
+- `src/Intellishelf.Api/Program.cs` - Application startup
+- `src/Intellishelf.Api/Modules/` - DI configuration per feature
+- `src/Intellishelf.Api/appsettings.json` - App configuration (do not commit secrets)
+
+**Test infrastructure:**
+- `tests/Intellishelf.Integration.Tests/Infra/TestWebApplicationFactory.cs` - Test host factory
+- `tests/Intellishelf.Integration.Tests/Infra/Fixtures/` - Testcontainers fixtures
