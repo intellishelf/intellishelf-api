@@ -31,57 +31,10 @@ public class MongoDbFixture : IAsyncLifetime
     {
         var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
 
-        // Define the Atlas Search index - matches production configuration exactly
-        var searchIndexDefinition = new MongoDB.Bson.BsonDocument
-        {
-            { "mappings", new MongoDB.Bson.BsonDocument
-                {
-                    { "dynamic", false },
-                    { "fields", new MongoDB.Bson.BsonDocument
-                        {
-                            { "Title", new MongoDB.Bson.BsonArray
-                                {
-                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
-                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
-                                }
-                            },
-                            { "Authors", new MongoDB.Bson.BsonArray
-                                {
-                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
-                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
-                                }
-                            },
-                            { "Tags", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "string" }
-                                }
-                            },
-                            { "Description", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "string" }
-                                }
-                            },
-                            { "Annotation", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "string" }
-                                }
-                            },
-                            { "Publisher", new MongoDB.Bson.BsonArray
-                                {
-                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
-                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
-                                }
-                            },
-                            { "UserId", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "objectId" }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
+        // Load search index definition from JSON file (matches production configuration)
+        var searchIndexJson = await File.ReadAllTextAsync(
+            Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "search-index.json"));
+        var searchIndexDefinition = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<MongoDB.Bson.BsonDocument>(searchIndexJson);
 
         // Create the search index
         var indexName = await booksCollection.SearchIndexes.CreateOneAsync(
