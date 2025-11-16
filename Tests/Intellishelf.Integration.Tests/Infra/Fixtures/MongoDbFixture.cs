@@ -1,5 +1,7 @@
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 using Xunit;
@@ -34,11 +36,11 @@ public class MongoDbFixture : IAsyncLifetime
         // Load search index definition from JSON file (matches production configuration)
         var searchIndexJson = await File.ReadAllTextAsync(
             Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "search-index.json"));
-        var searchIndexDefinition = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<MongoDB.Bson.BsonDocument>(searchIndexJson);
+        var searchIndexDefinition = BsonSerializer.Deserialize<BsonDocument>(searchIndexJson);
 
         // Create the search index
         var indexName = await booksCollection.SearchIndexes.CreateOneAsync(
-            new MongoDB.Driver.CreateSearchIndexModel("default", searchIndexDefinition));
+            new CreateSearchIndexModel("default", searchIndexDefinition));
 
         // Poll until the index is ready (usually takes 2-10 seconds)
         var maxWaitTime = TimeSpan.FromSeconds(30);
