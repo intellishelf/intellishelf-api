@@ -64,8 +64,8 @@ public class MongoDbFixture : IAsyncLifetime
         const string indexName = "default";
         const int maxRetries = 10;
         var retryDelay = TimeSpan.FromSeconds(1);
-        var indexReadyTimeout = TimeSpan.FromSeconds(30);
-        var pollInterval = TimeSpan.FromMilliseconds(500);
+        var indexReadyTimeout = TimeSpan.FromMinutes(1);
+        var pollInterval = TimeSpan.FromSeconds(1);
 
         for (int attempt = 0; attempt < maxRetries; attempt++)
         {
