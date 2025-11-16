@@ -61,7 +61,7 @@ public class BookService(
             var imageStreamResult = await httpImageDownloader.DownloadImageAsync(metadata.CoverImageUrl);
             if (imageStreamResult.IsSuccess)
             {
-                var fileName = $"{metadata.Isbn13 ?? metadata.Isbn10 ?? normalizedIsbn}.jpg";
+                var fileName = $"{Guid.NewGuid()}.jpg";
                 var uploadResult = await fileStorageService.UploadFileAsync(userId, imageStreamResult.Value, fileName);
 
                 if (uploadResult.IsSuccess)
