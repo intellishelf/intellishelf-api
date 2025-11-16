@@ -332,12 +332,79 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.Equal(FileErrorCodes.UploadFailed, problem.Type);
     }
 
+    [Fact]
+    private async Task GivenValidBookData_WhenPostNewBookWithReadingStatus_ThenCreatedWithStatus()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Book with Status"), "Title");
+        content.Add(new StringContent("Test Author"), "Authors[0]");
+        content.Add(new StringContent(((int)ReadingStatus.Reading).ToString()), "Status");
+        content.Add(new StringContent(DateTime.UtcNow.ToString("O")), "StartedReadingDate");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        Assert.Equal(ReadingStatus.Reading, book.Status);
+        Assert.NotNull(book.StartedReadingDate);
+    }
+
+    [Fact]
+    private async Task GivenExistingBook_WhenUpdateReadingStatus_ThenUpdatesStatus()
+    {
+        // Arrange
+        var book = CreateBookEntity("Book to Update Status", "Author");
+        await _mongoDbFixture.SeedBooksAsync(book);
+
+        using var updatedBook = new MultipartFormDataContent();
+        updatedBook.Add(new StringContent(book.Title), "Title");
+        updatedBook.Add(new StringContent(((int)ReadingStatus.Read).ToString()), "Status");
+        updatedBook.Add(new StringContent(DateTime.UtcNow.ToString("O")), "FinishedReadingDate");
+
+        // Act
+        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var storedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Equal(ReadingStatus.Read, storedBook.Status);
+        Assert.NotNull(storedBook.FinishedReadingDate);
+    }
+
+    [Fact]
+    private async Task GivenBooksWithDifferentStatuses_WhenSearchByStatus_ThenReturnsFilteredBooks()
+    {
+        // Arrange
+        var unreadBook = CreateBookEntity("Unread Book", "Author A", status: ReadingStatus.Unread);
+        var readingBook = CreateBookEntity("Reading Book", "Author B", status: ReadingStatus.Reading);
+        var readBook = CreateBookEntity("Read Book", "Author C", status: ReadingStatus.Read);
+
+        await _mongoDbFixture.SeedBooksAsync(unreadBook, readingBook, readBook);
+
+        // Act
+        var response = await _client.GetAsync($"/api/books/search?searchTerm=Book&status={(int)ReadingStatus.Reading}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>());
+        Assert.Equal(1, pagedResult.TotalCount);
+        Assert.Single(pagedResult.Items);
+        Assert.Equal("Reading Book", pagedResult.Items.First().Title);
+        Assert.Equal(ReadingStatus.Reading, pagedResult.Items.First().Status);
+    }
+
     private static BookEntity CreateBookEntity(
         string title,
         string author,
         string? userId = null,
         DateTime? createdDate = null,
-        string? coverImageUrl = null)
+        string? coverImageUrl = null,
+        ReadingStatus? status = null)
     {
         var timestamp = createdDate ?? DateTime.UtcNow;
         return new BookEntity
@@ -348,7 +415,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             CreatedDate = timestamp,
             ModifiedDate = timestamp,
             UserId = ObjectId.Parse(userId ?? DefaultTestUsers.Authenticated.Id),
-            CoverImageUrl = coverImageUrl
+            CoverImageUrl = coverImageUrl,
+            Status = status
         };
     }
 

@@ -21,6 +21,9 @@ public class BookEntityMapper : IBookEntityMapper
             Publisher = bookEntity.Publisher,
             CoverImageUrl = bookEntity.CoverImageUrl,
             CreatedDate = bookEntity.CreatedDate,
-            Tags = bookEntity.Tags
+            Tags = bookEntity.Tags,
+            Status = bookEntity.Status,
+            StartedReadingDate = bookEntity.StartedReadingDate,
+            FinishedReadingDate = bookEntity.FinishedReadingDate
         };
 }

@@ -120,7 +120,10 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             Pages = request.Pages,
             CoverImageUrl = request.CoverImageUrl,
             CreatedDate = DateTime.UtcNow,
-            ModifiedDate = DateTime.UtcNow
+            ModifiedDate = DateTime.UtcNow,
+            Status = request.Status,
+            StartedReadingDate = request.StartedReadingDate,
+            FinishedReadingDate = request.FinishedReadingDate
         };
 
         await _booksCollection.InsertOneAsync(book);
@@ -149,6 +152,9 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             update.Set(b => b.Description, request.Description),
             update.Set(b => b.Publisher, request.Publisher),
             update.Set(b => b.Pages, request.Pages),
+            update.Set(b => b.Status, request.Status),
+            update.Set(b => b.StartedReadingDate, request.StartedReadingDate),
+            update.Set(b => b.FinishedReadingDate, request.FinishedReadingDate),
             update.CurrentDate(b => b.ModifiedDate)
         };
 
@@ -185,9 +191,17 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         var looseFuzzy = new SearchFuzzyOptions { MaxEdits = 1, PrefixLength = 2 };
 
-        var searchFilter = searchBuilder
+        var compoundBuilder = searchBuilder
             .Compound()
-            .Filter(searchBuilder.Equals(f => f.UserId, userObjectId))
+            .Filter(searchBuilder.Equals(f => f.UserId, userObjectId));
+
+        // Add status filter if provided
+        if (queryParameters.Status.HasValue)
+        {
+            compoundBuilder = compoundBuilder.Filter(searchBuilder.Equals(f => f.Status, queryParameters.Status.Value));
+        }
+
+        var searchFilter = compoundBuilder
             .Should(
                 searchBuilder.Autocomplete(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
                 searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
