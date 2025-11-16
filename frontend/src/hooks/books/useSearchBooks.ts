@@ -1,12 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { booksApi } from '../../api/endpoints/books';
-import type { SearchBooksParams } from '../../types/book';
+import type { SearchBooksParams, PagedResult, Book } from '../../types/book';
 
-export const useSearchBooks = (params: SearchBooksParams) => {
+export const useSearchBooks = (
+  params: SearchBooksParams,
+  options?: Omit<UseQueryOptions<PagedResult<Book>>, 'queryKey' | 'queryFn'>
+) => {
   return useQuery({
     queryKey: ['books', 'search', params],
     queryFn: () => booksApi.searchBooks(params),
-    enabled: !!params.searchTerm,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    ...options,
   });
 };
