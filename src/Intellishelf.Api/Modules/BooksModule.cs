@@ -5,6 +5,7 @@ using Intellishelf.Data.Books.DataAccess;
 using Intellishelf.Data.Books.Mappers;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Services;
+using Intellishelf.Domain.Files.Services;
 
 namespace Intellishelf.Api.Modules;
 
@@ -18,5 +19,9 @@ public static class BooksModule
         services.AddTransient<IBookService, BookService>();
         services.AddSingleton<IImageFileValidator, ImageFileValidator>();
         services.AddSingleton<IImageFileProcessor, ImageFileProcessor>();
+
+        // ISBN import services
+        services.AddHttpClient<IBookMetadataService, GoogleBooksMetadataService>();
+        services.AddHttpClient<IHttpImageDownloader, HttpImageDownloader>();
     }
 }

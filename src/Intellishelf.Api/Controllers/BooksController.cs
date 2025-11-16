@@ -76,6 +76,16 @@ public class BooksController(
             : HandleErrorResponse(result.Error);
     }
 
+    [HttpPost("from-isbn")]
+    public async Task<ActionResult<Book>> AddBookFromIsbn([FromBody] AddBookFromIsbnContract contract)
+    {
+        var result = await bookService.TryAddBookFromIsbnAsync(CurrentUserId, contract.Isbn);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetBook), new { bookId = result.Value.Id }, result.Value)
+            : HandleErrorResponse(result.Error);
+    }
+
     [HttpPut("{bookId}")]
     public async Task<IActionResult> UpdateBook([FromForm] BookRequestContractBase contract,
         [FromRoute] string bookId)
