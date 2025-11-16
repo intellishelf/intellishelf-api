@@ -1,4 +1,5 @@
 import { ReadingStatus } from '../../types/book';
+import { STATUS_CONFIG } from '../../constants';
 
 interface StatusFilterProps {
   selectedStatus: ReadingStatus | null;
@@ -9,14 +10,13 @@ interface StatusFilterProps {
 interface StatusTab {
   label: string;
   value: ReadingStatus | null;
-  color: string;
 }
 
 const statusTabs: StatusTab[] = [
-  { label: 'All Books', value: null, color: 'text-gray-700' },
-  { label: 'Unread', value: ReadingStatus.Unread, color: 'text-gray-700' },
-  { label: 'Reading', value: ReadingStatus.Reading, color: 'text-blue-700' },
-  { label: 'Read', value: ReadingStatus.Read, color: 'text-green-700' },
+  { label: 'All Books', value: null },
+  { label: STATUS_CONFIG[ReadingStatus.Unread].label, value: ReadingStatus.Unread },
+  { label: STATUS_CONFIG[ReadingStatus.Reading].label, value: ReadingStatus.Reading },
+  { label: STATUS_CONFIG[ReadingStatus.Read].label, value: ReadingStatus.Read },
 ];
 
 export const StatusFilter: React.FC<StatusFilterProps> = ({

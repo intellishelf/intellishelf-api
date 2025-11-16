@@ -4,7 +4,7 @@ import { ArrowLeft, Edit, Trash2, BookOpen } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { Button, Spinner } from '../components/ui';
 import { StatusBadge } from '../components/books/StatusBadge';
-import { EditBookModal } from '../components/books/EditBookModal';
+import { BookFormModal } from '../components/books/BookFormModal';
 import { DeleteBookModal } from '../components/books/DeleteBookModal';
 import { useBook } from '../hooks/books/useBook';
 
@@ -222,7 +222,7 @@ export const BookDetailPage = () => {
 
       {/* Modals */}
       {isEditModalOpen && (
-        <EditBookModal
+        <BookFormModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           book={book}

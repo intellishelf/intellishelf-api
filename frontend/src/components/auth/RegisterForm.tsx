@@ -5,6 +5,8 @@ import { Button, Input, Card } from '../ui';
 import { BookOpen } from 'lucide-react';
 import { authApi } from '../../api/endpoints/auth';
 import toast from 'react-hot-toast';
+import { validateEmail, validatePassword } from '../../utils/validation';
+import { extractErrorMessage } from '../../utils/errors';
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
@@ -25,28 +27,25 @@ export const RegisterForm = () => {
       email?: string;
       password?: string;
       confirmPassword?: string;
-    } = {};
+    } = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
 
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
+    // Validate password confirmation
     if (!confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // Filter out undefined values
+    const filteredErrors = Object.fromEntries(
+      Object.entries(newErrors).filter(([_, value]) => value !== undefined)
+    ) as typeof newErrors;
+
+    setErrors(filteredErrors);
+    return Object.keys(filteredErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,8 +61,8 @@ export const RegisterForm = () => {
       await register({ email, password });
       toast.success('Account created successfully!');
       navigate('/dashboard', { replace: true });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.title || 'Registration failed. Please try again.';
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, 'Registration failed. Please try again.');
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

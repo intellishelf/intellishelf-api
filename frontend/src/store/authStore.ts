@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { User, LoginRequest, RegisterRequest } from '../types/auth';
 import { authApi } from '../api/endpoints/auth';
 import { setAccessToken, getAccessToken } from '../api/client';
+import { extractErrorMessage } from '../utils/errors';
 
 interface AuthState {
   user: User | null;
@@ -40,8 +41,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
         error: null,
       });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.title || 'Login failed. Please try again.';
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, 'Login failed. Please try again.');
       set({
         user: null,
         isAuthenticated: false,
@@ -68,8 +69,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
         error: null,
       });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.title || 'Registration failed. Please try again.';
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, 'Registration failed. Please try again.');
       set({
         user: null,
         isAuthenticated: false,
