@@ -15,7 +15,7 @@ public static class AiModule
         var aiConfig = aiSection
             .Get<AiConfig>() ?? throw new InvalidOperationException("AI configuration is missing");
 
-        builder.Services.AddSingleton(_ => new ChatClient("gpt-4o-mini", aiConfig.OpenAiApiKey));
+        builder.Services.AddSingleton(_ => new ChatClient("gpt-4o", aiConfig.OpenAiApiKey));
         builder.Services.AddTransient<IAiService, AiService>();
     }
 }

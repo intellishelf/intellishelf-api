@@ -25,6 +25,7 @@ AzureModule.Register(builder);
 UsersModule.Register(builder);
 BooksModule.Register(builder.Services);
 AiModule.Register(builder);
+ChatModule.Register(builder.Services);
 
 var app = builder.Build();
 
