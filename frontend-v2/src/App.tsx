@@ -1,38 +1,78 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
-import Index from "./pages/Index";
-import AddBooks from "./pages/AddBooks";
-import Chat from "./pages/Chat";
-import Settings from "./pages/Settings";
-import BookDetail from "./pages/BookDetail";
-import NotFound from "./pages/NotFound";
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useAuth } from './hooks/auth/useAuth';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { BookDetailPage } from './pages/BookDetailPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
-const queryClient = new QueryClient();
+function App() {
+  const { loadUser } = useAuth();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/add" element={<AddBooks />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/book/:id" element={<BookDetail />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  // Load user on app mount (if token exists in localStorage)
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  return (
+    <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#fff',
+            color: '#1f2937',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/books/:bookId"
+          element={
+            <ProtectedRoute>
+              <BookDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect root to dashboard */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        {/* 404 page */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
