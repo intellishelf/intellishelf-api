@@ -102,7 +102,7 @@ public class BookService(
             Isbn13 = isbn13,
             Pages = metadata.Pages,
             CoverImageUrl = coverImageUrl,
-            Status = ReadingStatus.ToRead,
+            Status = ReadingStatus.Unread,
             Tags = null,
             Annotation = null,
             StartedReadingDate = null,

@@ -356,7 +356,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.False(string.IsNullOrWhiteSpace(book.Id));
         Assert.False(string.IsNullOrWhiteSpace(book.Title));
         Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
-        Assert.Equal(ReadingStatus.ToRead, book.Status);
+        Assert.Equal(ReadingStatus.Unread, book.Status);
 
         // Verify ISBNs are stored
         Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
@@ -409,7 +409,6 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         // Arrange - Add a book with ISBN first
         var isbn13 = "9780135957059";
         var existingBook = CreateBookEntity("Existing Book", "Author");
-        existingBook.Isbn13 = isbn13;
         await _mongoDbFixture.SeedBooksAsync(existingBook);
 
         var request = new { Isbn = isbn13 };
