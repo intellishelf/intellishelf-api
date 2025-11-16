@@ -50,14 +50,14 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
     private async Task GivenBooksWithMatchingTitle_WhenSearch_ThenReturnsMatchingBooks()
     {
         // Arrange
-        var csharpBook = CreateBookEntity("The C# Programming Language", "Anders Hejlsberg");
-        var pythonBook = CreateBookEntity("Learning Python", "Mark Lutz");
-        var javaBook = CreateBookEntity("Effective Java", "Joshua Bloch");
+        var prideAndPrejudice = CreateBookEntity("Pride and Prejudice", "Jane Austen");
+        var wuthering = CreateBookEntity("Wuthering Heights", "Emily Brontë");
+        var frankenstein = CreateBookEntity("Frankenstein", "Mary Shelley");
 
-        await _mongoDbFixture.SeedBooksAndWaitForIndexing(csharpBook, pythonBook, javaBook);
+        await _mongoDbFixture.SeedBooksAndWaitForIndexing(prideAndPrejudice, wuthering, frankenstein);
 
         // Act
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Python");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Prejudice");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -66,45 +66,21 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         Assert.NotNull(pagedResult);
         Assert.Single(pagedResult.Items);
         Assert.Equal(1, pagedResult.TotalCount);
-        Assert.Equal("Learning Python", pagedResult.Items.First().Title);
+        Assert.Equal("Pride and Prejudice", pagedResult.Items.First().Title);
     }
 
     [Fact]
     private async Task GivenBooksWithMatchingAuthor_WhenSearch_ThenReturnsMatchingBooks()
     {
         // Arrange
-        var csharpBook = CreateBookEntity("C# in Depth", "Jon Skeet");
-        var pythonBook = CreateBookEntity("Fluent Python", "Luciano Ramalho");
-        var anotherCsharpBook = CreateBookEntity("Pro C#", "Andrew Troelsen");
+        var greatExpectations = CreateBookEntity("Great Expectations", "Charles Dickens");
+        var atale = CreateBookEntity("A Tale of Two Cities", "Charles Dickens");
+        var mobyDick = CreateBookEntity("Moby Dick", "Herman Melville");
 
-        await _mongoDbFixture.SeedBooksAndWaitForIndexing(csharpBook, pythonBook, anotherCsharpBook);
+        await _mongoDbFixture.SeedBooksAndWaitForIndexing(greatExpectations, atale, mobyDick);
 
         // Act
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Skeet");
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
-        Assert.NotNull(pagedResult);
-        Assert.Single(pagedResult.Items);
-        Assert.Equal(1, pagedResult.TotalCount);
-        Assert.Equal("C# in Depth", pagedResult.Items.First().Title);
-        Assert.Contains("Jon Skeet", pagedResult.Items.First().Authors);
-    }
-
-    [Fact]
-    private async Task GivenMultipleMatches_WhenSearch_ThenReturnsAllMatches()
-    {
-        // Arrange
-        var designPatternsBook = CreateBookEntity("Design Patterns", "Gang of Four");
-        var cleanCodeBook = CreateBookEntity("Clean Code", "Robert Martin");
-        var refactoringBook = CreateBookEntity("Refactoring", "Martin Fowler");
-
-        await _mongoDbFixture.SeedBooksAndWaitForIndexing(designPatternsBook, cleanCodeBook, refactoringBook);
-
-        // Act - Search for "Martin" which appears in 2 books
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Martin");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Dickens");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -113,24 +89,50 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         Assert.NotNull(pagedResult);
         Assert.Equal(2, pagedResult.Items.Count);
         Assert.Equal(2, pagedResult.TotalCount);
+        var titles = pagedResult.Items.Select(b => b.Title).ToArray();
+        Assert.Contains("Great Expectations", titles);
+        Assert.Contains("A Tale of Two Cities", titles);
+    }
+
+    [Fact]
+    private async Task GivenMultipleMatches_WhenSearch_ThenReturnsAllMatches()
+    {
+        // Arrange
+        var theBronteSisters = CreateBookEntity("The Brontë Sisters", "Various");
+        var jane = CreateBookEntity("Jane Eyre", "Charlotte Brontë");
+        var wuthering = CreateBookEntity("Wuthering Heights", "Emily Brontë");
+
+        await _mongoDbFixture.SeedBooksAndWaitForIndexing(theBronteSisters, jane, wuthering);
+
+        // Act - Search for "Brontë" which appears in 3 books
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Brontë");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        Assert.NotNull(pagedResult);
+        Assert.Equal(3, pagedResult.Items.Count);
+        Assert.Equal(3, pagedResult.TotalCount);
 
         var titles = pagedResult.Items.Select(b => b.Title).ToArray();
-        Assert.Contains("Clean Code", titles);
-        Assert.Contains("Refactoring", titles);
+        Assert.Contains("The Brontë Sisters", titles);
+        Assert.Contains("Jane Eyre", titles);
+        Assert.Contains("Wuthering Heights", titles);
     }
 
     [Fact]
     private async Task GivenBooks_WhenSearchWithPagination_ThenReturnsPagedResults()
     {
         // Arrange
-        var book1 = CreateBookEntity("Programming Book One", "Author A");
-        var book2 = CreateBookEntity("Programming Book Two", "Author B");
-        var book3 = CreateBookEntity("Programming Book Three", "Author C");
+        var sherlock1 = CreateBookEntity("A Scandal in Bohemia", "Arthur Conan Doyle");
+        var sherlock2 = CreateBookEntity("The Speckled Band", "Arthur Conan Doyle");
+        var sherlock3 = CreateBookEntity("The Red-Headed League", "Arthur Conan Doyle");
 
-        await _mongoDbFixture.SeedBooksAndWaitForIndexing(book1, book2, book3);
+        await _mongoDbFixture.SeedBooksAndWaitForIndexing(sherlock1, sherlock2, sherlock3);
 
         // Act - Search with page size of 2
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Programming&page=1&pageSize=2");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Doyle&page=1&pageSize=2");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
