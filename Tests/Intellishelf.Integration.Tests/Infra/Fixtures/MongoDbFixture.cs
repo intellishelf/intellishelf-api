@@ -31,7 +31,7 @@ public class MongoDbFixture : IAsyncLifetime
     {
         var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
 
-        // Define the Atlas Search index with autocomplete and text fields
+        // Define the Atlas Search index - matches production configuration exactly
         var searchIndexDefinition = new MongoDB.Bson.BsonDocument
         {
             { "mappings", new MongoDB.Bson.BsonDocument
@@ -39,70 +39,37 @@ public class MongoDbFixture : IAsyncLifetime
                     { "dynamic", false },
                     { "fields", new MongoDB.Bson.BsonDocument
                         {
-                            { "Title", new MongoDB.Bson.BsonDocument
+                            { "Title", new MongoDB.Bson.BsonArray
                                 {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
+                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
+                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
                                 }
                             },
-                            { "Title", new MongoDB.Bson.BsonDocument
+                            { "Authors", new MongoDB.Bson.BsonArray
                                 {
-                                    { "type", "autocomplete" },
-                                    { "analyzer", "lucene.standard" },
-                                    { "tokenization", "edgeGram" },
-                                    { "minGrams", 2 },
-                                    { "maxGrams", 15 },
-                                    { "foldDiacritics", true }
-                                }
-                            },
-                            { "Authors", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
-                                }
-                            },
-                            { "Authors", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "autocomplete" },
-                                    { "analyzer", "lucene.standard" },
-                                    { "tokenization", "edgeGram" },
-                                    { "minGrams", 2 },
-                                    { "maxGrams", 15 },
-                                    { "foldDiacritics", true }
-                                }
-                            },
-                            { "Publisher", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
-                                }
-                            },
-                            { "Publisher", new MongoDB.Bson.BsonDocument
-                                {
-                                    { "type", "autocomplete" },
-                                    { "analyzer", "lucene.standard" },
-                                    { "tokenization", "edgeGram" },
-                                    { "minGrams", 2 },
-                                    { "maxGrams", 15 },
-                                    { "foldDiacritics", true }
+                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
+                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
                                 }
                             },
                             { "Tags", new MongoDB.Bson.BsonDocument
                                 {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
+                                    { "type", "string" }
                                 }
                             },
                             { "Description", new MongoDB.Bson.BsonDocument
                                 {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
+                                    { "type", "string" }
                                 }
                             },
                             { "Annotation", new MongoDB.Bson.BsonDocument
                                 {
-                                    { "type", "string" },
-                                    { "analyzer", "lucene.standard" }
+                                    { "type", "string" }
+                                }
+                            },
+                            { "Publisher", new MongoDB.Bson.BsonArray
+                                {
+                                    new MongoDB.Bson.BsonDocument { { "type", "string" } },
+                                    new MongoDB.Bson.BsonDocument { { "type", "autocomplete" } }
                                 }
                             },
                             { "UserId", new MongoDB.Bson.BsonDocument
