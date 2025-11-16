@@ -1,3 +1,5 @@
+using Intellishelf.Domain.Books.Models;
+
 namespace Intellishelf.Api.Contracts.Books;
 
 public class BookRequestContractBase
@@ -14,4 +16,8 @@ public class BookRequestContractBase
     public string? Publisher { get; init; }
     public string[]? Tags { get; init; }
     public IFormFile? ImageFile { get; init; }
+
+    public ReadingStatus Status { get; init; } = ReadingStatus.Unread;
+    public DateTime? StartedReadingDate { get; init; }
+    public DateTime? FinishedReadingDate { get; init; }
 }

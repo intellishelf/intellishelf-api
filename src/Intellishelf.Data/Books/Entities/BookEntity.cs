@@ -23,7 +23,7 @@ public class BookEntity : EntityBase
     public required DateTime CreatedDate { get; init; }
     public required DateTime ModifiedDate { get; init; }
 
-    public ReadingStatus? Status { get; init; }
+    public required ReadingStatus Status { get; init; }
     public DateTime? StartedReadingDate { get; init; }
     public DateTime? FinishedReadingDate { get; init; }
 }
