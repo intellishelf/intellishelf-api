@@ -43,7 +43,7 @@ public class GoogleBooksMetadataService(HttpClient httpClient) : IBookMetadataSe
                     : "Unknown Title",
 
                 Authors = volumeInfo.TryGetProperty("authors", out var authors) && authors.ValueKind == JsonValueKind.Array
-                    ? string.Join(", ", authors.EnumerateArray().Select(a => a.GetString()).Where(a => a != null))
+                    ? authors.EnumerateArray().Select(a => a.GetString()).Where(a => a != null).ToArray()
                     : null,
 
                 Publisher = volumeInfo.TryGetProperty("publisher", out var publisher)
