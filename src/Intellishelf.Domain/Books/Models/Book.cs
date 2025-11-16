@@ -18,4 +18,8 @@ public class Book
     public DateTime? PublicationDate { get; init; }
     public string? Publisher { get; init; }
     public string[]? Tags { get; init; }
+
+    public ReadingStatus Status { get; init; }
+    public DateTime? StartedReadingDate { get; init; }
+    public DateTime? FinishedReadingDate { get; init; }
 }

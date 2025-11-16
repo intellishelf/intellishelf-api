@@ -19,7 +19,10 @@ public class BookMapper : IBookMapper
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
             Tags = contract.Tags,
-            CoverImageUrl = coverImageUrl
+            CoverImageUrl = coverImageUrl,
+            Status = contract.Status,
+            StartedReadingDate = contract.StartedReadingDate,
+            FinishedReadingDate = contract.FinishedReadingDate
         };
 
     public UpdateBookRequest MapUpdate(string userId, string bookId, BookRequestContractBase contract, string? coverImageUrl) =>
@@ -37,6 +40,9 @@ public class BookMapper : IBookMapper
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
             Tags = contract.Tags,
-            CoverImageUrl = coverImageUrl
+            CoverImageUrl = coverImageUrl,
+            Status = contract.Status,
+            StartedReadingDate = contract.StartedReadingDate,
+            FinishedReadingDate = contract.FinishedReadingDate
         };
 }

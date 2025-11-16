@@ -1,3 +1,4 @@
+using Intellishelf.Domain.Books.Models;
 using MongoDB.Bson;
 
 namespace Intellishelf.Data.Books.Entities;
@@ -21,4 +22,8 @@ public class BookEntity : EntityBase
     public string[]? Tags { get; init; }
     public required DateTime CreatedDate { get; init; }
     public required DateTime ModifiedDate { get; init; }
+
+    public required ReadingStatus Status { get; init; }
+    public DateTime? StartedReadingDate { get; init; }
+    public DateTime? FinishedReadingDate { get; init; }
 }

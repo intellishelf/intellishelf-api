@@ -176,6 +176,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(new StringContent("Test Author"), "Authors[0]");
         content.Add(new StringContent("Test description"), "Description");
         content.Add(new StringContent(DateTime.UtcNow.ToString("O")), "PublicationDate");
+        content.Add(new StringContent(nameof(ReadingStatus.Reading)), "Status");
+        content.Add(new StringContent(DateTime.UtcNow.ToString("O")), "StartedReadingDate");
 
         var imageContent = new ByteArrayContent(SampleImageBytes);
         imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
@@ -193,20 +195,21 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.Equal("Test Book Title", book.Title);
         Assert.Contains("Test Author", book.Authors);
         Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+        Assert.Equal(ReadingStatus.Reading, book.Status);
+        Assert.NotNull(book.StartedReadingDate);
 
         var location = response.Headers.Location;
         Assert.NotNull(location);
 
         var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
         Assert.NotNull(persistedBook);
-        Assert.Equal("Test Book Title", persistedBook!.Title);
+        Assert.Equal("Test Book Title", persistedBook.Title);
         Assert.Contains("Test Author", persistedBook.Authors ?? []);
+        Assert.Equal(ReadingStatus.Reading, persistedBook.Status);
 
-        if (!string.IsNullOrWhiteSpace(persistedBook.CoverImageUrl))
-        {
-            var blobExists = await _azuriteFixture.BlobExistsFromUrlAsync(persistedBook.CoverImageUrl);
-            Assert.True(blobExists);
-        }
+        Assert.NotNull(persistedBook.CoverImageUrl);
+        var blobExists = await _azuriteFixture.BlobExistsFromUrlAsync(persistedBook.CoverImageUrl);
+        Assert.True(blobExists);
     }
 
     [Fact]
@@ -268,6 +271,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         using var updatedBook = new MultipartFormDataContent();
         updatedBook.Add(new StringContent("Updated Title"), "Title");
         updatedBook.Add(new StringContent("Author Two"), "Authors[0]");
+        updatedBook.Add(new StringContent(nameof(ReadingStatus.Read)), "Status");
+        updatedBook.Add(new StringContent(DateTime.UtcNow.ToString("O")), "FinishedReadingDate");
 
         // Act
         var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook);
@@ -279,6 +284,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.NotNull(storedBook);
         Assert.Equal("Updated Title", storedBook.Title);
         Assert.Contains("Author Two", storedBook.Authors ?? []);
+        Assert.Equal(ReadingStatus.Read, storedBook.Status);
+        Assert.NotNull(storedBook.FinishedReadingDate);
     }
 
     [Fact]
@@ -332,6 +339,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.Equal(FileErrorCodes.UploadFailed, problem.Type);
     }
 
+
     private static BookEntity CreateBookEntity(
         string title,
         string author,
@@ -348,7 +356,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             CreatedDate = timestamp,
             ModifiedDate = timestamp,
             UserId = ObjectId.Parse(userId ?? DefaultTestUsers.Authenticated.Id),
-            CoverImageUrl = coverImageUrl
+            CoverImageUrl = coverImageUrl,
+            Status = ReadingStatus.Unread
         };
     }
 

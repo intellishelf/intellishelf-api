@@ -15,4 +15,7 @@ public class BookRequestBase
     public string? Publisher { get; init; }
     public string[]? Tags { get; init; }
     public string? CoverImageUrl { get; init; }
+    public required ReadingStatus Status { get; init; }
+    public DateTime? StartedReadingDate { get; init; }
+    public DateTime? FinishedReadingDate { get; init; }
 }

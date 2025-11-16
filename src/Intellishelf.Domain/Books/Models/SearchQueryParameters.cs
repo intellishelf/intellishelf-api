@@ -16,4 +16,6 @@ public class SearchQueryParameters
         get => _pageSize;
         set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
     }
+
+    public ReadingStatus? Status { get; init; }
 }
