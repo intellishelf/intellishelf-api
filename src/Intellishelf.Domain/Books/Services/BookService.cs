@@ -32,23 +32,18 @@ public class BookService(
             return new Error(BookErrorCodes.InvalidIsbn, "The provided ISBN format is invalid");
         }
 
-        // Normalize and determine ISBN type
+        // Normalize ISBN
         var normalizedIsbn = IsbnHelper.NormalizeIsbn(isbn);
-        string? isbn10 = null;
-        string? isbn13 = null;
 
-        if (normalizedIsbn.Length == 10)
-        {
-            isbn10 = normalizedIsbn;
-            isbn13 = IsbnHelper.ConvertIsbn10ToIsbn13(normalizedIsbn);
-        }
-        else if (normalizedIsbn.Length == 13)
-        {
-            isbn13 = normalizedIsbn;
-        }
+        // Fetch metadata from Google Books
+        var metadataResult = await bookMetadataService.TryGetBookMetadataAsync(normalizedIsbn);
+        if (!metadataResult.IsSuccess)
+            return new Error(metadataResult.Error!.Code, metadataResult.Error.Message);
 
-        // Check for duplicate
-        var existingBookResult = await bookDao.FindByIsbnAsync(userId, isbn10, isbn13);
+        var metadata = metadataResult.Value;
+
+        // Check for duplicate using ISBNs from Google Books response
+        var existingBookResult = await bookDao.FindByIsbnAsync(userId, metadata.Isbn10, metadata.Isbn13);
         if (!existingBookResult.IsSuccess)
             return new Error(existingBookResult.Error!.Code, existingBookResult.Error.Message);
 
@@ -59,17 +54,6 @@ public class BookService(
                 "You already have this book in your library");
         }
 
-        // Fetch metadata from Google Books
-        var metadataResult = await bookMetadataService.TryGetBookMetadataAsync(normalizedIsbn);
-        if (!metadataResult.IsSuccess)
-            return new Error(metadataResult.Error!.Code, metadataResult.Error.Message);
-
-        var metadata = metadataResult.Value;
-
-        // Use ISBNs from metadata if available, otherwise use our normalized values
-        isbn10 = metadata.Isbn10 ?? isbn10;
-        isbn13 = metadata.Isbn13 ?? isbn13;
-
         // Download and upload cover image if available
         string? coverImageUrl = null;
         if (!string.IsNullOrWhiteSpace(metadata.CoverImageUrl))
@@ -77,7 +61,7 @@ public class BookService(
             var imageStreamResult = await httpImageDownloader.DownloadImageAsync(metadata.CoverImageUrl);
             if (imageStreamResult.IsSuccess)
             {
-                var fileName = $"{isbn13 ?? isbn10}.jpg";
+                var fileName = $"{metadata.Isbn13 ?? metadata.Isbn10 ?? normalizedIsbn}.jpg";
                 var uploadResult = await fileStorageService.UploadFileAsync(userId, imageStreamResult.Value, fileName);
 
                 if (uploadResult.IsSuccess)
@@ -98,8 +82,8 @@ public class BookService(
             Publisher = metadata.Publisher,
             PublicationDate = metadata.PublicationDate,
             Description = metadata.Description,
-            Isbn10 = isbn10,
-            Isbn13 = isbn13,
+            Isbn10 = metadata.Isbn10,
+            Isbn13 = metadata.Isbn13,
             Pages = metadata.Pages,
             CoverImageUrl = coverImageUrl,
             Status = ReadingStatus.Unread,
