@@ -1,28 +1,43 @@
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Testcontainers.MongoDb;
 using Xunit;
 
 namespace Intellishelf.Integration.Tests.Infra.Fixtures;
 
 public class MongoDbFixture : IAsyncLifetime
 {
-    private MongoDbContainer _mongoContainer;
-    public string ConnectionString => _mongoContainer.GetConnectionString();
-    public IMongoDatabase Database { get; private set; }
-
+    private const int MongoDbPort = 27017;
+    private IContainer _container = default!;
+    public string ConnectionString { get; private set; } = default!;
+    public IMongoDatabase Database { get; private set; } = default!;
     public async Task InitializeAsync()
     {
-        _mongoContainer = new MongoDbBuilder()
+        _container = new ContainerBuilder()
             .WithImage("mongodb/mongodb-atlas-local:latest")
+            // map container port to a random free host port
+            .WithPortBinding(MongoDbPort, assignRandomHostPort: true)
+            // wait until MongoDB inside the container is listening
+            .WithWaitStrategy(
+                Wait.ForUnixContainer()
+                    .UntilPortIsAvailable(MongoDbPort)
+            )
             .Build();
 
-        await _mongoContainer.StartAsync();
+        await _container.StartAsync();
 
-        var client = new MongoClient(_mongoContainer.GetConnectionString());
+        var mappedPort = _container.GetMappedPublicPort(MongoDbPort);
+
+        // Recommended pattern from Atlas Local docs:
+        // mongosh "mongodb://localhost:27017/?directConnection=true"
+        // :contentReference[oaicite:2]{index=2}
+        ConnectionString = $"mongodb://127.0.0.1:{mappedPort}/?directConnection=true";
+
+        var client = new MongoClient(ConnectionString);
         Database = client.GetDatabase("intellishelf-test");
 
         // Create Atlas Search index for books collection
@@ -31,26 +46,57 @@ public class MongoDbFixture : IAsyncLifetime
 
     private async Task CreateSearchIndexAsync()
     {
-        var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
+        // Ensure the collection exists by creating it if it doesn't
+        try
+        {
+            await Database.CreateCollectionAsync(BookEntity.CollectionName);
+        }
+        catch (MongoCommandException ex) when (ex.Message.Contains("already exists"))
+        {
+            // Collection already exists, that's fine
+        }
 
-        // Load search index definition from JSON file (matches production configuration)
+        var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
         var searchIndexJson = await File.ReadAllTextAsync(
             Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "search-index.json"));
         var searchIndexDefinition = BsonSerializer.Deserialize<BsonDocument>(searchIndexJson);
 
-        // Create the search index
-        var indexName = await booksCollection.SearchIndexes.CreateOneAsync(
-            new CreateSearchIndexModel("default", searchIndexDefinition));
-
-        // Poll until the index is ready (usually takes 2-10 seconds)
-        var maxWaitTime = TimeSpan.FromSeconds(30);
+        const string indexName = "default";
+        const int maxRetries = 10;
+        var retryDelay = TimeSpan.FromSeconds(1);
+        var indexReadyTimeout = TimeSpan.FromSeconds(30);
         var pollInterval = TimeSpan.FromMilliseconds(500);
+
+        for (int attempt = 0; attempt < maxRetries; attempt++)
+        {
+            try
+            {
+                // Create the search index
+                await booksCollection.SearchIndexes.CreateOneAsync(
+                    new CreateSearchIndexModel(indexName, searchIndexDefinition));
+
+                // Wait for index to become READY
+                await WaitForIndexReadyAsync(booksCollection, indexName, indexReadyTimeout, pollInterval);
+                return;
+            }
+            catch (MongoCommandException ex) when (ex.Message.Contains("connecting to Search Index Management service") && attempt < maxRetries - 1)
+            {
+                // Search service not ready, retry after delay
+                await Task.Delay(retryDelay);
+            }
+        }
+
+        throw new TimeoutException("Failed to create search index after multiple retries. Search service may not be available.");
+    }
+
+    private async Task WaitForIndexReadyAsync(IMongoCollection<BookEntity> collection, string indexName, TimeSpan timeout, TimeSpan pollInterval)
+    {
         var startTime = DateTime.UtcNow;
 
-        while (DateTime.UtcNow - startTime < maxWaitTime)
+        while (DateTime.UtcNow - startTime < timeout)
         {
-            var indexes = await booksCollection.SearchIndexes.ListAsync().ToListAsync();
-            var index = indexes.FirstOrDefault(i => i["name"] == "default");
+            var indexes = (await collection.SearchIndexes.ListAsync()).ToList();
+            var index = indexes.FirstOrDefault(i => i["name"] == indexName);
 
             if (index != null && index.Contains("status") && index["status"] == "READY")
             {
@@ -64,7 +110,7 @@ public class MongoDbFixture : IAsyncLifetime
     }
 
     public async Task DisposeAsync() =>
-        await _mongoContainer.DisposeAsync();
+        await _container.DisposeAsync();
 
     private Task SeedUserAsync(UserEntity user)
     {
