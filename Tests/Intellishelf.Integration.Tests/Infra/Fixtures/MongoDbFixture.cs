@@ -1,5 +1,7 @@
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 using Xunit;
@@ -15,13 +17,50 @@ public class MongoDbFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _mongoContainer = new MongoDbBuilder()
-            .WithImage("mongo:7.0")
+            .WithImage("mongodb/mongodb-atlas-local:latest")
             .Build();
 
         await _mongoContainer.StartAsync();
 
         var client = new MongoClient(_mongoContainer.GetConnectionString());
         Database = client.GetDatabase("intellishelf-test");
+
+        // Create Atlas Search index for books collection
+        await CreateSearchIndexAsync();
+    }
+
+    private async Task CreateSearchIndexAsync()
+    {
+        var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
+
+        // Load search index definition from JSON file (matches production configuration)
+        var searchIndexJson = await File.ReadAllTextAsync(
+            Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "search-index.json"));
+        var searchIndexDefinition = BsonSerializer.Deserialize<BsonDocument>(searchIndexJson);
+
+        // Create the search index
+        var indexName = await booksCollection.SearchIndexes.CreateOneAsync(
+            new CreateSearchIndexModel("default", searchIndexDefinition));
+
+        // Poll until the index is ready (usually takes 2-10 seconds)
+        var maxWaitTime = TimeSpan.FromSeconds(30);
+        var pollInterval = TimeSpan.FromMilliseconds(500);
+        var startTime = DateTime.UtcNow;
+
+        while (DateTime.UtcNow - startTime < maxWaitTime)
+        {
+            var indexes = await booksCollection.SearchIndexes.ListAsync().ToListAsync();
+            var index = indexes.FirstOrDefault(i => i["name"] == "default");
+
+            if (index != null && index.Contains("status") && index["status"] == "READY")
+            {
+                return; // Index is ready
+            }
+
+            await Task.Delay(pollInterval);
+        }
+
+        throw new TimeoutException("Search index did not become ready within the expected time.");
     }
 
     public async Task DisposeAsync() =>
@@ -40,6 +79,17 @@ public class MongoDbFixture : IAsyncLifetime
 
     public async Task SeedBooksAsync(params BookEntity[] books) =>
         await Database.GetCollection<BookEntity>(BookEntity.CollectionName).InsertManyAsync(books);
+
+    /// <summary>
+    /// Seeds books and waits for Atlas Search indexing to complete.
+    /// Use this method ONLY for search tests. Regular tests should use SeedBooksAsync().
+    /// </summary>
+    public async Task SeedBooksAndWaitForIndexing(params BookEntity[] books)
+    {
+        await SeedBooksAsync(books);
+        // Atlas Search has ~1 second indexing delay regardless of document count
+        await Task.Delay(1500);
+    }
 
     public async Task ClearBooksAsync() =>
         await Database.GetCollection<BookEntity>(BookEntity.CollectionName).DeleteManyAsync(FilterDefinition<BookEntity>.Empty);

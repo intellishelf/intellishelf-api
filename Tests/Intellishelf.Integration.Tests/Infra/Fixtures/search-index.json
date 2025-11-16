@@ -1,0 +1,43 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "Title": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "autocomplete"
+        }
+      ],
+      "Authors": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "autocomplete"
+        }
+      ],
+      "Tags": {
+        "type": "string"
+      },
+      "Description": {
+        "type": "string"
+      },
+      "Annotation": {
+        "type": "string"
+      },
+      "Publisher": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "autocomplete"
+        }
+      ],
+      "UserId": {
+        "type": "objectId"
+      }
+    }
+  }
+}
