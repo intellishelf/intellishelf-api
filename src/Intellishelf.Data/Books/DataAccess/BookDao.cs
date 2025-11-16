@@ -103,6 +103,43 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         return mapper.Map(bookEntity);
     }
 
+    public async Task<TryResult<Book?>> FindByIsbnAsync(string userId, string? isbn10, string? isbn13)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+
+        var filterBuilder = Builders<BookEntity>.Filter;
+        var filters = new List<FilterDefinition<BookEntity>>
+        {
+            filterBuilder.Eq(b => b.UserId, userIdObject)
+        };
+
+        var isbnFilters = new List<FilterDefinition<BookEntity>>();
+
+        if (!string.IsNullOrWhiteSpace(isbn10))
+            isbnFilters.Add(filterBuilder.Eq(b => b.Isbn10, isbn10));
+
+        if (!string.IsNullOrWhiteSpace(isbn13))
+            isbnFilters.Add(filterBuilder.Eq(b => b.Isbn13, isbn13));
+
+        if (isbnFilters.Count > 0)
+        {
+            filters.Add(filterBuilder.Or(isbnFilters));
+        }
+        else
+        {
+            // No ISBN provided, return null
+            return (Book?)null;
+        }
+
+        var filter = filterBuilder.And(filters);
+
+        var bookEntity = await _booksCollection
+            .Find(filter)
+            .FirstOrDefaultAsync();
+
+        return bookEntity != null ? mapper.Map(bookEntity) : null;
+    }
+
     public async Task<TryResult<Book>> AddBookAsync(AddBookRequest request)
     {
         var book = new BookEntity

@@ -15,8 +15,9 @@ public abstract class ApiControllerBase : ControllerBase
     private static int MapErrorToStatusCode(string code) => code switch
     {
         // 404 Not Found
-        BookErrorCodes.BookNotFound => StatusCodes.Status404NotFound,
-        
+        BookErrorCodes.BookNotFound or
+        BookErrorCodes.IsbnNotFound => StatusCodes.Status404NotFound,
+
         // 401 Unauthorized
         UserErrorCodes.UserNotFound or
         UserErrorCodes.Unauthorized or
@@ -24,20 +25,26 @@ public abstract class ApiControllerBase : ControllerBase
         UserErrorCodes.RefreshTokenNotFound  or
         UserErrorCodes.RefreshTokenRevoked or
         UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
-        
+
         // 409 Conflict
-        UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,
+        UserErrorCodes.AlreadyExists or
+        BookErrorCodes.DuplicateIsbn => StatusCodes.Status409Conflict,
 
         // 400 Bad Request
         FileErrorCodes.InvalidFileType or
-        FileErrorCodes.FileTooLarge => StatusCodes.Status400BadRequest,
+        FileErrorCodes.FileTooLarge or
+        BookErrorCodes.InvalidIsbn => StatusCodes.Status400BadRequest,
+
+        // 502 Bad Gateway (external service errors)
+        BookErrorCodes.MetadataServiceError or
+        BookErrorCodes.CoverImageDownloadFailed => StatusCodes.Status502BadGateway,
 
         // 500 Internal Server Error
-        FileErrorCodes.UploadFailed or 
-        FileErrorCodes.DeletionFailed or 
-        AiErrorCodes.AiResponseNotParsed or 
+        FileErrorCodes.UploadFailed or
+        FileErrorCodes.DeletionFailed or
+        AiErrorCodes.AiResponseNotParsed or
         AiErrorCodes.RequestFailed => StatusCodes.Status500InternalServerError,
-        
+
         _ => StatusCodes.Status500InternalServerError
     };
 

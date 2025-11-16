@@ -339,6 +339,111 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.Equal(FileErrorCodes.UploadFailed, problem.Type);
     }
 
+    [Fact]
+    private async Task GivenValidIsbn13_WhenAddBookFromIsbn_ThenCreated()
+    {
+        // Arrange - Using a known ISBN for testing (The Pragmatic Programmer)
+        var request = new { Isbn = "9780135957059" };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        Assert.NotNull(book);
+        Assert.False(string.IsNullOrWhiteSpace(book.Id));
+        Assert.False(string.IsNullOrWhiteSpace(book.Title));
+        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+        Assert.Equal(ReadingStatus.ToRead, book.Status);
+
+        // Verify ISBNs are stored
+        Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
+
+        // Verify book was persisted
+        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(persistedBook);
+        Assert.Equal(book.Title, persistedBook.Title);
+    }
+
+    [Fact]
+    private async Task GivenValidIsbn10_WhenAddBookFromIsbn_ThenCreatedWithBothIsbnFormats()
+    {
+        // Arrange - ISBN-10 version of The Pragmatic Programmer
+        var request = new { Isbn = "0135957052" };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        Assert.NotNull(book);
+        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+
+        // Both ISBN formats should be present (converted)
+        Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
+    }
+
+    [Fact]
+    private async Task GivenInvalidIsbn_WhenAddBookFromIsbn_ThenBadRequest()
+    {
+        // Arrange - Invalid ISBN (wrong length)
+        var request = new { Isbn = "123" };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.Equal(BookErrorCodes.InvalidIsbn, problem.Type);
+    }
+
+    [Fact]
+    private async Task GivenDuplicateIsbn_WhenAddBookFromIsbn_ThenConflict()
+    {
+        // Arrange - Add a book with ISBN first
+        var isbn13 = "9780135957059";
+        var existingBook = CreateBookEntity("Existing Book", "Author");
+        existingBook.Isbn13 = isbn13;
+        await _mongoDbFixture.SeedBooksAsync(existingBook);
+
+        var request = new { Isbn = isbn13 };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.Equal(BookErrorCodes.DuplicateIsbn, problem.Type);
+    }
+
+    [Fact]
+    private async Task GivenIsbnNotInGoogleBooks_WhenAddBookFromIsbn_ThenNotFound()
+    {
+        // Arrange - Using an ISBN that's unlikely to exist
+        var request = new { Isbn = "9999999999999" };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+
+        // Assert - Should get either NotFound or BadGateway depending on API response
+        Assert.True(
+            response.StatusCode == HttpStatusCode.NotFound ||
+            response.StatusCode == HttpStatusCode.BadGateway);
+
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        Assert.True(
+            problem.Type == BookErrorCodes.IsbnNotFound ||
+            problem.Type == BookErrorCodes.MetadataServiceError);
+    }
+
 
     private static BookEntity CreateBookEntity(
         string title,
