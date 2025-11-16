@@ -100,18 +100,18 @@ export const RegisterForm = () => {
           <Input
             type="password"
             label="Password"
-            placeholder="••••••••"
+            placeholder="•••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={errors.password}
-            helperText="Must be at least 6 characters"
+            helperText="Must be at least 5 characters"
             disabled={isLoading}
           />
 
           <Input
             type="password"
             label="Confirm Password"
-            placeholder="••••••••"
+            placeholder="•••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={errors.confirmPassword}
