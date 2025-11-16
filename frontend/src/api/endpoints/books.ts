@@ -6,6 +6,7 @@ import type {
   SearchBooksParams,
   AddBookRequest,
 } from '../../types/book';
+import { buildBookFormData } from '../../utils/formData';
 
 export const booksApi = {
   // Get paginated books
@@ -34,25 +35,7 @@ export const booksApi = {
 
   // Add new book
   addBook: async (data: AddBookRequest): Promise<Book> => {
-    const formData = new FormData();
-
-    // Append all fields to FormData
-    formData.append('title', data.title);
-    if (data.annotation) formData.append('annotation', data.annotation);
-    if (data.authors) formData.append('authors', data.authors);
-    if (data.description) formData.append('description', data.description);
-    if (data.isbn10) formData.append('isbn10', data.isbn10);
-    if (data.isbn13) formData.append('isbn13', data.isbn13);
-    if (data.pages !== undefined) formData.append('pages', data.pages.toString());
-    if (data.publicationDate) formData.append('publicationDate', data.publicationDate);
-    if (data.publisher) formData.append('publisher', data.publisher);
-    if (data.tags) {
-      data.tags.forEach((tag) => formData.append('tags', tag));
-    }
-    if (data.imageFile) formData.append('imageFile', data.imageFile);
-    if (data.status !== undefined) formData.append('status', data.status.toString());
-    if (data.startedReadingDate) formData.append('startedReadingDate', data.startedReadingDate);
-    if (data.finishedReadingDate) formData.append('finishedReadingDate', data.finishedReadingDate);
+    const formData = buildBookFormData(data);
 
     const response = await apiClient.post<Book>('/books', formData, {
       headers: {
@@ -64,25 +47,7 @@ export const booksApi = {
 
   // Update book
   updateBook: async (bookId: string, data: AddBookRequest): Promise<void> => {
-    const formData = new FormData();
-
-    // Append all fields to FormData
-    formData.append('title', data.title);
-    if (data.annotation) formData.append('annotation', data.annotation);
-    if (data.authors) formData.append('authors', data.authors);
-    if (data.description) formData.append('description', data.description);
-    if (data.isbn10) formData.append('isbn10', data.isbn10);
-    if (data.isbn13) formData.append('isbn13', data.isbn13);
-    if (data.pages !== undefined) formData.append('pages', data.pages.toString());
-    if (data.publicationDate) formData.append('publicationDate', data.publicationDate);
-    if (data.publisher) formData.append('publisher', data.publisher);
-    if (data.tags) {
-      data.tags.forEach((tag) => formData.append('tags', tag));
-    }
-    if (data.imageFile) formData.append('imageFile', data.imageFile);
-    if (data.status !== undefined) formData.append('status', data.status.toString());
-    if (data.startedReadingDate) formData.append('startedReadingDate', data.startedReadingDate);
-    if (data.finishedReadingDate) formData.append('finishedReadingDate', data.finishedReadingDate);
+    const formData = buildBookFormData(data);
 
     await apiClient.put(`/books/${bookId}`, formData, {
       headers: {

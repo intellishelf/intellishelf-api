@@ -5,6 +5,8 @@ import { Button, Input, Card } from '../ui';
 import { BookOpen } from 'lucide-react';
 import { authApi } from '../../api/endpoints/auth';
 import toast from 'react-hot-toast';
+import { validateEmail, validatePassword } from '../../utils/validation';
+import { extractErrorMessage } from '../../utils/errors';
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -20,22 +22,18 @@ export const LoginForm = () => {
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   const validateForm = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string } = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
 
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-    }
+    // Filter out undefined values
+    const filteredErrors = Object.fromEntries(
+      Object.entries(newErrors).filter(([_, value]) => value !== undefined)
+    ) as { email?: string; password?: string };
 
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(filteredErrors);
+    return Object.keys(filteredErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,8 +49,8 @@ export const LoginForm = () => {
       await login({ email, password });
       toast.success('Successfully logged in!');
       navigate(from, { replace: true });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.title || 'Login failed. Please check your credentials.';
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, 'Login failed. Please check your credentials.');
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

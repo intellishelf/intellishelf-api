@@ -7,8 +7,7 @@ import { BooksGrid } from '../components/books/BooksGrid';
 import { EmptyState } from '../components/books/EmptyState';
 import { LoadingSkeleton } from '../components/books/LoadingSkeleton';
 import { Pagination } from '../components/common/Pagination';
-import { AddBookModal } from '../components/books/AddBookModal';
-import { EditBookModal } from '../components/books/EditBookModal';
+import { BookFormModal } from '../components/books/BookFormModal';
 import { DeleteBookModal } from '../components/books/DeleteBookModal';
 import { SearchBar } from '../components/search/SearchBar';
 import { StatusFilter } from '../components/search/StatusFilter';
@@ -217,18 +216,14 @@ export const DashboardPage = () => {
       </div>
 
       {/* Modals */}
-      <AddBookModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+      <BookFormModal
+        isOpen={isAddModalOpen || !!editingBook}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingBook(null);
+        }}
+        book={editingBook || undefined}
       />
-
-      {editingBook && (
-        <EditBookModal
-          isOpen={!!editingBook}
-          onClose={() => setEditingBook(null)}
-          book={editingBook}
-        />
-      )}
 
       {deletingBook && (
         <DeleteBookModal

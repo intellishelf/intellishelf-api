@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { booksApi } from '../../api/endpoints/books';
+import type { PagedResult, Book } from '../../types/book';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '../../utils/errors';
 
 export const useDeleteBook = () => {
   const queryClient = useQueryClient();
@@ -15,23 +17,23 @@ export const useDeleteBook = () => {
       const previousBooks = queryClient.getQueryData(['books']);
 
       // Optimistically update to remove book
-      queryClient.setQueriesData({ queryKey: ['books'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ['books'] }, (old: PagedResult<Book> | undefined) => {
         if (!old) return old;
         return {
           ...old,
-          items: old.items.filter((book: any) => book.id !== bookId),
+          items: old.items.filter((book) => book.id !== bookId),
           totalCount: old.totalCount - 1,
         };
       });
 
       return { previousBooks };
     },
-    onError: (error: any, _bookId, context) => {
+    onError: (error, _bookId, context) => {
       // Rollback on error
       if (context?.previousBooks) {
         queryClient.setQueryData(['books'], context.previousBooks);
       }
-      const message = error.response?.data?.detail || 'Failed to delete book';
+      const message = extractErrorMessage(error, 'Failed to delete book');
       toast.error(message);
     },
     onSuccess: () => {
