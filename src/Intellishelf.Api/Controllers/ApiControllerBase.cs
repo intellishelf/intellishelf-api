@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Ai.Errors;
 using Intellishelf.Domain.Books.Errors;
+using Intellishelf.Domain.Chat.Errors;
 using Intellishelf.Domain.Files.ErrorCodes;
 using Intellishelf.Domain.Users.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,8 @@ public abstract class ApiControllerBase : ControllerBase
         FileErrorCodes.UploadFailed or
         FileErrorCodes.DeletionFailed or
         AiErrorCodes.AiResponseNotParsed or
-        AiErrorCodes.RequestFailed => StatusCodes.Status500InternalServerError,
+        AiErrorCodes.RequestFailed or
+        ChatErrorCodes.AiRequestFailed => StatusCodes.Status500InternalServerError,
 
         _ => StatusCodes.Status500InternalServerError
     };
