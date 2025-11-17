@@ -9,20 +9,12 @@ namespace Intellishelf.Domain.Chat.Services;
 
 public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
 {
-    public async IAsyncEnumerable<ChatStreamChunk> ChatStreamAsync(string userId, ChatRequest request)
+    public async Task<TryResult<IAsyncEnumerable<ChatStreamChunk>>> ChatStreamAsync(string userId, ChatRequest request)
     {
-        // Retrieve user's books
+        // Validate prerequisites - errors here return proper HTTP status codes
         var booksResult = await bookDao.GetBooksAsync(userId);
         if (!booksResult.IsSuccess)
-        {
-            yield return new ChatStreamChunk
-            {
-                Content = string.Empty,
-                Done = true,
-                Error = booksResult.Error.Message
-            };
-            yield break;
-        }
+            return booksResult.Error;
 
         var books = booksResult.Value;
 
@@ -82,22 +74,36 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
         // Add current user message
         messages.Add(OpenAIChatMessage.CreateUserMessage(request.Message));
 
-        // Stream the response from OpenAI
-        var streamingEnumerable = StreamOpenAiResponseAsync(messages);
-        await foreach (var chunk in streamingEnumerable)
-        {
-            yield return chunk;
-        }
+        // Return the streaming enumerable - errors after this point are mid-stream
+        return StreamOpenAiResponseAsync(messages);
     }
 
     private async IAsyncEnumerable<ChatStreamChunk> StreamOpenAiResponseAsync(List<OpenAIChatMessage> messages)
     {
-        ChatStreamChunk? errorChunk = null;
-
+        var enumerator = chatClient.CompleteChatStreamingAsync(messages).GetAsyncEnumerator();
         try
         {
-            await foreach (var update in chatClient.CompleteChatStreamingAsync(messages))
+            while (true)
             {
+                StreamingChatCompletionUpdate update;
+                try
+                {
+                    if (!await enumerator.MoveNextAsync())
+                        break;
+                    update = enumerator.Current;
+                }
+                catch (Exception ex)
+                {
+                    // Mid-stream error - send error chunk and stop
+                    yield return new ChatStreamChunk
+                    {
+                        Content = string.Empty,
+                        Done = true,
+                        Error = $"AI request failed: {ex.Message}"
+                    };
+                    yield break;
+                }
+
                 foreach (var contentPart in update.ContentUpdate)
                 {
                     yield return new ChatStreamChunk
@@ -107,22 +113,17 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
                     };
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            errorChunk = new ChatStreamChunk
+
+            // Send final chunk on success
+            yield return new ChatStreamChunk
             {
                 Content = string.Empty,
-                Done = true,
-                Error = $"AI request failed: {ex.Message}"
+                Done = true
             };
         }
-
-        // Send final chunk - either success or error
-        yield return errorChunk ?? new ChatStreamChunk
+        finally
         {
-            Content = string.Empty,
-            Done = true
-        };
+            await enumerator.DisposeAsync();
+        }
     }
 }

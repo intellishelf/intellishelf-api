@@ -15,11 +15,6 @@ public class ChatController(IChatService chatService) : ApiControllerBase
     [HttpPost]
     public async Task ChatStream([FromBody] ChatRequestDto requestDto, CancellationToken cancellationToken)
     {
-        // Set SSE headers
-        Response.Headers.Append("Content-Type", "text/event-stream");
-        Response.Headers.Append("Cache-Control", "no-cache");
-        Response.Headers.Append("Connection", "keep-alive");
-
         // Map DTO to Domain model
         var request = new ChatRequest
         {
@@ -31,8 +26,21 @@ public class ChatController(IChatService chatService) : ApiControllerBase
             }).ToArray()
         };
 
+        // Validate prerequisites - returns proper HTTP status if error
+        var streamResult = await chatService.ChatStreamAsync(CurrentUserId, request);
+        if (!streamResult.IsSuccess)
+        {
+            HandleErrorResponse(streamResult.Error);
+            return;
+        }
+
+        // Set SSE headers - only after validation succeeds
+        Response.Headers.Append("Content-Type", "text/event-stream");
+        Response.Headers.Append("Cache-Control", "no-cache");
+        Response.Headers.Append("Connection", "keep-alive");
+
         // Stream the response
-        await foreach (var chunk in chatService.ChatStreamAsync(CurrentUserId, request).WithCancellation(cancellationToken))
+        await foreach (var chunk in streamResult.Value.WithCancellation(cancellationToken))
         {
             var json = JsonSerializer.Serialize(chunk);
             var sseMessage = $"data: {json}\n\n";

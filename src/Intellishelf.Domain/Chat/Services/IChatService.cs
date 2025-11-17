@@ -4,5 +4,5 @@ namespace Intellishelf.Domain.Chat.Services;
 
 public interface IChatService
 {
-    IAsyncEnumerable<ChatStreamChunk> ChatStreamAsync(string userId, ChatRequest request);
+    Task<TryResult<IAsyncEnumerable<ChatStreamChunk>>> ChatStreamAsync(string userId, ChatRequest request);
 }
