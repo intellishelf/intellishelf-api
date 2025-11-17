@@ -46,40 +46,40 @@ const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
   };
 
   return (
-    <div className="space-y-2">
+    <div className='space-y-2'>
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
         onClick={handleClick}
-        className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors relative"
+        className='border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors relative'
       >
         {preview ? (
           <>
             <img
               src={preview}
-              alt="Preview"
-              className="max-h-64 mx-auto rounded-lg"
+              alt='Preview'
+              className='max-h-64 mx-auto rounded-lg'
             />
             <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2"
+              type='button'
+              variant='destructive'
+              size='icon'
+              className='absolute top-2 right-2'
               onClick={(e) => {
                 e.stopPropagation();
                 handleClear();
               }}
             >
-              <X className="w-4 h-4" />
+              <X className='w-4 h-4' />
             </Button>
           </>
         ) : (
           <div>
-            <Upload className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
+            <Upload className='w-12 h-12 mx-auto mb-2 text-muted-foreground' />
+            <p className='text-sm text-muted-foreground'>
               Drag & drop or click to upload
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className='text-xs text-muted-foreground mt-1'>
               PNG, JPG up to 10MB
             </p>
           </div>
@@ -88,9 +88,9 @@ const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
 
       <input
         ref={inputRef}
-        type="file"
+        type='file'
         accept="image/*"
-        className="hidden"
+        className='hidden'
         onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
       />
     </div>

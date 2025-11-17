@@ -6,14 +6,14 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface BooksPaginationProps {
   currentPage: number;
@@ -77,30 +77,30 @@ const BooksPagination = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2">
+    <div className='flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2'>
       {/* Results info and page size selector */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+      <div className='flex items-center gap-4 text-sm text-muted-foreground'>
         <p>
-          Showing <span className="font-medium text-foreground">{startItem}</span> to{" "}
-          <span className="font-medium text-foreground">{endItem}</span> of{" "}
-          <span className="font-medium text-foreground">{totalCount}</span> results
+          Showing <span className='font-medium text-foreground'>{startItem}</span> to{" "}
+          <span className='font-medium text-foreground'>{endItem}</span> of{" "}
+          <span className='font-medium text-foreground'>{totalCount}</span> results
         </p>
-        <div className="flex items-center gap-2">
-          <label htmlFor="pageSize" className="whitespace-nowrap">
+        <div className='flex items-center gap-2'>
+          <label htmlFor="pageSize" className='whitespace-nowrap'>
             Per page:
           </label>
           <Select
             value={pageSize.toString()}
             onValueChange={(value) => onPageSizeChange(Number(value))}
           >
-            <SelectTrigger id="pageSize" className="w-[70px] h-8">
+            <SelectTrigger id='pageSize' className='w-[70px] h-8'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="12">12</SelectItem>
-              <SelectItem value="24">24</SelectItem>
-              <SelectItem value="48">48</SelectItem>
-              <SelectItem value="96">96</SelectItem>
+              <SelectItem value='12'>12</SelectItem>
+              <SelectItem value='24'>24</SelectItem>
+              <SelectItem value='48'>48</SelectItem>
+              <SelectItem value='96'>96</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -130,7 +130,7 @@ const BooksPagination = ({
                 <PaginationLink
                   onClick={() => onPageChange(pageNum as number)}
                   isActive={currentPage === pageNum}
-                  className="cursor-pointer"
+                  className='cursor-pointer'
                 >
                   {pageNum}
                 </PaginationLink>

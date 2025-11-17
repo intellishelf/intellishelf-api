@@ -12,10 +12,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-64" />
-          <Skeleton className="h-64 w-96" />
+      <div className='flex items-center justify-center h-screen'>
+        <div className='space-y-4'>
+          <Skeleton className='h-12 w-64' />
+          <Skeleton className='h-64 w-96' />
         </div>
       </div>
     );
