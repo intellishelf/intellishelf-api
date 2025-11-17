@@ -63,10 +63,10 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
         {
             iteration++;
 
-            var toolCalls = new List<ChatToolCall>();
+            var toolCallUpdates = new Dictionary<int, StreamingChatToolCallUpdate>();
             var contentBuilder = new StringBuilder();
 
-            // Stream the response and collect tool calls
+            // Stream the response and collect tool call updates
             await foreach (var update in chatClient.CompleteChatStreamingAsync(messages, chatOptions))
             {
                 // Collect content
@@ -82,10 +82,11 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
                     };
                 }
 
-                // Collect tool calls
+                // Collect streaming tool call updates
                 foreach (var toolCallUpdate in update.ToolCallUpdates)
                 {
-                    toolCalls.Add(toolCallUpdate);
+                    // Accumulate updates by index (streaming may send multiple updates for same tool call)
+                    toolCallUpdates[toolCallUpdate.Index] = toolCallUpdate;
                 }
 
                 // Check if we're done (no tool calls)
@@ -101,8 +102,17 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
             }
 
             // If LLM wants to call tools, execute them
-            if (toolCalls.Count > 0)
+            if (toolCallUpdates.Count > 0)
             {
+                // Convert streaming updates to complete ChatToolCall objects
+                var toolCalls = toolCallUpdates.Values
+                    .OrderBy(tc => tc.Index)
+                    .Select(tc => ChatToolCall.CreateFunctionToolCall(
+                        tc.ToolCallId,
+                        tc.FunctionName,
+                        tc.FunctionArguments))
+                    .ToList();
+
                 // Add assistant message with tool calls
                 messages.Add(OpenAIChatMessage.CreateAssistantMessage(toolCalls));
 
