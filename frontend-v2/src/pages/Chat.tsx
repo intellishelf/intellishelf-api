@@ -118,7 +118,7 @@ const Chat = () => {
                 }`}
               >
                 {message.role === "assistant" ? (
-                  <div className="text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0">
+                  <div className="text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary">
                     <ReactMarkdown>{message.content || "..."}</ReactMarkdown>
                   </div>
                 ) : (
