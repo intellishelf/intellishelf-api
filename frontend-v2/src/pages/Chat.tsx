@@ -6,6 +6,7 @@ import { Send, Bot, User, StopCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStreamChat } from "@/hooks/chat/useStreamChat";
 import type { ChatMessage } from "@/types/chat";
+import ReactMarkdown from "react-markdown";
 
 interface Message extends ChatMessage {
   id: string;
@@ -116,7 +117,15 @@ const Chat = () => {
                     : "bg-card"
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content || "..."}</p>
+                {message.role === "assistant" ? (
+                  <ReactMarkdown
+                    className="text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0"
+                  >
+                    {message.content || "..."}
+                  </ReactMarkdown>
+                ) : (
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                )}
               </Card>
               {message.role === "user" && (
                 <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
