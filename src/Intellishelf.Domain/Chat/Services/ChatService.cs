@@ -9,12 +9,20 @@ namespace Intellishelf.Domain.Chat.Services;
 
 public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
 {
-    public async Task<TryResult<ChatResponse>> ChatAsync(string userId, ChatRequest request)
+    public async IAsyncEnumerable<ChatStreamChunk> ChatStreamAsync(string userId, ChatRequest request)
     {
         // Retrieve user's books
         var booksResult = await bookDao.GetBooksAsync(userId);
         if (!booksResult.IsSuccess)
-            return booksResult.Error;
+        {
+            yield return new ChatStreamChunk
+            {
+                Content = string.Empty,
+                Done = true,
+                Error = booksResult.Error.Message
+            };
+            yield break;
+        }
 
         var books = booksResult.Value;
 
@@ -42,17 +50,17 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
 
         var systemPrompt = $"""
             You are a friendly and conversational personal librarian assistant. You have access to the user's complete book collection.
-            
+
             Your role is to:
             - Answer questions about their books naturally and conversationally
             - Provide recommendations based on their collection
             - Help them find specific books or information
             - Discuss their reading progress and history
-            
+
             Here is their book collection (in JSON format):
-            
+
             {booksJson}
-            
+
             Be helpful, conversational, and personable in your responses. When discussing books, use natural language rather than just listing data.
             """;
 
@@ -74,23 +82,36 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
         // Add current user message
         messages.Add(OpenAIChatMessage.CreateUserMessage(request.Message));
 
+        // Stream the response from OpenAI
         try
         {
-            // Call OpenAI ChatClient
-            var completion = await chatClient.CompleteChatAsync(messages);
-
-            var responseMessage = completion.Value.Content[0].Text;
-            var tokensUsed = completion.Value.Usage.InputTokenCount + completion.Value.Usage.OutputTokenCount;
-
-            return new ChatResponse
+            await foreach (var update in chatClient.CompleteChatStreamingAsync(messages))
             {
-                Message = responseMessage,
-                TokensUsed = tokensUsed
+                foreach (var contentPart in update.ContentUpdate)
+                {
+                    yield return new ChatStreamChunk
+                    {
+                        Content = contentPart.Text,
+                        Done = false
+                    };
+                }
+            }
+
+            // Send final chunk to signal completion
+            yield return new ChatStreamChunk
+            {
+                Content = string.Empty,
+                Done = true
             };
         }
         catch (Exception ex)
         {
-            return new Error(ChatErrorCodes.AiRequestFailed, $"AI request failed: {ex.Message}");
+            yield return new ChatStreamChunk
+            {
+                Content = string.Empty,
+                Done = true,
+                Error = $"AI request failed: {ex.Message}"
+            };
         }
     }
 }

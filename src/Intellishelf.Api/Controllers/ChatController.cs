@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using Intellishelf.Api.Contracts.Chat;
 using Intellishelf.Domain.Chat.Models;
 using Intellishelf.Domain.Chat.Services;
@@ -7,12 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace Intellishelf.Api.Controllers;
 
 [Authorize]
-[Route("chat")]
+[Route("chat-stream")]
 public class ChatController(IChatService chatService) : ApiControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<ChatResponse>> Chat([FromBody] ChatRequestDto requestDto)
+    public async Task ChatStream([FromBody] ChatRequestDto requestDto, CancellationToken cancellationToken)
     {
+        // Set SSE headers
+        Response.Headers.Append("Content-Type", "text/event-stream");
+        Response.Headers.Append("Cache-Control", "no-cache");
+        Response.Headers.Append("Connection", "keep-alive");
+
         // Map DTO to Domain model
         var request = new ChatRequest
         {
@@ -24,12 +31,18 @@ public class ChatController(IChatService chatService) : ApiControllerBase
             }).ToArray()
         };
 
-        // Call service
-        var result = await chatService.ChatAsync(CurrentUserId, request);
+        // Stream the response
+        await foreach (var chunk in chatService.ChatStreamAsync(CurrentUserId, request).WithCancellation(cancellationToken))
+        {
+            var json = JsonSerializer.Serialize(chunk);
+            var sseMessage = $"data: {json}\n\n";
+            var bytes = Encoding.UTF8.GetBytes(sseMessage);
 
-        if (!result.IsSuccess)
-            return HandleErrorResponse(result.Error);
+            await Response.Body.WriteAsync(bytes, cancellationToken);
+            await Response.Body.FlushAsync(cancellationToken);
 
-        return Ok(result.Value);
+            if (chunk.Done)
+                break;
+        }
     }
 }
