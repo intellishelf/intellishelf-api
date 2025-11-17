@@ -7,6 +7,7 @@ import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { API_URL } from '@/lib/api';
 import { BookOpen } from 'lucide-react';
 
 const Auth = () => {
@@ -20,7 +21,7 @@ const Auth = () => {
 
   const handleGoogleLogin = () => {
     const returnUrl = encodeURIComponent('/');
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/auth/google?returnUrl=${returnUrl}`;
+    window.location.href = `${API_URL}/auth/google?returnUrl=${returnUrl}`;
   };
 
   return (
