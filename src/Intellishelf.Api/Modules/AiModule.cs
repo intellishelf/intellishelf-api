@@ -1,5 +1,6 @@
 using Intellishelf.Api.Configuration;
 using Intellishelf.Domain.Ai.Services;
+using Intellishelf.Domain.Chat.Services;
 using OpenAI.Chat;
 
 namespace Intellishelf.Api.Modules;
@@ -17,5 +18,6 @@ public static class AiModule
 
         builder.Services.AddSingleton(_ => new ChatClient("gpt-4o-mini", aiConfig.OpenAiApiKey));
         builder.Services.AddTransient<IAiService, AiService>();
+        builder.Services.AddTransient<IChatService, ChatService>();
     }
 }

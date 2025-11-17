@@ -45,8 +45,10 @@ Sync Impact Report:
 **MUST** propagate rich `Error` payloads rather than throwing exceptions for expected failure scenarios.
 **MUST** convert `TryResult` errors to `ProblemDetails` at the controller layer with appropriate HTTP status codes.
 **MUST NOT** use exceptions for flow control in business logic.
+**MUST** use error code format `{Feature}.{ErrorType}` (e.g., `Books.NotFound`, `Users.Unauthorized`, `Chat.AiRequestFailed`).
+**MUST** define error codes as `public const string` in static `{Feature}ErrorCodes` classes within `Intellishelf.Domain/{Feature}/Errors/`.
 
-**Rationale**: The TryResult pattern makes failure paths explicit, reduces exception overhead, and provides rich error context for better diagnostics. Controllers act as the translation boundary between domain errors and HTTP responses.
+**Rationale**: The TryResult pattern makes failure paths explicit, reduces exception overhead, and provides rich error context for better diagnostics. Controllers act as the translation boundary between domain errors and HTTP responses. Consistent error code format enables predictable client-side error handling and debugging.
 
 ### IV. Integration-First Testing
 

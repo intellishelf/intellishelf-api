@@ -46,6 +46,22 @@ public class AuthController(
         if (!result.IsSuccess)
             return HandleErrorResponse(result.Error);
 
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, result.Value.UserId),
+            new Claim(ClaimTypes.Email, loginRequest.Email)
+        };
+
+        await HttpContext.SignInAsync(
+            AuthConfig.CookieScheme,
+            new ClaimsPrincipal(new ClaimsIdentity(claims, AuthConfig.CookieScheme)),
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = result.Value.AccessTokenExpiry
+            }
+        );
+
         SetRefreshCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiry);
 
         return Ok(mapper.MapLoginResult(result.Value));
@@ -180,11 +196,11 @@ public class AuthController(
           );
     }
 
-    private void SetRefreshCookie(string refreshToken, DateTime expiry) => SetCookie(refreshToken, expiry);
+    private void SetRefreshCookie(string refreshToken, DateTime expiry) => SetCookie(_authConfig.RefreshTokenCookieName, refreshToken, expiry);
 
-    private void ClearRefreshCookie() => SetCookie(string.Empty, DateTimeOffset.UnixEpoch);
+    private void ClearRefreshCookie() => SetCookie(_authConfig.RefreshTokenCookieName, string.Empty, DateTimeOffset.UnixEpoch);
 
-    private void SetCookie(string value, DateTimeOffset expiry)
+    private void SetCookie(string name, string value, DateTimeOffset expiry)
     {
         var options = new CookieOptions
         {
@@ -196,7 +212,7 @@ public class AuthController(
             IsEssential = true
         };
 
-        Response.Cookies.Append(_authConfig.RefreshTokenCookieName, value, options);
+        Response.Cookies.Append(name, value, options);
     }
 
 

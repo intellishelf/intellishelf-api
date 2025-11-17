@@ -12,6 +12,8 @@ import Settings from "./pages/Settings";
 import BookDetail from "./pages/BookDetail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient({
   defaultOptions: {

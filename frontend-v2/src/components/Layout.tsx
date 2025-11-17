@@ -1,7 +1,10 @@
 import { ReactNode } from "react";
-import { Library, Plus, MessageSquare, Settings, BookOpen } from "lucide-react";
+import { Library, Plus, MessageSquare, Settings, BookOpen, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +18,14 @@ const navItems = [
 ];
 
 const Layout = ({ children }: LayoutProps) => {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
+
   return (
     <div className="flex h-screen w-full bg-background">
       {/* Sidebar */}
@@ -44,11 +55,22 @@ const Layout = ({ children }: LayoutProps) => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="text-xs text-muted-foreground">
-            Your digital library
+        {user && (
+          <div className="p-4 border-t border-sidebar-border">
+            <div className="mb-3 px-4">
+              <p className="text-xs text-muted-foreground">Signed in as</p>
+              <p className="text-sm font-medium text-foreground truncate">{user.email}</p>
+            </div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-5 h-5 mr-3" />
+              Logout
+            </Button>
           </div>
-        </div>
+        )}
       </aside>
 
       {/* Main Content */}

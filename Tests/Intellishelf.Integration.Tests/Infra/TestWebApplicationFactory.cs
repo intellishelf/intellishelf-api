@@ -1,6 +1,5 @@
 using Intellishelf.Api.Configuration;
 using Intellishelf.Domain.Users.Config;
-using Intellishelf.Integration.Tests;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
