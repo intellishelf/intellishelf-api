@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+export const API_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api`;
 
 // Helper to build query params (handles arrays, null/undefined)
 const buildQueryParams = (params: Record<string, any>): URLSearchParams => {

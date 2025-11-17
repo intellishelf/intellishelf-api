@@ -1663,7 +1663,7 @@ VITE_API_BASE_URL=http://localhost:5000
 # Install dependencies
 npm install
 
-# Start dev server (port 8080)
+# Start dev server (port 3000)
 npm run dev
 
 # Build for production
