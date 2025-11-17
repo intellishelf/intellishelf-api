@@ -83,6 +83,17 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
         messages.Add(OpenAIChatMessage.CreateUserMessage(request.Message));
 
         // Stream the response from OpenAI
+        var streamingEnumerable = StreamOpenAiResponseAsync(messages);
+        await foreach (var chunk in streamingEnumerable)
+        {
+            yield return chunk;
+        }
+    }
+
+    private async IAsyncEnumerable<ChatStreamChunk> StreamOpenAiResponseAsync(List<OpenAIChatMessage> messages)
+    {
+        ChatStreamChunk? errorChunk = null;
+
         try
         {
             await foreach (var update in chatClient.CompleteChatStreamingAsync(messages))
@@ -96,22 +107,22 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
                     };
                 }
             }
-
-            // Send final chunk to signal completion
-            yield return new ChatStreamChunk
-            {
-                Content = string.Empty,
-                Done = true
-            };
         }
         catch (Exception ex)
         {
-            yield return new ChatStreamChunk
+            errorChunk = new ChatStreamChunk
             {
                 Content = string.Empty,
                 Done = true,
                 Error = $"AI request failed: {ex.Message}"
             };
         }
+
+        // Send final chunk - either success or error
+        yield return errorChunk ?? new ChatStreamChunk
+        {
+            Content = string.Empty,
+            Done = true
+        };
     }
 }
