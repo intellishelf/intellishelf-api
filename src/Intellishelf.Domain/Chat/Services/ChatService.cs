@@ -80,50 +80,22 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
 
     private async IAsyncEnumerable<ChatStreamChunk> StreamOpenAiResponseAsync(List<OpenAIChatMessage> messages)
     {
-        var enumerator = chatClient.CompleteChatStreamingAsync(messages).GetAsyncEnumerator();
-        try
+        await foreach (var update in chatClient.CompleteChatStreamingAsync(messages))
         {
-            while (true)
+            foreach (var contentPart in update.ContentUpdate)
             {
-                StreamingChatCompletionUpdate update;
-                try
+                yield return new ChatStreamChunk
                 {
-                    if (!await enumerator.MoveNextAsync())
-                        break;
-                    update = enumerator.Current;
-                }
-                catch (Exception ex)
-                {
-                    // Mid-stream error - send error chunk and stop
-                    yield return new ChatStreamChunk
-                    {
-                        Content = string.Empty,
-                        Done = true,
-                        Error = $"AI request failed: {ex.Message}"
-                    };
-                    yield break;
-                }
-
-                foreach (var contentPart in update.ContentUpdate)
-                {
-                    yield return new ChatStreamChunk
-                    {
-                        Content = contentPart.Text,
-                        Done = false
-                    };
-                }
+                    Content = contentPart.Text,
+                    Done = false
+                };
             }
+        }
 
-            // Send final chunk on success
-            yield return new ChatStreamChunk
-            {
-                Content = string.Empty,
-                Done = true
-            };
-        }
-        finally
+        yield return new ChatStreamChunk
         {
-            await enumerator.DisposeAsync();
-        }
+            Content = string.Empty,
+            Done = true
+        };
     }
 }
