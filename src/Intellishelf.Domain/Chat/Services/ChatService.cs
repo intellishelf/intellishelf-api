@@ -75,7 +75,7 @@ public class ChatService(IBookDao bookDao, ChatClient chatClient) : IChatService
         messages.Add(OpenAIChatMessage.CreateUserMessage(request.Message));
 
         // Return the streaming enumerable - errors after this point are mid-stream
-        return StreamOpenAiResponseAsync(messages);
+        return TryResult.Success(StreamOpenAiResponseAsync(messages));
     }
 
     private async IAsyncEnumerable<ChatStreamChunk> StreamOpenAiResponseAsync(List<OpenAIChatMessage> messages)
