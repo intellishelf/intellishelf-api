@@ -25,6 +25,7 @@ AzureModule.Register(builder);
 UsersModule.Register(builder);
 BooksModule.Register(builder.Services);
 AiModule.Register(builder);
+McpModule.Register(builder.Services);
 
 var app = builder.Build();
 
@@ -40,4 +41,5 @@ app.UseStatusCodePages();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+McpModule.MapMcpEndpoints(app);
 app.Run();
