@@ -8,8 +8,9 @@ export interface ChatRequest {
   history?: ChatMessage[];
 }
 
+// Backend sends PascalCase properties
 export interface ChatStreamChunk {
-  content: string;
-  done: boolean;
-  error?: string;
+  Content: string;
+  Done: boolean;
+  Error?: string;
 }

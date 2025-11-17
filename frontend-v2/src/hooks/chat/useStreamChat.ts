@@ -28,16 +28,16 @@ export function useStreamChat() {
           { message, history },
           abortControllerRef.current.signal
         )) {
-          if (chunk.error) {
-            onError?.(chunk.error);
+          if (chunk.Error) {
+            onError?.(chunk.Error);
             break;
           }
 
-          if (chunk.content) {
-            onChunk?.(chunk.content);
+          if (chunk.Content) {
+            onChunk?.(chunk.Content);
           }
 
-          if (chunk.done) {
+          if (chunk.Done) {
             onComplete?.();
             break;
           }
