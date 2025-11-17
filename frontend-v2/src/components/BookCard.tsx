@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useDeleteBook } from '@/hooks/books/useDeleteBook';
+import { useBookCoverColor } from '@/hooks/utils/useBookCoverColor';
 import BookForm from './books/BookForm';
 import StatusBadge from './books/StatusBadge';
 
@@ -34,6 +35,9 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
   const { mutate: deleteBook } = useDeleteBook();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+
+  // Extract dominant color for subtle accent
+  const dominantColor = useBookCoverColor(book.coverImageUrl);
 
   const handleClick = () => {
     if (onClick) {
@@ -61,8 +65,11 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
   return (
     <>
       <Card
-        className="bg-book-card hover:bg-book-card-hover border-border transition-all cursor-pointer group overflow-hidden relative"
+        className="bg-book-card hover:bg-book-card-hover border-border transition-all duration-300 cursor-pointer group overflow-hidden relative"
         onClick={handleClick}
+        style={{
+          '--card-color': dominantColor,
+        } as React.CSSProperties}
       >
         <div className="aspect-[2/3] relative overflow-hidden bg-secondary">
           {book.coverImageUrl ? (
@@ -86,6 +93,14 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
               <Trash className="w-4 h-4" />
             </Button>
           </div>
+
+          {/* Subtle color accent on hover */}
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 50% 100%, hsl(var(--card-color) / 0.5), transparent 70%)`
+            }}
+          />
         </div>
 
         <div className="p-4">
