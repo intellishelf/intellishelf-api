@@ -6,7 +6,7 @@ interface GoogleIconProps {
 
 export const GoogleIcon = ({ className }: GoogleIconProps) => (
   <svg
-    role="img"
+    role='img'
     viewBox="0 0 24 24"
     className={className}
     fill="currentColor"

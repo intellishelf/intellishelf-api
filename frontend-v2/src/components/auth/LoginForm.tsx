@@ -23,17 +23,17 @@ const LoginForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <FormField
           control={form.control}
-          name="email"
+          name='email'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
-                  placeholder="you@example.com"
+                  type='email'
+                  placeholder='you@example.com'
                   {...field}
                 />
               </FormControl>
@@ -44,14 +44,14 @@ const LoginForm = () => {
 
         <FormField
           control={form.control}
-          name="password"
+          name='password'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input
-                  type="password"
-                  placeholder="••••••••"
+                  type='password'
+                  placeholder='••••••••'
                   {...field}
                 />
               </FormControl>
@@ -61,8 +61,8 @@ const LoginForm = () => {
         />
 
         <Button
-          type="submit"
-          className="w-full"
+          type='submit'
+          className='w-full'
           disabled={login.isPending}
         >
           {login.isPending ? 'Logging in...' : 'Login'}

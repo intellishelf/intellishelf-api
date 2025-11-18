@@ -16,10 +16,10 @@ const EmptyState = ({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-      <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
-      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+    <div className='flex flex-col items-center justify-center h-full py-12 text-center'>
+      <BookOpen className='w-16 h-16 text-muted-foreground mb-4' />
+      <h3 className='text-lg font-semibold text-foreground mb-2'>{title}</h3>
+      <p className='text-sm text-muted-foreground mb-6 max-w-sm'>
         {description}
       </p>
       {showAddButton && (

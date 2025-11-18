@@ -90,10 +90,10 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <FormField
           control={form.control}
-          name="imageFile"
+          name='imageFile'
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
               <FormLabel>Cover Image</FormLabel>
@@ -111,12 +111,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="title"
+          name='title'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title *</FormLabel>
               <FormControl>
-                <Input placeholder="The Great Gatsby" {...field} />
+                <Input placeholder='The Great Gatsby' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,13 +125,13 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="authors"
+          name='authors'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Author(s)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="F. Scott Fitzgerald, ..."
+                  placeholder='F. Scott Fitzgerald, ...'
                   {...field}
                 />
               </FormControl>
@@ -142,14 +142,14 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="A brief description..."
-                  className="resize-none"
+                  placeholder='A brief description...'
+                  className='resize-none'
                   rows={4}
                   {...field}
                 />
@@ -159,15 +159,15 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className='grid grid-cols-2 gap-4'>
           <FormField
             control={form.control}
-            name="isbn10"
+            name='isbn10'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>ISBN-10</FormLabel>
                 <FormControl>
-                  <Input placeholder="0-123-45678-9" {...field} />
+                  <Input placeholder='0-123-45678-9' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -176,12 +176,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
           <FormField
             control={form.control}
-            name="isbn13"
+            name='isbn13'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>ISBN-13</FormLabel>
                 <FormControl>
-                  <Input placeholder="978-0-123-45678-9" {...field} />
+                  <Input placeholder='978-0-123-45678-9' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -189,15 +189,15 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className='grid grid-cols-2 gap-4'>
           <FormField
             control={form.control}
-            name="pages"
+            name='pages'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Pages</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="320" {...field} />
+                  <Input type='number' placeholder='320' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -206,12 +206,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
           <FormField
             control={form.control}
-            name="publicationDate"
+            name='publicationDate'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Published Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type='date' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -221,12 +221,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="publisher"
+          name='publisher'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Publisher</FormLabel>
               <FormControl>
-                <Input placeholder="Scribner" {...field} />
+                <Input placeholder='Scribner' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -235,14 +235,14 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="annotation"
+          name='annotation'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Personal Notes</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Your personal notes about this book..."
-                  className="resize-none"
+                  placeholder='Your personal notes about this book...'
+                  className='resize-none'
                   rows={3}
                   {...field}
                 />
@@ -254,13 +254,13 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="tags"
+          name='tags'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tags</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="fiction, classic, american (comma separated)"
+                  placeholder='fiction, classic, american (comma separated)'
                   {...field}
                 />
               </FormControl>
@@ -271,7 +271,7 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
         <FormField
           control={form.control}
-          name="status"
+          name='status'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Reading Status</FormLabel>
@@ -281,13 +281,13 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select reading status" />
+                    <SelectValue placeholder='Select reading status' />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="0">Unread</SelectItem>
-                  <SelectItem value="1">Reading</SelectItem>
-                  <SelectItem value="2">Read</SelectItem>
+                  <SelectItem value='0'>Unread</SelectItem>
+                  <SelectItem value='1'>Reading</SelectItem>
+                  <SelectItem value='2'>Read</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -298,12 +298,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
         {form.watch('status') === 1 && (
           <FormField
             control={form.control}
-            name="startedReadingDate"
+            name='startedReadingDate'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Started Reading</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type='date' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -315,12 +315,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
           <>
             <FormField
               control={form.control}
-              name="startedReadingDate"
+              name='startedReadingDate'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Started Reading</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type='date' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -329,12 +329,12 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
 
             <FormField
               control={form.control}
-              name="finishedReadingDate"
+              name='finishedReadingDate'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Finished Reading</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type='date' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -343,7 +343,7 @@ const BookForm = ({ book, onSuccess }: BookFormProps) => {
           </>
         )}
 
-        <Button type="submit" disabled={isPending} className="w-full">
+        <Button type='submit' disabled={isPending} className='w-full'>
           {isPending
             ? book
               ? 'Updating...'

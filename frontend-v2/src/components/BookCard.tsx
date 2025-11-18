@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Edit, Trash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Book } from "@/types/book";
-import { Card } from "@/components/ui/card";
+import { Book } from '@/types/book';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -65,52 +65,52 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
   return (
     <>
       <Card
-        className="bg-book-card hover:bg-book-card-hover border-border transition-all duration-300 cursor-pointer group overflow-hidden relative"
+        className='bg-book-card hover:bg-book-card-hover border-border transition-all duration-300 cursor-pointer group overflow-hidden relative'
         onClick={handleClick}
         style={{
           '--card-color': dominantColor,
         } as React.CSSProperties}
       >
-        <div className="aspect-[2/3] relative overflow-hidden bg-secondary">
+        <div className='aspect-[2/3] relative overflow-hidden bg-secondary'>
           {book.coverImageUrl ? (
             <img
               src={book.coverImageUrl}
               alt={book.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-muted-foreground text-sm">No cover</span>
+            <div className='w-full h-full flex items-center justify-center'>
+              <span className='text-muted-foreground text-sm'>No cover</span>
             </div>
           )}
 
           {/* Hover overlay with actions */}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <Button size="icon" variant="secondary" onClick={handleEdit}>
-              <Edit className="w-4 h-4" />
+          <div className='absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2'>
+            <Button size='icon' variant='secondary' onClick={handleEdit}>
+              <Edit className='w-4 h-4' />
             </Button>
-            <Button size="icon" variant="destructive" onClick={handleDelete}>
-              <Trash className="w-4 h-4" />
+            <Button size='icon' variant='destructive' onClick={handleDelete}>
+              <Trash className='w-4 h-4' />
             </Button>
           </div>
 
           {/* Subtle color accent on hover */}
           <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none"
+            className='absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none'
             style={{
               background: `radial-gradient(circle at 50% 100%, hsl(var(--card-color) / 0.5), transparent 70%)`
             }}
           />
         </div>
 
-        <div className="p-4">
-          <h3 className="font-semibold text-foreground line-clamp-2 mb-1">
+        <div className='p-4'>
+          <h3 className='font-semibold text-foreground line-clamp-2 mb-1'>
             {book.title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-1">
+          <p className='text-sm text-muted-foreground line-clamp-1'>
             {book.authors || 'Unknown Author'}
           </p>
-          <div className="mt-2">
+          <div className='mt-2'>
             <StatusBadge status={book.status} />
           </div>
         </div>
@@ -118,7 +118,7 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
 
       {/* Edit dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
           <DialogHeader>
             <DialogTitle>Edit Book</DialogTitle>
           </DialogHeader>

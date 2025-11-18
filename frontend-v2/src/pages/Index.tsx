@@ -1,4 +1,4 @@
-import Library from "./Library";
+import Library from './Library';
 
 const Index = () => {
   return <Library />;
