@@ -63,8 +63,8 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
         {
             iteration++;
 
-            var toolCallUpdates = new Dictionary<int, StreamingChatToolCallUpdate>();
-            var contentBuilder = new StringBuilder();
+            var toolCallAccumulators = new Dictionary<int, ToolCallAccumulator>();
+            var hasContent = false;
 
             // Stream the response and collect tool call updates
             await foreach (var update in chatClient.CompleteChatStreamingAsync(messages, chatOptions))
@@ -72,7 +72,7 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
                 // Collect content
                 foreach (var contentPart in update.ContentUpdate)
                 {
-                    contentBuilder.Append(contentPart.Text);
+                    hasContent = true;
 
                     // Stream content to client
                     yield return new ChatStreamChunk
@@ -82,11 +82,24 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
                     };
                 }
 
-                // Collect streaming tool call updates
+                // Accumulate streaming tool call updates (incremental fragments)
                 foreach (var toolCallUpdate in update.ToolCallUpdates)
                 {
-                    // Accumulate updates by index (streaming may send multiple updates for same tool call)
-                    toolCallUpdates[toolCallUpdate.Index] = toolCallUpdate;
+                    if (!toolCallAccumulators.TryGetValue(toolCallUpdate.Index, out var accumulator))
+                    {
+                        accumulator = new ToolCallAccumulator { Index = toolCallUpdate.Index };
+                        toolCallAccumulators[toolCallUpdate.Index] = accumulator;
+                    }
+
+                    // Accumulate incremental data
+                    if (toolCallUpdate.ToolCallId != null)
+                        accumulator.ToolCallId = toolCallUpdate.ToolCallId;
+
+                    if (toolCallUpdate.FunctionName != null)
+                        accumulator.FunctionName = toolCallUpdate.FunctionName;
+
+                    if (toolCallUpdate.FunctionArgumentsUpdate != null)
+                        accumulator.FunctionArguments.Append(toolCallUpdate.FunctionArgumentsUpdate);
                 }
 
                 // Check if we're done (no tool calls)
@@ -99,19 +112,37 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
                     };
                     yield break;
                 }
+
+                // Tool calls requested - finish streaming and execute tools
+                if (update.FinishReason == ChatFinishReason.ToolCalls)
+                {
+                    break;
+                }
             }
 
             // If LLM wants to call tools, execute them
-            if (toolCallUpdates.Count > 0)
+            if (toolCallAccumulators.Count > 0)
             {
-                // Convert streaming updates to complete ChatToolCall objects
-                var toolCalls = toolCallUpdates.Values
-                    .OrderBy(tc => tc.Index)
-                    .Select(tc => ChatToolCall.CreateFunctionToolCall(
-                        tc.ToolCallId,
-                        tc.FunctionName,
-                        tc.FunctionArguments))
+                // Convert accumulated updates to complete ChatToolCall objects
+                var toolCalls = toolCallAccumulators.Values
+                    .Where(acc => acc.FunctionName != null && acc.ToolCallId != null)
+                    .OrderBy(acc => acc.Index)
+                    .Select(acc => ChatToolCall.CreateFunctionToolCall(
+                        acc.ToolCallId!,
+                        acc.FunctionName!,
+                        BinaryData.FromString(acc.FunctionArguments.ToString())))
                     .ToList();
+
+                if (toolCalls.Count == 0)
+                {
+                    // Invalid tool calls - bail out
+                    yield return new ChatStreamChunk
+                    {
+                        Content = string.Empty,
+                        Done = true
+                    };
+                    yield break;
+                }
 
                 // Add assistant message with tool calls
                 messages.Add(OpenAIChatMessage.CreateAssistantMessage(toolCalls));
@@ -147,5 +178,13 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
             Content = string.Empty,
             Done = true
         };
+    }
+
+    private class ToolCallAccumulator
+    {
+        public required int Index { get; init; }
+        public string? ToolCallId { get; set; }
+        public string? FunctionName { get; set; }
+        public StringBuilder FunctionArguments { get; } = new();
     }
 }
