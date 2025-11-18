@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, Grid3x3, List, Filter } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import BookCard from '@/components/BookCard';
 import BooksGridSkeleton from '@/components/books/BooksGridSkeleton';
@@ -9,6 +9,7 @@ import SearchEmptyState from '@/components/SearchEmptyState';
 import BooksPagination from '@/components/books/BooksPagination';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useBooks } from '@/hooks/books/useBooks';
 import { useSearchBooks } from '@/hooks/books/useSearchBooks';
 import { useDebounce } from '@/hooks/utils/useDebounce';
@@ -32,6 +33,7 @@ const Library = () => {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [orderBy] = useState<BookOrderBy>(BookOrderBy.Added);
   const [ascending] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Debounce search term
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -107,6 +109,25 @@ const Library = () => {
             <div className='flex-1 max-w-2xl'>
               <SearchBar value={searchQuery} onChange={handleSearchChange} />
             </div>
+            <div className='flex items-center gap-2'>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size='icon'
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3x3 className='w-4 h-4' />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size='icon'
+                onClick={() => setViewMode('list')}
+              >
+                <List className='w-4 h-4' />
+              </Button>
+              <Button variant='outline' size='icon'>
+                <Filter className='w-4 h-4' />
+              </Button>
+            </div>
             <Tabs
               value={selectedStatus?.toString() ?? 'all'}
               onValueChange={(v) =>
@@ -143,18 +164,46 @@ const Library = () => {
         </div>
       </header>
 
-      {/* Books Grid */}
+      {/* Books Display */}
       <div className='flex-1 overflow-auto'>
         <div className='p-6'>
           {isLoading ? (
-            <BooksGridSkeleton />
-          ) : books && books.length > 0 ? (
-            <>
-              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6'>
-                {books.map((book) => (
-                  <BookCard key={book.id} book={book} />
+            viewMode === 'grid' ? (
+              <BooksGridSkeleton />
+            ) : (
+              <div className='flex flex-col gap-3 max-w-4xl'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className='flex gap-4 p-4 border border-border rounded-lg'>
+                    <Skeleton className='w-24 h-36 rounded flex-shrink-0' />
+                    <div className='flex-1 space-y-3'>
+                      <Skeleton className='h-5 w-3/4' />
+                      <Skeleton className='h-4 w-1/2' />
+                      <Skeleton className='h-4 w-full' />
+                      <Skeleton className='h-4 w-full' />
+                      <div className='flex gap-2'>
+                        <Skeleton className='h-5 w-16' />
+                        <Skeleton className='h-5 w-16' />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
+            )
+          ) : books && books.length > 0 ? (
+            <>
+              {viewMode === 'grid' ? (
+                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6'>
+                  {books.map((book) => (
+                    <BookCard key={book.id} book={book} viewMode='grid' />
+                  ))}
+                </div>
+              ) : (
+                <div className='flex flex-col gap-3 max-w-4xl'>
+                  {books.map((book) => (
+                    <BookCard key={book.id} book={book} viewMode='list' />
+                  ))}
+                </div>
+              )}
 
               {/* Pagination */}
               {totalPages && totalPages > 1 && (
