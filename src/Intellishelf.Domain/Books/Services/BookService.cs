@@ -1,3 +1,4 @@
+using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Helpers;
@@ -10,7 +11,8 @@ public class BookService(
     IBookDao bookDao,
     IFileStorageService fileStorageService,
     IBookMetadataService bookMetadataService,
-    IHttpImageDownloader httpImageDownloader) : IBookService
+    IHttpImageDownloader httpImageDownloader,
+    IAiService aiService) : IBookService
 {
     public async Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId) =>
         await bookDao.GetBooksAsync(userId);
@@ -21,8 +23,24 @@ public class BookService(
     public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
         await bookDao.GetBookAsync(userId, bookId);
 
-    public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request) =>
-        await bookDao.AddBookAsync(request);
+    public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request)
+    {
+        var addResult = await bookDao.AddBookAsync(request);
+        if (!addResult.IsSuccess)
+            return addResult;
+
+        var book = addResult.Value;
+
+        // Generate and store embedding
+        var embeddingResult = await aiService.GenerateEmbeddingAsync(book);
+        if (embeddingResult.IsSuccess)
+        {
+            await bookDao.UpdateEmbeddingAsync(book.UserId, book.Id, embeddingResult.Value);
+        }
+        // If embedding generation fails, continue anyway - the book is already added
+
+        return book;
+    }
 
     public async Task<TryResult<Book>> TryAddBookFromIsbnAsync(string userId, string isbn)
     {
@@ -93,7 +111,21 @@ public class BookService(
             FinishedReadingDate = null
         };
 
-        return await bookDao.AddBookAsync(addBookRequest);
+        var addResult = await bookDao.AddBookAsync(addBookRequest);
+        if (!addResult.IsSuccess)
+            return addResult;
+
+        var book = addResult.Value;
+
+        // Generate and store embedding
+        var embeddingResult = await aiService.GenerateEmbeddingAsync(book);
+        if (embeddingResult.IsSuccess)
+        {
+            await bookDao.UpdateEmbeddingAsync(book.UserId, book.Id, embeddingResult.Value);
+        }
+        // If embedding generation fails, continue anyway - the book is already added
+
+        return book;
     }
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
@@ -106,7 +138,23 @@ public class BookService(
             await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
         }
 
-        return await bookDao.TryUpdateBookAsync(request);
+        var updateResult = await bookDao.TryUpdateBookAsync(request);
+        if (!updateResult.IsSuccess)
+            return updateResult;
+
+        // Get the updated book and regenerate embedding
+        var updatedBookResult = await bookDao.GetBookAsync(request.UserId, request.Id);
+        if (updatedBookResult.IsSuccess)
+        {
+            var embeddingResult = await aiService.GenerateEmbeddingAsync(updatedBookResult.Value);
+            if (embeddingResult.IsSuccess)
+            {
+                await bookDao.UpdateEmbeddingAsync(request.UserId, request.Id, embeddingResult.Value);
+            }
+            // If embedding generation fails, continue anyway - the book is already updated
+        }
+
+        return TryResult.Success();
     }
 
     public async Task<TryResult> TryDeleteBookAsync(string userId, string bookId)
@@ -123,6 +171,38 @@ public class BookService(
 
     public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
-       return await bookDao.SearchAsync(userId, queryParameters);
+        // If no embedding is provided, generate one from the search term for semantic search
+        if (queryParameters.SearchEmbedding == null || queryParameters.SearchEmbedding.Length == 0)
+        {
+            // Create a temporary book object to generate embedding from search term
+            var tempBook = new Book
+            {
+                Id = string.Empty,
+                UserId = userId,
+                Title = queryParameters.SearchTerm,
+                CreatedDate = DateTime.UtcNow,
+                Status = ReadingStatus.Unread,
+                Authors = null,
+                Description = null,
+                Tags = null
+            };
+
+            var embeddingResult = await aiService.GenerateEmbeddingAsync(tempBook);
+            if (embeddingResult.IsSuccess)
+            {
+                // Create new query parameters with the embedding
+                queryParameters = new SearchQueryParameters
+                {
+                    SearchTerm = queryParameters.SearchTerm,
+                    Page = queryParameters.Page,
+                    PageSize = queryParameters.PageSize,
+                    Status = queryParameters.Status,
+                    SearchEmbedding = embeddingResult.Value
+                };
+            }
+            // If embedding generation fails, continue with text-only search
+        }
+
+        return await bookDao.SearchAsync(userId, queryParameters);
     }
 }

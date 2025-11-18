@@ -185,6 +185,25 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             : TryResult.Success();
     }
 
+    public async Task<TryResult> UpdateEmbeddingAsync(string userId, string bookId, float[] embedding)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+
+        var filter = Builders<BookEntity>
+            .Filter
+            .Where(b => b.Id == bookId && b.UserId == userIdObject);
+
+        var update = Builders<BookEntity>.Update
+            .Set(b => b.Embedding, embedding)
+            .CurrentDate(b => b.ModifiedDate);
+
+        var result = await _booksCollection.UpdateOneAsync(filter, update);
+
+        return result.MatchedCount == 0
+            ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to update")
+            : TryResult.Success();
+    }
+
     public async Task<TryResult> DeleteBookAsync(string userId, string bookId)
     {
         var userIdObject = ObjectId.Parse(userId);
@@ -214,21 +233,44 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             compoundBuilder = compoundBuilder.Filter(searchBuilder.Equals(f => f.Status, queryParameters.Status.Value));
         }
 
+        // Build text search clauses
+        var shouldClauses = new List<SearchDefinition<BookEntity>>
+        {
+            searchBuilder.Autocomplete(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+            searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+            searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+            searchBuilder.Autocomplete(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+            searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+            searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+            searchBuilder.Autocomplete(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
+            searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
+            searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
+            searchBuilder.Text(f => f.Tags, queryParameters.SearchTerm, score: scoreBuilder.Boost(2.0)),
+            searchBuilder.Text(f => f.Description, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0)),
+            searchBuilder.Text(f => f.Annotation, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0))
+        };
+
+        // Add vector search if embeddings are available
+        // Note: This requires a vector search index named "vector_index" on the Embedding field in MongoDB Atlas
+        // To create the index, use MongoDB Atlas UI or CLI with the following configuration:
+        // Index name: vector_index
+        // Field: Embedding
+        // Dimensions: 3072 (for text-embedding-3-large)
+        // Similarity: cosine
+        if (queryParameters.SearchEmbedding != null && queryParameters.SearchEmbedding.Length > 0)
+        {
+            shouldClauses.Add(
+                searchBuilder.KnnVector(
+                    f => f.Embedding,
+                    queryParameters.SearchEmbedding,
+                    100, // Number of candidates to consider
+                    score: scoreBuilder.Boost(10.0) // Boost vector search results
+                )
+            );
+        }
+
         var searchFilter = compoundBuilder
-            .Should(
-                searchBuilder.Autocomplete(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
-                searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
-                searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
-                searchBuilder.Autocomplete(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
-                searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
-                searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
-                searchBuilder.Autocomplete(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(3.0)),
-                searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),
-                searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, fuzzy: looseFuzzy, score: scoreBuilder.Boost(2.0)),
-                searchBuilder.Text(f => f.Tags, queryParameters.SearchTerm, score: scoreBuilder.Boost(2.0)),
-                searchBuilder.Text(f => f.Description, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0)),
-                searchBuilder.Text(f => f.Annotation, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0))
-            )
+            .Should(shouldClauses.ToArray())
             .MinimumShouldMatch(1);
 
         var books = await _booksCollection

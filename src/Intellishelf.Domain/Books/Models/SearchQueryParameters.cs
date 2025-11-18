@@ -18,4 +18,6 @@ public class SearchQueryParameters
     }
 
     public ReadingStatus? Status { get; init; }
+
+    public float[]? SearchEmbedding { get; init; }
 }
