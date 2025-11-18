@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Chat.Models;
-using ModelContextProtocol;
+using ModelContextProtocol.Server;
 
 namespace Intellishelf.Api.Mcp.Tools;
 
