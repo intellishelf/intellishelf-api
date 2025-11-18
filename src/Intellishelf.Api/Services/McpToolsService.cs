@@ -52,7 +52,7 @@ public class McpToolsService(GetAllBooksTool getAllBooksTool, GetBooksByAuthorTo
 
     private async Task<string> ExecuteGetBooksByAuthorAsync(string userId, string argumentsJson)
     {
-        var args = JsonSerializer.Deserialize<GetBooksByAuthorArgs>(argumentsJson)
+        var args = JsonSerializer.Deserialize<GetBooksByAuthorArgs>(argumentsJson, new JsonSerializerOptions{ PropertyNameCaseInsensitive = true})
             ?? throw new InvalidOperationException("Invalid arguments for get_books_by_author");
 
         var books = await getBooksByAuthorTool.GetBooksByAuthor(userId, args.Author);
