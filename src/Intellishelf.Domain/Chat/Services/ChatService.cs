@@ -150,6 +150,19 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
                 // Execute each tool call
                 foreach (var toolCall in toolCalls)
                 {
+                    // Notify client that tool is being called with friendly description
+                    var description = ToolCallFormatter.FormatToolCall(
+                        toolCall.FunctionName,
+                        toolCall.FunctionArguments.ToString());
+
+                    yield return new ChatStreamChunk
+                    {
+                        Type = ChunkType.ToolCall,
+                        ToolCallDescription = description,
+                        Content = string.Empty,
+                        Done = false
+                    };
+
                     var toolResult = await mcpToolsService.ExecuteToolAsync(
                         userId,
                         toolCall.FunctionName,
