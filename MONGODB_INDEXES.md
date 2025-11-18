@@ -1,21 +1,21 @@
 # MongoDB Atlas Index Configuration
 
-This document describes the required MongoDB Atlas indexes for the IntelliShelf API search functionality.
+This document describes the required MongoDB Atlas index for the IntelliShelf API search functionality.
 
-## Required Indexes
+## Required Index
 
-The application uses **Reciprocal Rank Fusion (RRF)** for hybrid search, combining:
+The application uses **hybrid search** combining:
 - **Text search** (exact matches, autocomplete, fuzzy matching)
 - **Vector search** (semantic similarity via embeddings)
 
-This requires **TWO separate indexes** in MongoDB Atlas.
+Both are handled by a **single Atlas Search index** with `knnVector` support.
 
 ---
 
-## 1. Atlas Search Index (for text search)
+## Atlas Search Index (Hybrid Text + Vector)
 
 **Index Name:** `default`
-**Index Type:** Search Index
+**Index Type:** Atlas Search Index
 **Collection:** `Books`
 
 ### Configuration JSON:
@@ -63,6 +63,11 @@ This requires **TWO separate indexes** in MongoDB Atlas.
       },
       "Status": {
         "type": "string"
+      },
+      "Embedding": {
+        "type": "knnVector",
+        "dimensions": 3072,
+        "similarity": "cosine"
       }
     }
   }
@@ -80,109 +85,87 @@ This requires **TWO separate indexes** in MongoDB Atlas.
 
 ---
 
-## 2. Atlas Vector Search Index (for semantic search)
-
-**Index Name:** `vector_index`
-**Index Type:** Vector Search Index
-**Collection:** `Books`
-
-### Configuration JSON:
-
-```json
-{
-  "fields": [
-    {
-      "type": "vector",
-      "path": "Embedding",
-      "numDimensions": 3072,
-      "similarity": "cosine"
-    },
-    {
-      "type": "filter",
-      "path": "UserId"
-    },
-    {
-      "type": "filter",
-      "path": "Status"
-    }
-  ]
-}
-```
-
-### How to Create:
-1. Go to **MongoDB Atlas** → Your Cluster → **Search**
-2. Click **"Create Search Index"** dropdown → Select **"Atlas Vector Search"**
-3. Select **"JSON Editor"**
-4. Index Name: `vector_index`
-5. Collection: `Books`
-6. Paste the JSON configuration above
-7. Click **"Create Vector Search Index"**
-
----
-
 ## How It Works
+
+The search uses a **compound query** that combines text and vector searches in a single operation. MongoDB Atlas Search automatically balances the scores.
 
 ### Search Query: "Shakespeare"
 
-**1. Text Search** (higher priority for exact matches):
-- Finds books with "Shakespeare" in **Title** or **Authors** → **Rank 1-10**
-- RRF Score: `1 / (rank + 1 + 1)` = `0.5` for rank 1, `0.33` for rank 2, etc.
+**Text Search Component:**
+- Matches "Shakespeare" in Title, Authors fields
+- Uses autocomplete for partial matches
+- Fuzzy matching for typos
+- Boost values prioritize Title (8.0) and Authors (8.0) over Description (1.0)
 
-**2. Vector Search** (lower priority for semantic matches):
-- Finds books semantically similar to "Shakespeare" (e.g., Renaissance drama, Elizabethan literature) → **Rank 1-50**
-- RRF Score: `1 / (rank + 60 + 1)` = `0.016` for rank 1, `0.015` for rank 2, etc.
+**Vector Search Component:**
+- Generates embedding for query "Shakespeare"
+- Finds books with semantically similar embeddings
+- Boost value (10.0) balances vector scores with text scores
 
-**3. Combined Results**:
-- Book "Romeo and Juliet by William Shakespeare":
-  - Text rank: #1 (score: 0.5)
-  - Vector rank: #5 (score: 0.015)
-  - **Final score: 0.515** ✅ **HIGHEST**
+**Combined Result:**
+- "Romeo and Juliet by William Shakespeare" → **HIGH text score + HIGH vector score** ✅
+- "Hamlet" → **HIGH text score + HIGH vector score** ✅
+- "Renaissance Drama" → **LOW text score + MEDIUM vector score**
+- "Heart of Darkness" → **MEDIUM text score (contains "dark") + LOW vector score**
 
-- Book "Hamlet by William Shakespeare":
-  - Text rank: #2 (score: 0.33)
-  - Vector rank: #3 (score: 0.016)
-  - **Final score: 0.346**
-
-- Book "Renaissance Drama" (no "Shakespeare" in title/author):
-  - Text rank: N/A (score: 0)
-  - Vector rank: #10 (score: 0.014)
-  - **Final score: 0.014** (appears lower in results)
-
-### Result:
-✅ Exact matches appear **first**
-✅ Semantically related books appear **after**
-✅ Best of both worlds!
+Books matching both text and semantic meaning rank highest.
 
 ---
 
-## Tuning RRF Priorities
+## How Vector Search Prevents False Positives
 
-In `BookDao.cs:234-235`, you can adjust the priorities:
+### Example: Query "dark novels"
+
+**Text-only would match:**
+- ❌ "Heart of Darkness" (contains "dark")
+- ❌ "The Novel" (contains "novel")
+- ✅ "Dark Fantasy series" (actually relevant)
+
+**Hybrid text + vector matches:**
+- ✅ "Dark Fantasy series" → HIGH text + HIGH vector (genre match)
+- ✅ "Gothic horror novel" → LOW text + HIGH vector (semantically similar)
+- ⚠️ "Heart of Darkness" → MEDIUM text + LOW vector (not about dark fiction genre)
+
+The **vector embedding understands context**, so "Heart of Darkness" (about colonialism) is not semantically similar to "dark novels" (dark fantasy genre), even though both contain the word "dark".
+
+---
+
+## Tuning Search Boosts
+
+In `BookDao.cs:239-250`, you can adjust text field boosts:
 
 ```csharp
-const int textPriority = 1;    // Lower = higher importance (exact matches)
-const int vectorPriority = 60; // Higher = lower importance (semantic matches)
+searchBuilder.Text(f => f.Title, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),     // Exact title matches
+searchBuilder.Text(f => f.Authors, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)),   // Author name matches
+searchBuilder.Text(f => f.Publisher, queryParameters.SearchTerm, score: scoreBuilder.Boost(8.0)), // Publisher matches
+searchBuilder.Text(f => f.Tags, queryParameters.SearchTerm, score: scoreBuilder.Boost(2.0)),      // Tag matches
+searchBuilder.Text(f => f.Description, queryParameters.SearchTerm, score: scoreBuilder.Boost(1.0)), // Description matches
 ```
 
-**To favor exact matches more:**
-- Decrease `textPriority` (e.g., 1 → 0)
-- Increase `vectorPriority` (e.g., 60 → 100)
+In `BookDao.cs:263`, adjust vector search boost:
+
+```csharp
+searchBuilder.KnnVector(f => f.Embedding, queryParameters.SearchEmbedding, 100, score: scoreBuilder.Boost(10.0))
+```
+
+**To favor exact text matches more:**
+- Increase text boosts: `8.0 → 15.0`
+- Decrease vector boost: `10.0 → 5.0`
 
 **To favor semantic search more:**
-- Increase `textPriority` (e.g., 1 → 10)
-- Decrease `vectorPriority` (e.g., 60 → 30)
+- Decrease text boosts: `8.0 → 5.0`
+- Increase vector boost: `10.0 → 20.0`
 
 ---
 
 ## Verification
 
-After creating both indexes, verify they're active:
+After creating the index, verify it's active:
 
 ```bash
 # Check Atlas UI: Search → Indexes
 # You should see:
-# 1. "default" - Search Index - Status: Active
-# 2. "vector_index" - Vector Search Index - Status: Active
+# - "default" - Search Index - Status: Active
 ```
 
 Index creation takes **5-15 minutes** depending on collection size.
@@ -192,17 +175,20 @@ Index creation takes **5-15 minutes** depending on collection size.
 ## Troubleshooting
 
 ### Error: "Index not found"
-- Ensure index names match exactly: `default` and `vector_index`
-- Wait for indexes to finish building (check status in Atlas UI)
-
-### Error: "$vectorSearch is not supported"
-- You created an **Atlas Search** index instead of **Atlas Vector Search**
-- Delete the wrong index and recreate using the correct type
+- Ensure index name is exactly: `default`
+- Wait for index to finish building (check status in Atlas UI)
 
 ### No vector search results
 - Ensure books have embeddings (check `Embedding` field is populated)
 - Verify embedding dimensions are 3072 (text-embedding-3-large)
+- Vector search only activates when embeddings are available
 
 ### Poor search quality
-- Adjust RRF priorities in `BookDao.cs:234-235`
-- Tune text search boosts in `BookDao.cs:533-573`
+- Tune text search boosts in `BookDao.cs:239-250`
+- Tune vector search boost in `BookDao.cs:263`
+- Ensure embeddings are being generated correctly (check database)
+
+### "knnVector" type not supported
+- Make sure you created an **Atlas Search Index** (not Vector Search Index)
+- The `knnVector` type is only available in Atlas Search indexes
+- Recreate the index using the "Create Search Index" option
