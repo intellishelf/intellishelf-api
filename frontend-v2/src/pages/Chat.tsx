@@ -2,14 +2,20 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Send, Bot, User, StopCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Send, Bot, User, StopCircle, Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useStreamChat } from '@/hooks/chat/useStreamChat';
-import type { ChatMessage } from '@/types/chat';
+import type { ChatMessage, ChunkType } from '@/types/chat';
 import ReactMarkdown from 'react-markdown';
+
+type MessagePart =
+  | { type: 'content'; text: string }
+  | { type: 'toolCall'; description: string };
 
 interface Message extends ChatMessage {
   id: string;
+  parts?: MessagePart[];
 }
 
 const Chat = () => {
@@ -54,6 +60,7 @@ const Chat = () => {
       id: assistantMessageId,
       role: "assistant",
       content: "",
+      parts: [],
     };
     setMessages((prev) => [...prev, assistantMessage]);
 
@@ -63,15 +70,35 @@ const Chat = () => {
       content,
     }));
 
-    // Stream the response
+    // Stream the response with parts
+    const messageParts: MessagePart[] = [];
     let accumulatedContent = '';
+
     await sendMessage(input, history, {
       onChunk: (chunk) => {
-        accumulatedContent += chunk;
+        // Handle tool calls
+        if (chunk.Type === 1 && chunk.ToolCallDescription) {
+          // 1 = ChunkType.ToolCall
+          messageParts.push({
+            type: 'toolCall',
+            description: chunk.ToolCallDescription,
+          });
+        }
+
+        // Handle content
+        if (chunk.Content) {
+          accumulatedContent += chunk.Content;
+        }
+
+        // Update message with accumulated content and parts
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMessageId
-              ? { ...msg, content: accumulatedContent }
+              ? {
+                  ...msg,
+                  content: accumulatedContent,
+                  parts: [...messageParts],
+                }
               : msg
           )
         );
@@ -118,8 +145,28 @@ const Chat = () => {
                 }`}
               >
                 {message.role === "assistant" ? (
-                  <div className='text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary'>
-                    <ReactMarkdown>{message.content || "..."}</ReactMarkdown>
+                  <div className='space-y-2'>
+                    {/* Show tool call indicators */}
+                    {message.parts && message.parts.length > 0 && (
+                      <div className='flex flex-wrap gap-2 mb-2'>
+                        {message.parts
+                          .filter((part) => part.type === 'toolCall')
+                          .map((part, idx) => (
+                            <Badge
+                              key={idx}
+                              variant='secondary'
+                              className='text-xs flex items-center gap-1'
+                            >
+                              <Sparkles className='w-3 h-3' />
+                              {part.type === 'toolCall' && part.description}
+                            </Badge>
+                          ))}
+                      </div>
+                    )}
+                    {/* Show content */}
+                    <div className='text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary'>
+                      <ReactMarkdown>{message.content || "..."}</ReactMarkdown>
+                    </div>
                   </div>
                 ) : (
                   <p className='text-sm whitespace-pre-wrap'>{message.content}</p>

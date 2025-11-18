@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { streamChat } from '@/lib/chat-api';
-import type { ChatMessage } from '@/types/chat';
+import type { ChatMessage, ChatStreamChunk } from '@/types/chat';
 
 interface UseStreamChatOptions {
-  onChunk?: (content: string) => void;
+  onChunk?: (chunk: ChatStreamChunk) => void;
   onComplete?: () => void;
   onError?: (error: string) => void;
 }
@@ -33,9 +33,8 @@ export function useStreamChat() {
             break;
           }
 
-          if (chunk.Content) {
-            onChunk?.(chunk.Content);
-          }
+          // Pass the entire chunk (handles both content and tool calls)
+          onChunk?.(chunk);
 
           if (chunk.Done) {
             onComplete?.();
