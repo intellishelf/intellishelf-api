@@ -57,11 +57,6 @@ const api = {
       throw new Error(error || `HTTP ${res.status}: ${res.statusText}`);
     }
 
-    // 204 No Content has no body to parse
-    if (res.status === 204) {
-      return undefined as T;
-    }
-
     return res.json();
   },
 
@@ -93,12 +88,21 @@ const api = {
       throw new Error(error || `HTTP ${res.status}: ${res.statusText}`);
     }
 
-    // 204 No Content has no body to parse
-    if (res.status === 204) {
-      return undefined as T;
-    }
-
     return res.json();
+  },
+
+  void: async (endpoint: string, method: 'POST' | 'DELETE' = 'POST'): Promise<void> => {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error || `HTTP ${res.status}: ${res.statusText}`);
+    }
+    // Don't parse response body - just validate success
   },
 
   upload: async <T>(endpoint: string, formData: FormData): Promise<T> => {

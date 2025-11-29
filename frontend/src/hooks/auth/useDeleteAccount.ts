@@ -8,7 +8,7 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => api.delete('/auth/account'),
+    mutationFn: () => api.void('/auth/account', 'DELETE'),
     onSuccess: () => {
       // Clear all cached data
       queryClient.clear();
