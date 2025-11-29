@@ -3,8 +3,21 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useDeleteAccount } from '@/hooks/auth/useDeleteAccount';
 
 type ColorPalette = 'cyan' | 'purple' | 'emerald' | 'amber';
 
@@ -17,6 +30,9 @@ const colorPalettes: Record<ColorPalette, { primary: string; name: string }> = {
 
 const Settings = () => {
   const [selectedPalette, setSelectedPalette] = useState<ColorPalette>('cyan');
+  const [confirmationChecked, setConfirmationChecked] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const deleteAccountMutation = useDeleteAccount();
 
   useEffect(() => {
     const saved = localStorage.getItem('colorPalette') as ColorPalette;
@@ -43,6 +59,15 @@ const Settings = () => {
     toast.success('Color palette updated', {
       description: `Switched to ${colorPalettes[palette].name}`,
     });
+  };
+
+  const handleDeleteAccount = () => {
+    if (!confirmationChecked) {
+      toast.error('Please confirm that you understand this action cannot be undone');
+      return;
+    }
+
+    deleteAccountMutation.mutate();
   };
 
   return (
@@ -130,6 +155,84 @@ const Settings = () => {
                 Import Books
               </Button>
             </div>
+          </Card>
+
+          <Card className='bg-card border-destructive p-6'>
+            <h2 className='text-xl font-semibold text-destructive mb-2'>
+              Danger Zone
+            </h2>
+            <p className='text-sm text-muted-foreground mb-4'>
+              Irreversible actions that will permanently affect your account
+            </p>
+
+            <AlertDialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) {
+                setConfirmationChecked(false);
+              }
+            }}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant='destructive'
+                  className='w-full'
+                  disabled={deleteAccountMutation.isPending}
+                >
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className='text-destructive'>
+                    Delete Account Permanently?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className='space-y-4'>
+                    <p>
+                      This action <span className='font-semibold text-destructive'>cannot be undone</span>.
+                      This will permanently delete your account and remove all your data from our servers.
+                    </p>
+                    <p className='text-sm'>
+                      The following data will be permanently deleted:
+                    </p>
+                    <ul className='text-sm list-disc list-inside space-y-1 ml-2'>
+                      <li>All your books and reading lists</li>
+                      <li>All book cover images</li>
+                      <li>Your account information</li>
+                      <li>All session data</li>
+                    </ul>
+
+                    <div className='flex items-start space-x-2 bg-destructive/10 p-3 rounded-md border border-destructive/20'>
+                      <Checkbox
+                        id='confirm-delete'
+                        checked={confirmationChecked}
+                        onCheckedChange={(checked) => setConfirmationChecked(checked === true)}
+                        className='mt-0.5 border-destructive data-[state=checked]:bg-destructive data-[state=checked]:border-destructive'
+                      />
+                      <label
+                        htmlFor='confirm-delete'
+                        className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'
+                      >
+                        I understand that this action is permanent and cannot be undone
+                      </label>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleteAccountMutation.isPending}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDeleteAccount();
+                    }}
+                    disabled={!confirmationChecked || deleteAccountMutation.isPending}
+                    className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  >
+                    {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </Card>
         </div>
       </div>
