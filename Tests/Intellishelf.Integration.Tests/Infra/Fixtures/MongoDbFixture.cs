@@ -168,12 +168,12 @@ public class MongoDbFixture : IAsyncLifetime
             CreatedAt = DateTime.UtcNow
         };
 
-        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens")
+        await Database.GetCollection<RefreshTokenEntity>(RefreshTokenEntity.CollectionName)
             .InsertOneAsync(entity);
     }
 
     public async Task<List<RefreshTokenEntity>> GetRefreshTokensByUserIdAsync(string userId) =>
-        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens")
+        await Database.GetCollection<RefreshTokenEntity>(RefreshTokenEntity.CollectionName)
             .Find(rt => rt.UserId == userId)
             .ToListAsync();
 
@@ -181,5 +181,5 @@ public class MongoDbFixture : IAsyncLifetime
         await Database.GetCollection<UserEntity>(UserEntity.CollectionName).DeleteManyAsync(FilterDefinition<UserEntity>.Empty);
 
     public async Task ClearRefreshTokensAsync() =>
-        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens").DeleteManyAsync(FilterDefinition<RefreshTokenEntity>.Empty);
+        await Database.GetCollection<RefreshTokenEntity>(RefreshTokenEntity.CollectionName).DeleteManyAsync(FilterDefinition<RefreshTokenEntity>.Empty);
 }

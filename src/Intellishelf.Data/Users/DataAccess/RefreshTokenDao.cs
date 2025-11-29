@@ -9,7 +9,7 @@ namespace Intellishelf.Data.Users.DataAccess;
 
 public class RefreshTokenDao(IMongoDatabase database, IRefreshTokenMapper mapper) : IRefreshTokenDao
 {
-    private readonly IMongoCollection<RefreshTokenEntity> _refreshTokensCollection = database.GetCollection<RefreshTokenEntity>("RefreshTokens");
+    private readonly IMongoCollection<RefreshTokenEntity> _refreshTokensCollection = database.GetCollection<RefreshTokenEntity>(RefreshTokenEntity.CollectionName);
 
     public async Task<TryResult<RefreshToken>> TryAddAsync(RefreshToken refreshToken)
     {
