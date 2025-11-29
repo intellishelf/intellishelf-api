@@ -130,6 +130,23 @@ public class AuthController(
             : HandleErrorResponse(result.Error);
     }
 
+    [HttpDelete("account")]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var userId = CurrentUserId;
+
+        var result = await authService.TryDeleteAccountAsync(userId);
+
+        if (!result.IsSuccess)
+            return HandleErrorResponse(result.Error);
+
+        // Clear authentication cookie after successful deletion
+        ClearRefreshCookie();
+        await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
+
+        return NoContent();
+    }
+
     [HttpGet("google")]
     [AllowAnonymous]
     public IActionResult SignInWithGoogle([FromQuery] string? returnUrl = null)

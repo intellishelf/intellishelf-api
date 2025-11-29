@@ -20,4 +20,6 @@ public interface IBookDao
     Task<TryResult> DeleteBookAsync(string userId, string bookId);
 
     Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters);
+
+    Task<TryResult<long>> DeleteAllBooksByUserAsync(string userId);
 }

@@ -43,6 +43,7 @@ public abstract class ApiControllerBase : ControllerBase
         // 500 Internal Server Error
         FileErrorCodes.UploadFailed or
         FileErrorCodes.DeletionFailed or
+        UserErrorCodes.DeletionFailed or
         AiErrorCodes.AiResponseNotParsed or
         AiErrorCodes.RequestFailed or
         ChatErrorCodes.AiRequestFailed => StatusCodes.Status500InternalServerError,

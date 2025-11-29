@@ -42,6 +42,38 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
         }
     }
 
+    public async Task<TryResult<int>> DeleteAllUserFilesAsync(string userId)
+    {
+        try
+        {
+            await containerClient.CreateIfNotExistsAsync();
+
+            var prefix = $"userFiles/{userId}/";
+            var deletedCount = 0;
+
+            await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: prefix))
+            {
+                try
+                {
+                    var blobClient = containerClient.GetBlobClient(blobItem.Name);
+                    await blobClient.DeleteIfExistsAsync();
+                    deletedCount++;
+                }
+                catch (Exception ex)
+                {
+                    // Log warning but continue - best effort deletion
+                    System.Diagnostics.Debug.WriteLine($"Warning: Failed to delete blob {blobItem.Name}: {ex.Message}");
+                }
+            }
+
+            return deletedCount;
+        }
+        catch (Exception ex)
+        {
+            return new Error(FileErrorCodes.DeletionFailed, $"Failed to delete user files: {ex.Message}");
+        }
+    }
+
     private string ExtractBlobPathFromUrl(string url)
     {
         var builder = new BlobUriBuilder(new Uri(url));

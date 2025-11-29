@@ -3,10 +3,13 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Intellishelf.Common.TryResult;
+using Intellishelf.Domain.Books.DataAccess;
+using Intellishelf.Domain.Files.Services;
 using Intellishelf.Domain.Users.Config;
 using Intellishelf.Domain.Users.DataAccess;
 using Intellishelf.Domain.Users.Helpers;
 using Intellishelf.Domain.Users.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,7 +18,10 @@ namespace Intellishelf.Domain.Users.Services;
 public class AuthService(
     IOptions<AuthConfig> options,
     IUserDao userDao,
-    IRefreshTokenDao refreshTokenDao)
+    IRefreshTokenDao refreshTokenDao,
+    IBookDao bookDao,
+    IFileStorageService fileStorageService,
+    ILogger<AuthService> logger)
     : IAuthService
 {
     public async Task<TryResult<User>> TryFindByIdAsync(string id) =>
@@ -204,5 +210,52 @@ public class AuthService(
             IsRevoked: false,
             CreatedAt: DateTime.UtcNow
         );
+    }
+
+    public async Task<TryResult> TryDeleteAccountAsync(string userId)
+    {
+        // 1. Delete all book cover images (best effort)
+        var deleteFilesResult = await fileStorageService.DeleteAllUserFilesAsync(userId);
+        if (deleteFilesResult.IsSuccess)
+        {
+            logger.LogInformation("Deleted {DeletedFileCount} book cover images for user {UserId}", deleteFilesResult.Value, userId);
+        }
+        else
+        {
+            logger.LogWarning("Failed to delete book cover images for user {UserId}: {Error}", userId, deleteFilesResult.Error!.Message);
+        }
+
+        // 2. Delete all books (best effort)
+        var deleteBooksResult = await bookDao.DeleteAllBooksByUserAsync(userId);
+        if (deleteBooksResult.IsSuccess)
+        {
+            logger.LogInformation("Deleted {DeletedBookCount} books for user {UserId}", deleteBooksResult.Value, userId);
+        }
+        else
+        {
+            logger.LogWarning("Failed to delete books for user {UserId}: {Error}", userId, deleteBooksResult.Error!.Message);
+        }
+
+        // 3. Delete all refresh tokens (best effort)
+        var deleteTokensResult = await refreshTokenDao.TryDeleteAllByUserIdAsync(userId);
+        if (deleteTokensResult.IsSuccess)
+        {
+            logger.LogInformation("Deleted {DeletedTokenCount} refresh tokens for user {UserId}", deleteTokensResult.Value, userId);
+        }
+        else
+        {
+            logger.LogWarning("Failed to delete refresh tokens for user {UserId}: {Error}", userId, deleteTokensResult.Error!.Message);
+        }
+
+        // 4. Delete user record (CRITICAL)
+        var deleteUserResult = await userDao.TryDeleteUserAsync(userId);
+        if (!deleteUserResult.IsSuccess)
+        {
+            logger.LogError("Failed to delete user {UserId}: {Error}", userId, deleteUserResult.Error!.Message);
+            return new Error(UserErrorCodes.DeletionFailed, $"Failed to delete account: {deleteUserResult.Error.Message}");
+        }
+
+        logger.LogInformation("Successfully deleted account for user {UserId}", userId);
+        return TryResult.Success();
     }
 }

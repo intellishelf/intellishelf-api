@@ -254,4 +254,11 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         return pagedResult;
     }
+
+    public async Task<TryResult<long>> DeleteAllBooksByUserAsync(string userId)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+        var result = await _booksCollection.DeleteManyAsync(b => b.UserId == userIdObject);
+        return result.DeletedCount;
+    }
 }

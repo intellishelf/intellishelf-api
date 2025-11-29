@@ -9,4 +9,5 @@ public interface IRefreshTokenDao
     Task<TryResult<bool>> TryUpdateAsync(RefreshToken refreshToken);
     Task<TryResult<bool>> TryDeleteExpiredTokensAsync();
     Task<TryResult<IEnumerable<RefreshToken>>> TryFindByUserIdAsync(string userId);
+    Task<TryResult<long>> TryDeleteAllByUserIdAsync(string userId);
 }
