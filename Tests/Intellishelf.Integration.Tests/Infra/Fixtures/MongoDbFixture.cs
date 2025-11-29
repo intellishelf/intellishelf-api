@@ -9,6 +9,16 @@ using Xunit;
 
 namespace Intellishelf.Integration.Tests.Infra.Fixtures;
 
+public class RefreshTokenEntity
+{
+    public string Id { get; set; } = default!;
+    public string Token { get; set; } = default!;
+    public string UserId { get; set; } = default!;
+    public DateTime ExpiryDate { get; set; }
+    public bool IsRevoked { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
 public class MongoDbFixture : IAsyncLifetime
 {
     private const int MongoDbPort = 27017;
@@ -142,4 +152,44 @@ public class MongoDbFixture : IAsyncLifetime
 
     public async Task<BookEntity?> FindBookByIdAsync(string bookId) =>
         await Database.GetCollection<BookEntity>(BookEntity.CollectionName).Find(b => b.Id == bookId).FirstOrDefaultAsync();
+
+    public async Task<bool> UserExistsAsync(string userId) =>
+        await Database.GetCollection<UserEntity>(UserEntity.CollectionName)
+            .Find(u => u.Id == userId)
+            .AnyAsync();
+
+    public async Task<List<BookEntity>> GetBooksByUserIdAsync(string userId)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+        return await Database.GetCollection<BookEntity>(BookEntity.CollectionName)
+            .Find(b => b.UserId == userIdObject)
+            .ToListAsync();
+    }
+
+    public async Task SeedRefreshTokenAsync(string userId, string token)
+    {
+        var entity = new RefreshTokenEntity
+        {
+            Id = ObjectId.GenerateNewId().ToString(),
+            Token = token,
+            UserId = userId,
+            ExpiryDate = DateTime.UtcNow.AddDays(7),
+            IsRevoked = false,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens")
+            .InsertOneAsync(entity);
+    }
+
+    public async Task<List<RefreshTokenEntity>> GetRefreshTokensByUserIdAsync(string userId) =>
+        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens")
+            .Find(rt => rt.UserId == userId)
+            .ToListAsync();
+
+    public async Task ClearUsersAsync() =>
+        await Database.GetCollection<UserEntity>(UserEntity.CollectionName).DeleteManyAsync(FilterDefinition<UserEntity>.Empty);
+
+    public async Task ClearRefreshTokensAsync() =>
+        await Database.GetCollection<RefreshTokenEntity>("RefreshTokens").DeleteManyAsync(FilterDefinition<RefreshTokenEntity>.Empty);
 }
