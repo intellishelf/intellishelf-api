@@ -108,12 +108,14 @@ public class AuthController(
 
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
+            await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
             return NoContent();
         }
 
         var result = await authService.TryRevokeRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
 
         ClearRefreshCookie();
+        await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
 
         return result.IsSuccess
             ? NoContent()
