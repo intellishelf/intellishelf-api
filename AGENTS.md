@@ -1,6 +1,5 @@
-# CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to LLM agent when working with code in this repository.
 
 ## Build & Test Commands
 
@@ -47,287 +46,59 @@ src/
 
 **Location:** `src/Intellishelf.Common/TryResult/TryResult.cs`
 
-This codebase uses **railway-oriented programming** instead of exceptions for expected errors:
+Railway-oriented programming instead of exceptions. Service/DAO methods return `TryResult<T>` with two states: Success (has Value) or Error (has Error).
 
-```csharp
-// Service methods return TryResult<T>
-public async Task<TryResult<Book>> TryGetBookAsync(string userId, string bookId) =>
-    await bookDao.GetBookAsync(userId, bookId);
+**Usage:** Check `result.IsSuccess`, return `HandleErrorResponse(result.Error)` or `Ok(result.Value)`. Can return values directly (implicit conversion), errors via `new Error(code, message)`, or void via `TryResult.Success()`.
 
-// TryResult has two states: Success with value, or Error
-public record TryResult<TResult> : TryResult
-{
-    [MemberNotNullWhen(false, nameof(Error))]
-    public virtual bool IsSuccess { get; protected init; }
-    public Error? Error { get; }
-    public TryResult? Value { get; }
-}
-
-// Errors are simple records with Code and Message
-public record Error(string Code, string Message);
-```
-
-**How to use in controllers:**
-```csharp
-var result = await bookService.TryGetBookAsync(userId, bookId);
-if (!result.IsSuccess)
-    return HandleErrorResponse(result.Error);  // Converts to ProblemDetails
-return Ok(result.Value);
-```
-
-**Implicit conversions allow clean DAO/Service implementations:**
-```csharp
-// Return an error directly
-if (book == null)
-    return new Error(BookErrorCodes.BookNotFound, "Book not found.");
-
-// Return a value (implicitly converted to TryResult<Book>)
-return mapper.Map(bookEntity);
-
-// Return void success
-return TryResult.Success();
-```
-
-**Error Codes:** Defined in static classes per domain:
-- `src/Intellishelf.Domain/Books/Errors/BookErrorCodes.cs`
-- `src/Intellishelf.Domain/Users/Models/UserErrorCodes.cs`
-- `src/Intellishelf.Domain/Files/ErrorCodes/FileErrorCodes.cs`
-- `src/Intellishelf.Domain/Ai/Errors/AiErrorCodes.cs`
+**Error Codes:** Format `{Feature}.{ErrorType}` (e.g., `Books.NotFound`). Define as `public const string` in `Domain/{Feature}/Errors/{Feature}ErrorCodes.cs`.
 
 ## Error to HTTP Status Mapping
 
 **Location:** `src/Intellishelf.Api/Controllers/ApiControllerBase.cs`
 
-Error codes map to HTTP status codes in `ApiControllerBase.MapErrorToStatusCode()`:
-
-```csharp
-private static int MapErrorToStatusCode(string code) => code switch
-{
-    BookErrorCodes.BookNotFound => StatusCodes.Status404NotFound,
-    UserErrorCodes.Unauthorized => StatusCodes.Status401Unauthorized,
-    UserErrorCodes.AlreadyExists => StatusCodes.Status409Conflict,
-    FileErrorCodes.InvalidFileType => StatusCodes.Status400BadRequest,
-    _ => StatusCodes.Status500InternalServerError
-};
-```
-
-**When adding new error codes:**
-1. Add constant to appropriate `*ErrorCodes` class
-2. Update `MapErrorToStatusCode()` switch expression
-3. Use the error code in DAO/Service: `return new Error(YourErrorCodes.NewError, "Message");`
+Map error codes to HTTP status in `MapErrorToStatusCode()` switch. Add new error codes to switch (404 for NotFound, 401 for Unauthorized, 409 for AlreadyExists, 400 for InvalidInput, 502 for external service errors, 500 default).
 
 ## Module System (Dependency Injection)
 
 **Location:** `src/Intellishelf.Api/Modules/`
 
-Instead of massive `Program.cs`, DI is organized into modules per feature:
+DI organized into modules per feature: `DbModule`, `UsersModule`, `BooksModule`, `AzureModule`, `AiModule`. Each module has static `Register()` method called in `Program.cs`.
 
-- **DbModule:** MongoDB configuration and IMongoDatabase singleton
-- **UsersModule:** Authentication (JWT + Cookie + Google OAuth), user services, background cleanup
-- **BooksModule:** Book services, DAOs, mappers, image processors
-- **AzureModule:** Azure Blob Storage client
-- **AiModule:** OpenAI ChatClient configuration
-
-**Pattern:**
-```csharp
-// In Program.cs
-DbModule.Register(builder);
-UsersModule.Register(builder);
-BooksModule.Register(builder.Services);
-// ...
-
-// In each module
-public static class BooksModule
-{
-    public static void Register(IServiceCollection services)
-    {
-        services.AddSingleton<IBookEntityMapper, BookEntityMapper>();  // Stateless
-        services.AddTransient<IBookDao, BookDao>();                    // Per-request
-        services.AddTransient<IBookService, BookService>();
-    }
-}
-```
-
-**Lifecycle rules:**
-- `AddSingleton`: Mappers, validators, processors (stateless, thread-safe)
-- `AddTransient`: DAOs, Services (new instance per injection)
-- `AddScoped`: Services that need per-request state (e.g., FileStorageService)
+**Lifecycle:** Singleton (mappers, validators, processors - stateless), Transient (DAOs, services - per injection), Scoped (per-request state, rare), HttpClient (for HTTP services).
 
 ## Layer Communication Flow
 
-```
-HTTP Request
-    ↓
-[Authentication Middleware] → Validates JWT/Cookie/Google token
-    ↓
-[BooksController] → Extracts UserId from User.Claims
-    ↓
-[BookService] → Orchestrates business logic (e.g., delete old image before update)
-    ↓
-[BookDao] → Executes MongoDB queries with Builders API
-    ↓
-[MongoDB] → Returns BookEntity
-    ↓
-[Mapper] → BookEntity → Book (domain model)
-    ↓
-[TryResult<Book>] → Flows back up
-    ↓
-[Controller] → HandleErrorResponse() or Ok()
-    ↓
-ProblemDetails or JSON response
-```
+HTTP Request → Auth Middleware (JWT/Cookie/Google) → Controller (extract UserId) → Service (business logic orchestration) → DAO (MongoDB queries) → Mapper (Entity→Domain) → TryResult → Controller (HandleErrorResponse/Ok) → ProblemDetails/JSON.
 
-**Key point:** Services coordinate cross-cutting concerns (e.g., deleting files), DAOs focus purely on data access.
+**Key:** Services orchestrate cross-cutting concerns, DAOs focus on data access only.
 
 ## Integration Tests with Testcontainers
 
 **Location:** `tests/Intellishelf.Integration.Tests/`
 
-Integration tests use **real MongoDB and Azure Storage containers** (not mocks):
+Use real MongoDB and Azure Storage containers (not mocks). Fixtures (`MongoDbFixture`, `AzuriteFixture`) spin up containers via Testcontainers. Tests use `[Collection("Integration Tests")]` to share fixtures. `TestWebApplicationFactory` swaps dependencies and uses `TestAuthHandler` for auth bypass.
 
-```csharp
-// Fixtures spin up containers
-public class MongoDbFixture : IAsyncLifetime
-{
-    private MongoDbContainer _mongoContainer;
-    public string ConnectionString => _mongoContainer.GetConnectionString();
-
-    public async Task InitializeAsync()
-    {
-        _mongoContainer = new MongoDbBuilder().WithImage("mongo:7.0").Build();
-        await _mongoContainer.StartAsync();
-    }
-
-    // Helper methods for seeding test data
-    public Task SeedDefaultUserAsync() => ...;
-    public Task SeedBooksAsync(params BookEntity[] books) => ...;
-    public Task ClearBooksAsync() => ...;
-}
-```
-
-**Test structure:**
-```csharp
-[Collection("Integration Tests")]  // Share fixtures across tests in collection
-public sealed class BooksTests : IAsyncLifetime
-{
-    private readonly HttpClient _client;
-
-    public BooksTests(MongoDbFixture mongoDbFixture, AzuriteFixture azuriteFixture)
-    {
-        var factory = new TestWebApplicationFactory(mongoDbFixture, azuriteFixture);
-        _client = factory.CreateClient();
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _mongoDbFixture.ClearBooksAsync();
-        await _mongoDbFixture.SeedDefaultUserAsync();
-    }
-
-    [Fact]
-    public async Task GivenNoBooks_WhenGetBooks_ThenEmptyPagedResult() { ... }
-}
-```
-
-**TestWebApplicationFactory** swaps real MongoDB/Storage for containers and uses `TestAuthHandler` to bypass real authentication.
-
-**Requirements:**
-- Docker must be running for integration tests
-- Tests are isolated per collection with shared fixtures
-- Use `DefaultTestUsers.Authenticated` for seeding authenticated context
+**Requirements:** Docker running. Tests isolated per collection. Seed data via fixtures (`SeedDefaultUserAsync()`, `ClearBooksAsync()`).
 
 ## Data Access Patterns
 
-**Interfaces in Domain, Implementations in Data:**
-- Interface: `src/Intellishelf.Domain/Books/DataAccess/IBookDao.cs`
-- Implementation: `src/Intellishelf.Data/Books/DataAccess/BookDao.cs`
+**Pattern:** Interface in Domain, implementation in Data. DAOs inject `IMongoDatabase`, get collection via `database.GetCollection<TEntity>(CollectionName)`.
 
-**MongoDB specifics:**
-- Uses MongoDB.Driver fluent API (`Builders<T>.Filter`, `Builders<T>.Update`, `Builders<T>.Sort`)
-- ObjectId for user IDs, string IDs for entities
-- Entity classes inherit from `EntityBase` with `[BsonId]` attribute
-- Collections accessed via injected `IMongoDatabase`
-
-**Example DAO pattern:**
-```csharp
-public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookDao
-{
-    private readonly IMongoCollection<BookEntity> _booksCollection =
-        database.GetCollection<BookEntity>(BookEntity.CollectionName);
-
-    public async Task<TryResult<Book>> GetBookAsync(string userId, string bookId)
-    {
-        var filter = Builders<BookEntity>.Filter.And(
-            Builders<BookEntity>.Filter.Eq(b => b.UserId, ObjectId.Parse(userId)),
-            Builders<BookEntity>.Filter.Eq(b => b.Id, bookId));
-
-        var book = await _booksCollection.Find(filter).FirstOrDefaultAsync();
-
-        if (book == null)
-            return new Error(BookErrorCodes.BookNotFound, "Book not found.");
-
-        return mapper.Map(book);  // Implicit conversion to TryResult<Book>
-    }
-}
-```
+**MongoDB:** Use `Builders<T>.Filter/Update/Sort` for queries. `ObjectId` for user IDs, string for entity IDs. Entities inherit `EntityBase` with `[BsonId]`. Return `TryResult` from all DAO methods. Map entities to domain models via injected mappers.
 
 ## Authentication Architecture
 
 **Location:** `src/Intellishelf.Api/Modules/UsersModule.cs`
 
-The API supports **3 authentication schemes** routed by a policy scheme:
+Three schemes routed by policy: JWT Bearer (mobile, `Authorization` header), Cookie (web sessions), Google OAuth (external provider). Policy selector checks Authorization header to route between JWT/Cookie.
 
-1. **JWT Bearer** (`AuthConfig.JwtScheme`): For mobile clients, tokens in `Authorization: Bearer <token>` header
-2. **Cookie** (`AuthConfig.CookieScheme`): For web clients, cookie-based sessions
-3. **Google OAuth** (`GoogleDefaults.AuthenticationScheme`): External provider
-
-**Routing logic in Program.cs:**
-```csharp
-.AddPolicyScheme("Custom", "JWT or Cookie", options =>
-{
-    options.ForwardDefaultSelector = ctx =>
-    {
-        var auth = ctx.Request.Headers.Authorization.ToString();
-        return !string.IsNullOrEmpty(auth) ? AuthConfig.JwtScheme : AuthConfig.CookieScheme;
-    };
-})
-```
-
-**All API endpoints require `[Authorize]` by default** (via `ApiControllerBase`). Use `CurrentUserId` property to get authenticated user ID from claims.
+All endpoints require `[Authorize]` by default (via `ApiControllerBase`). Access user ID via `CurrentUserId` property from claims.
 
 ## AI Integration (OpenAI)
 
 **Location:** `src/Intellishelf.Domain/Ai/Services/AiService.cs`
 
-Books can be parsed from OCR text using OpenAI structured outputs:
-
-```csharp
-public class AiService(ChatClient chatClient) : IAiService
-{
-    // Uses JSON schema to enforce structured response
-    private static readonly ChatCompletionOptions ChatOptions = new()
-    {
-        Temperature = 0.0f,
-        ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-            jsonSchemaFormatName: "book_info",
-            jsonSchema: BinaryData.FromBytes(/* schema for ParsedBook */),
-            jsonSchemaIsStrict: true)
-    };
-
-    public async Task<TryResult<ParsedBook>> ParseBookFromTextAsync(string text, bool useMockedAi)
-    {
-        if (useMockedAi)
-            return new ParsedBook { Title = "Sample Book", ... };  // Mock for testing
-
-        var response = await chatClient.CompleteChatAsync(messages, ChatOptions);
-        var book = JsonSerializer.Deserialize<ParsedBook>(response.Value.Content[0].Text);
-
-        return book ?? new Error(AiErrorCodes.RequestFailed, "Response from AI could not be parsed.");
-    }
-}
-```
-
-**Endpoint:** `POST /books/parse-text` accepts OCR text and returns structured book data.
+Parse OCR text to structured book data using OpenAI with JSON schema validation (strict mode, temp 0.0). Supports mock mode for testing. Endpoint: `POST /books/parse-text`.
 
 ## Important File Paths
 
@@ -349,3 +120,72 @@ public class AiService(ChatClient chatClient) : IAiService
 **Test infrastructure:**
 - `tests/Intellishelf.Integration.Tests/Infra/TestWebApplicationFactory.cs` - Test host factory
 - `tests/Intellishelf.Integration.Tests/Infra/Fixtures/` - Testcontainers fixtures
+
+## Naming Conventions
+
+**Files:** `[Domain]Controller.cs`, `I[Domain]Service.cs`, `[Domain]Service.cs`, `I[Entity]Dao.cs`, `[Entity]Dao.cs`, `[Entity]Entity.cs`, `[Domain]ErrorCodes.cs`, `[Feature]Module.cs`, `[Service]Config.cs`, `[Domain]Helper.cs`
+
+**Methods:** `Try[Action]Async` (returns TryResult), `[Action]Async` (async), `Map[Target]` (mappers)
+
+**Variables:** `result`/`[action]Result`, `_[entityPlural]Collection`, `_[feature]Config`, `userIdObject = ObjectId.Parse(userId)`
+
+**Feature Structure:**
+```
+Domain/{Feature}/Services|Models|DataAccess|Errors|Helpers|Config
+Data/{Feature}/DataAccess|Entities|Mappers
+Api/Controllers|Contracts/{Feature}|Mappers
+```
+
+## Validation Patterns
+
+**File Validation:** Validators return `TryResult` (see `ImageFileValidator.cs`). Check file size, content type, extensions. Return error codes like `FileErrorCodes.FileTooLarge`, `FileErrorCodes.InvalidFileType`.
+
+**Domain Validation:** Use static helper classes (e.g., `IsbnHelper.IsValidIsbn()`, `IsbnHelper.NormalizeIsbn()`). Return errors via `TryResult`.
+
+**Self-Validating Query Parameters:** Use property setters to enforce constraints (e.g., auto-clamp PageSize to max 100).
+
+## Configuration Management
+
+**Config Classes:** Define `SectionName` constant, use `required` for mandatory values, nullable for optional (see `DatabaseConfig`, `AiConfig`, `AuthConfig`).
+
+**Module Pattern:** Load config via `GetSection()`, bind with `Configure<T>()`, access via `IOptions<T>` injection. Modules register services in `Program.cs`.
+
+## File Processing Pipeline
+
+**Three-Stage:** Validate (check size/type) → Process (resize to max 1000x1000, optimize) → Upload (to Azure Blob Storage). Controllers orchestrate all stages, return errors at each step.
+
+## Background Services
+
+Inherit from `BackgroundService`, use `IServiceProvider` to create scopes for transient dependencies. Register with `AddHostedService<T>()`. Example: `RefreshTokenCleanupService` runs every 24 hours.
+
+## Security Patterns
+
+**Cookies:** MUST use `HttpOnly = true`, `Secure = true`, `SameSite = Lax` for CSRF protection.
+
+**Password Hashing:** HMAC-SHA512 with random salt (see `AuthHelper.CreatePasswordHash()`, `AuthHelper.VerifyPasswordHash()`).
+
+**Authorization:** All controllers inherit `ApiControllerBase` with `[Authorize]` attribute. Use `CurrentUserId` property from base class. Use `[AllowAnonymous]` for public endpoints.
+
+## Code Quality Standards
+
+**Pre-commit:** Run `dotnet format`. All tests must pass before merge.
+
+**Code Review:** Verify TryResult usage, error codes mapped, integration tests added, no secrets committed, layer dependencies correct, async naming, proper DI lifecycle.
+
+## Extension Guide: Adding a New Feature
+
+**Quick Checklist:**
+1. Domain model + request/response records in `Domain/{Feature}/Models/`
+2. Error codes in `Domain/{Feature}/Errors/` + map in `ApiControllerBase.MapErrorToStatusCode()`
+3. DAO interface in `Domain/{Feature}/DataAccess/`
+4. Entity (inherit `EntityBase`, define `CollectionName`) in `Data/{Feature}/Entities/`
+5. Entity mapper (interface + impl) in `Data/{Feature}/Mappers/`
+6. DAO implementation (use `Builders<T>.Filter`, return `TryResult`) in `Data/{Feature}/DataAccess/`
+7. Service interface + implementation in `Domain/{Feature}/Services/`
+8. API contracts in `Api/Contracts/{Feature}/`
+9. API mapper in `Api/Mappers/`
+10. Controller (inherit `ApiControllerBase`, use `CurrentUserId`) in `Api/Controllers/`
+11. Module (register with correct lifetimes) in `Api/Modules/` + add to `Program.cs`
+12. Integration tests in `tests/Intellishelf.Integration.Tests/Features/`
+
+**Reference existing features** (Books, Users, Chat) for implementation patterns.
