@@ -46,4 +46,14 @@ public class UserDao(IMongoDatabase database, IUserMapper mapper) : IUserDao
 
         return mapper.Map(entity);
     }
+
+    public async Task<TryResult<bool>> TryDeleteUserAsync(string userId)
+    {
+        var result = await _usersCollection.DeleteOneAsync(u => u.Id == userId);
+
+        if (result.DeletedCount == 0)
+            return new Error(UserErrorCodes.UserNotFound, $"User with id {userId} not found");
+
+        return true;
+    }
 }

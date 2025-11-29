@@ -108,12 +108,14 @@ public class AuthController(
 
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
+            await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
             return NoContent();
         }
 
         var result = await authService.TryRevokeRefreshTokenAsync(new RefreshTokenRequest(refreshToken));
 
         ClearRefreshCookie();
+        await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
 
         return result.IsSuccess
             ? NoContent()
@@ -128,6 +130,23 @@ public class AuthController(
         return result.IsSuccess
             ? Ok(mapper.MapUser(result.Value))
             : HandleErrorResponse(result.Error);
+    }
+
+    [HttpDelete("account")]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var userId = CurrentUserId;
+
+        var result = await authService.TryDeleteAccountAsync(userId);
+
+        if (!result.IsSuccess)
+            return HandleErrorResponse(result.Error);
+
+        // Clear authentication cookie after successful deletion
+        ClearRefreshCookie();
+        await HttpContext.SignOutAsync(AuthConfig.CookieScheme);
+
+        return NoContent();
     }
 
     [HttpGet("google")]

@@ -6,4 +6,5 @@ public interface IFileStorageService
 {
     Task<TryResult<string>> UploadFileAsync(string userId, Stream fileStream, string fileName);
     Task<TryResult<bool>> DeleteFileFromUrlAsync(string url);
+    Task<TryResult<int>> DeleteAllUserFilesAsync(string userId);
 }

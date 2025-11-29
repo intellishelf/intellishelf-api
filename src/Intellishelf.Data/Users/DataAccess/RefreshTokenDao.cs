@@ -9,7 +9,7 @@ namespace Intellishelf.Data.Users.DataAccess;
 
 public class RefreshTokenDao(IMongoDatabase database, IRefreshTokenMapper mapper) : IRefreshTokenDao
 {
-    private readonly IMongoCollection<RefreshTokenEntity> _refreshTokensCollection = database.GetCollection<RefreshTokenEntity>("RefreshTokens");
+    private readonly IMongoCollection<RefreshTokenEntity> _refreshTokensCollection = database.GetCollection<RefreshTokenEntity>(RefreshTokenEntity.CollectionName);
 
     public async Task<TryResult<RefreshToken>> TryAddAsync(RefreshToken refreshToken)
     {
@@ -55,7 +55,13 @@ public class RefreshTokenDao(IMongoDatabase database, IRefreshTokenMapper mapper
     public async Task<TryResult<IEnumerable<RefreshToken>>> TryFindByUserIdAsync(string userId)
     {
         var refreshTokens = await _refreshTokensCollection.Find(rt => rt.UserId == userId).ToListAsync();
-        
+
         return refreshTokens.Select(mapper.Map).ToList();
+    }
+
+    public async Task<TryResult<long>> TryDeleteAllByUserIdAsync(string userId)
+    {
+        var result = await _refreshTokensCollection.DeleteManyAsync(rt => rt.UserId == userId);
+        return result.DeletedCount;
     }
 }

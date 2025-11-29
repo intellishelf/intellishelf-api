@@ -57,6 +57,10 @@ const api = {
       throw new Error(error || `HTTP ${res.status}: ${res.statusText}`);
     }
 
+    if (res.status === 204) {
+      return undefined as T;
+    }
+
     return res.json();
   },
 
@@ -86,6 +90,10 @@ const api = {
     if (!res.ok) {
       const error = await res.text();
       throw new Error(error || `HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    if (res.status === 204) {
+      return undefined as T;
     }
 
     return res.json();

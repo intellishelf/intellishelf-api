@@ -5,10 +5,12 @@ namespace Intellishelf.Data.Users.Entities;
 
 public class RefreshTokenEntity
 {
+    public const string CollectionName = "RefreshTokens";
+
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; init; } = null!;
-    
+
     public required string Token { get; init; }
     public required string UserId { get; init; }
     public required DateTime ExpiryDate { get; init; }

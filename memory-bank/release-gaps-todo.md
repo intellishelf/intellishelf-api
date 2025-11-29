@@ -40,14 +40,18 @@
   - **Low:** Settings persistence (nice-to-have)
 
 ### 3. No Account Deletion / Profile Management
-- **Status:** ❌ Not implemented
-- **Missing:**
-  - Delete account endpoint
+- **Status:** ✅ Account deletion implemented (2025-11-29)
+- **Completed:**
+  - ✅ Delete account endpoint (`DELETE /auth/account`)
+  - ✅ Cascade deletion: books, images, refresh tokens
+  - ✅ Frontend UI with confirmation dialog in Settings
+  - ✅ Proper cookie cleanup on logout (fixed)
+- **Still Missing:**
   - Change email endpoint
   - Change password endpoint (for local auth users)
   - User profile fields (name, avatar, bio, etc.)
-- **Impact:** Users can't manage their accounts. No GDPR compliance (can't delete data)
-- **Fix for POC:** Low priority unless you plan EU users
+- **Impact:** Users can now delete accounts and all associated data (GDPR compliant)
+- **Notes:** Hard delete with best-effort cascade. Session cookies now properly cleared on logout.
 
 ### 4. Email Verification
 - **Status:** ❌ Not implemented

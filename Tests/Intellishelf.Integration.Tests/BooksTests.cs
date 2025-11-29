@@ -482,5 +482,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         }
 
         public Task<TryResult<bool>> DeleteFileFromUrlAsync(string url) => Task.FromResult<TryResult<bool>>(false);
+
+        public Task<TryResult<int>> DeleteAllUserFilesAsync(string userId) => Task.FromResult<TryResult<int>>(0);
     }
 }
