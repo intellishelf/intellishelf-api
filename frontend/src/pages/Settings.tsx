@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { useDeleteAccount } from '@/hooks/auth/useDeleteAccount';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 type ColorPalette = 'cyan' | 'purple' | 'emerald' | 'amber';
 
@@ -32,7 +32,7 @@ const Settings = () => {
   const [selectedPalette, setSelectedPalette] = useState<ColorPalette>('cyan');
   const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const deleteAccountMutation = useDeleteAccount();
+  const { deleteAccount } = useAuth();
 
   useEffect(() => {
     const saved = localStorage.getItem('colorPalette') as ColorPalette;
@@ -67,7 +67,7 @@ const Settings = () => {
       return;
     }
 
-    deleteAccountMutation.mutate();
+    deleteAccount.mutate();
   };
 
   return (
@@ -175,7 +175,7 @@ const Settings = () => {
                 <Button
                   variant='destructive'
                   className='w-full'
-                  disabled={deleteAccountMutation.isPending}
+                  disabled={deleteAccount.isPending}
                 >
                   Delete Account
                 </Button>
@@ -217,7 +217,7 @@ const Settings = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel disabled={deleteAccountMutation.isPending}>
+                  <AlertDialogCancel disabled={deleteAccount.isPending}>
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
@@ -225,10 +225,10 @@ const Settings = () => {
                       e.preventDefault();
                       handleDeleteAccount();
                     }}
-                    disabled={!confirmationChecked || deleteAccountMutation.isPending}
+                    disabled={!confirmationChecked || deleteAccount.isPending}
                     className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
                   >
-                    {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
+                    {deleteAccount.isPending ? 'Deleting...' : 'Delete Account'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

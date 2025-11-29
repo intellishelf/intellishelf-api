@@ -57,6 +57,21 @@ export const useAuth = () => {
     },
   });
 
+  // Delete account mutation
+  const deleteAccount = useMutation({
+    mutationFn: () => api.delete<void>('/auth/account'),
+    onSuccess: () => {
+      // Clear all cached data
+      queryClient.clear();
+      toast.success('Account deleted successfully');
+      // Redirect to auth page
+      navigate('/auth');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to delete account: ${error.message}`);
+    },
+  });
+
   return {
     user,
     isLoading,
@@ -64,5 +79,6 @@ export const useAuth = () => {
     login,
     register,
     logout,
+    deleteAccount,
   };
 };
