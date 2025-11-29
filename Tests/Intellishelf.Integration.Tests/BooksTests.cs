@@ -339,53 +339,54 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.Equal(FileErrorCodes.UploadFailed, problem.Type);
     }
 
-    [Fact]
-    private async Task GivenValidIsbn13_WhenAddBookFromIsbn_ThenCreated()
-    {
-        // Arrange - Using a known ISBN for testing (The Pragmatic Programmer)
-        var request = new { Isbn = "9780135957059" };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
-        Assert.NotNull(book);
-        Assert.False(string.IsNullOrWhiteSpace(book.Id));
-        Assert.False(string.IsNullOrWhiteSpace(book.Title));
-        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
-        Assert.Equal(ReadingStatus.Unread, book.Status);
-
-        // Verify ISBNs are stored
-        Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
-
-        // Verify book was persisted
-        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
-        Assert.NotNull(persistedBook);
-        Assert.Equal(book.Title, persistedBook.Title);
-    }
-
-    [Fact]
-    private async Task GivenValidIsbn10_WhenAddBookFromIsbn_ThenCreatedWithBothIsbnFormats()
-    {
-        // Arrange - ISBN-10 version of The Pragmatic Programmer
-        var request = new { Isbn = "0135957052" };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
-        Assert.NotNull(book);
-        Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
-
-        // Both ISBN formats should be present (converted)
-        Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
-    }
+    //TODO: Mock HTTP call
+    // [Fact]
+    // private async Task GivenValidIsbn13_WhenAddBookFromIsbn_ThenCreated()
+    // {
+    //     // Arrange - Using a known ISBN for testing (The Pragmatic Programmer)
+    //     var request = new { Isbn = "9780135957059" };
+    //
+    //     // Act
+    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+    //
+    //     // Assert
+    //     Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    //
+    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+    //     Assert.NotNull(book);
+    //     Assert.False(string.IsNullOrWhiteSpace(book.Id));
+    //     Assert.False(string.IsNullOrWhiteSpace(book.Title));
+    //     Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+    //     Assert.Equal(ReadingStatus.Unread, book.Status);
+    //
+    //     // Verify ISBNs are stored
+    //     Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
+    //
+    //     // Verify book was persisted
+    //     var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+    //     Assert.NotNull(persistedBook);
+    //     Assert.Equal(book.Title, persistedBook.Title);
+    // }
+    //
+    // [Fact]
+    // private async Task GivenValidIsbn10_WhenAddBookFromIsbn_ThenCreatedWithBothIsbnFormats()
+    // {
+    //     // Arrange - ISBN-10 version of The Pragmatic Programmer
+    //     var request = new { Isbn = "0135957052" };
+    //
+    //     // Act
+    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+    //
+    //     // Assert
+    //     Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    //
+    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+    //     Assert.NotNull(book);
+    //     Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
+    //
+    //     // Both ISBN formats should be present (converted)
+    //     Assert.True(!string.IsNullOrWhiteSpace(book.Isbn10) || !string.IsNullOrWhiteSpace(book.Isbn13));
+    // }
 
     [Fact]
     private async Task GivenInvalidIsbn_WhenAddBookFromIsbn_ThenBadRequest()
@@ -406,9 +407,9 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     [Fact]
     private async Task GivenDuplicateIsbn_WhenAddBookFromIsbn_ThenConflict()
     {
-        // Arrange - Add a book with ISBN first
+        // Arrange
         var isbn13 = "9780135957059";
-        var existingBook = CreateBookEntity("Existing Book", "Author");
+        var existingBook = CreateBookEntity("Existing Book", "Author", isbn13: isbn13);
         await _mongoDbFixture.SeedBooksAsync(existingBook);
 
         var request = new { Isbn = isbn13 };
@@ -449,7 +450,9 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         string author,
         string? userId = null,
         DateTime? createdDate = null,
-        string? coverImageUrl = null)
+        string? coverImageUrl = null,
+        string? isbn10 = null,
+        string? isbn13 = null)
     {
         var timestamp = createdDate ?? DateTime.UtcNow;
         return new BookEntity
@@ -461,6 +464,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             ModifiedDate = timestamp,
             UserId = ObjectId.Parse(userId ?? DefaultTestUsers.Authenticated.Id),
             CoverImageUrl = coverImageUrl,
+            Isbn10 = isbn10,
+            Isbn13 = isbn13,
             Status = ReadingStatus.Unread
         };
     }
