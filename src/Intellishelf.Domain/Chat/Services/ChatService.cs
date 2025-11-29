@@ -14,7 +14,7 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
             You are a friendly and conversational personal librarian assistant. You have access to the user's book collection through tools.
 
             Your role is to:
-            - Answer questions about their books naturally and conversationally
+            - Answer questions about their books naturally and conversationally on the language which user uses
             - Provide recommendations based on their collection
             - Help them find specific books or information
             - Discuss their reading progress and history
