@@ -44,7 +44,7 @@ export const useAuth = () => {
 
   // Logout mutation
   const logout = useMutation({
-    mutationFn: () => api.void('/auth/logout', 'POST'),
+    mutationFn: () => api.post<void>('/auth/logout', {}),
     onSuccess: () => {
       queryClient.setQueryData(['auth', 'me'], null);
       queryClient.clear(); // Clear all cached data
