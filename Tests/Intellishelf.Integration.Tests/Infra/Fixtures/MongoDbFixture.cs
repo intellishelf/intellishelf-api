@@ -9,16 +9,6 @@ using Xunit;
 
 namespace Intellishelf.Integration.Tests.Infra.Fixtures;
 
-public class RefreshTokenEntity
-{
-    public string Id { get; set; } = default!;
-    public string Token { get; set; } = default!;
-    public string UserId { get; set; } = default!;
-    public DateTime ExpiryDate { get; set; }
-    public bool IsRevoked { get; set; }
-    public DateTime CreatedAt { get; set; }
-}
-
 public class MongoDbFixture : IAsyncLifetime
 {
     private const int MongoDbPort = 27017;
