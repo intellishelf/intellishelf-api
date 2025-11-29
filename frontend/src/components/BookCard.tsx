@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit, Trash } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Book } from '@/types/book';
 import { Card } from '@/components/ui/card';
@@ -87,11 +87,11 @@ const BookCard = ({ book, onClick, viewMode = 'grid' }: BookCardProps) => {
 
               {/* Hover overlay with actions */}
               <div className='absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2'>
-                <Button size='sm' variant='secondary' onClick={handleEdit}>
-                  <Edit className='w-3 h-3' />
+                <Button size='icon' variant='secondary' className='h-8 w-8' onClick={handleEdit}>
+                  <Pencil className='h-4 w-4' />
                 </Button>
-                <Button size='sm' variant='destructive' onClick={handleDelete}>
-                  <Trash className='w-3 h-3' />
+                <Button size='icon' variant='destructive' className='h-8 w-8' onClick={handleDelete}>
+                  <Trash2 className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -186,11 +186,11 @@ const BookCard = ({ book, onClick, viewMode = 'grid' }: BookCardProps) => {
 
           {/* Hover overlay with actions */}
           <div className='absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2'>
-            <Button size='icon' variant='secondary' onClick={handleEdit}>
-              <Edit className='w-4 h-4' />
+            <Button size='icon' variant='secondary' className='h-9 w-9' onClick={handleEdit}>
+              <Pencil className='h-4 w-4' />
             </Button>
-            <Button size='icon' variant='destructive' onClick={handleDelete}>
-              <Trash className='w-4 h-4' />
+            <Button size='icon' variant='destructive' className='h-9 w-9' onClick={handleDelete}>
+              <Trash2 className='h-4 w-4' />
             </Button>
           </div>
 
