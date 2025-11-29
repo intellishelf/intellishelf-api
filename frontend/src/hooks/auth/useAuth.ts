@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import type { User, LoginDto, RegisterDto, LoginResult, UserResponse } from '@/types/auth';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Get current user (cached)
   const { data: user, isLoading } = useQuery<UserResponse>({
@@ -46,9 +48,9 @@ export const useAuth = () => {
   const logout = useMutation({
     mutationFn: () => api.post<void>('/auth/logout', {}),
     onSuccess: () => {
-      queryClient.setQueryData(['auth', 'me'], null);
       queryClient.clear(); // Clear all cached data
       toast.success('Logged out successfully');
+      navigate('/auth');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Logout failed');
