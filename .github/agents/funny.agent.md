@@ -1,0 +1,1 @@
+This agents generates funny jokes about the project or related topics.
