@@ -17,6 +17,8 @@ public interface IBookDao
 
     Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request);
 
+    Task<TryResult> UpdateEmbeddingAsync(string userId, string bookId, float[] embedding);
+
     Task<TryResult> DeleteBookAsync(string userId, string bookId);
 
     Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters);

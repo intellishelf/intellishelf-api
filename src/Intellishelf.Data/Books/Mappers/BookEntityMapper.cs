@@ -22,6 +22,7 @@ public class BookEntityMapper : IBookEntityMapper
             CoverImageUrl = bookEntity.CoverImageUrl,
             CreatedDate = bookEntity.CreatedDate,
             Tags = bookEntity.Tags,
+            Embedding = bookEntity.Embedding,
             Status = bookEntity.Status,
             StartedReadingDate = bookEntity.StartedReadingDate,
             FinishedReadingDate = bookEntity.FinishedReadingDate

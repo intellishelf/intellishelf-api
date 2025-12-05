@@ -185,6 +185,25 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             : TryResult.Success();
     }
 
+    public async Task<TryResult> UpdateEmbeddingAsync(string userId, string bookId, float[] embedding)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+
+        var filter = Builders<BookEntity>
+            .Filter
+            .Where(b => b.Id == bookId && b.UserId == userIdObject);
+
+        var update = Builders<BookEntity>.Update
+            .Set(b => b.Embedding, embedding)
+            .CurrentDate(b => b.ModifiedDate);
+
+        var result = await _booksCollection.UpdateOneAsync(filter, update);
+
+        return result.MatchedCount == 0
+            ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to update")
+            : TryResult.Success();
+    }
+
     public async Task<TryResult> DeleteBookAsync(string userId, string bookId)
     {
         var userIdObject = ObjectId.Parse(userId);
@@ -198,17 +217,127 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
     public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
-        var scoreBuilder = Builders<BookEntity>.SearchScore;
-        var searchBuilder = Builders<BookEntity>.Search;
         var userObjectId = ObjectId.Parse(userId);
 
+        // Use hybrid search with $vectorSearch if embeddings are available
+        if (queryParameters.SearchEmbedding != null && queryParameters.SearchEmbedding.Length > 0)
+        {
+            return await SearchHybridAsync(userObjectId, queryParameters);
+        }
+
+        // Fall back to text-only search if no embeddings
+        return await SearchTextOnlyAsync(userObjectId, queryParameters);
+    }
+
+    private async Task<TryResult<PagedResult<Book>>> SearchHybridAsync(ObjectId userId, SearchQueryParameters queryParameters)
+    {
+        // Use $vectorSearch with $unionWith for hybrid search (recommended approach)
+        // This is simpler than full RRF but uses the non-deprecated $vectorSearch stage
+
+        var pipeline = new List<BsonDocument>();
+
+        // 1. Start with vector search
+        var vectorSearchStage = new BsonDocument("$vectorSearch", new BsonDocument
+        {
+            { "index", "vector_index" },
+            { "path", "Embedding" },
+            { "queryVector", new BsonArray(queryParameters.SearchEmbedding!.Select(f => new BsonDouble(f))) },
+            { "numCandidates", 150 },
+            { "limit", 50 },
+            { "filter", BuildVectorSearchFilter(userId, queryParameters.Status) }
+        });
+
+        pipeline.Add(vectorSearchStage);
+
+        // 2. Add vector search score
+        pipeline.Add(new BsonDocument("$addFields", new BsonDocument
+        {
+            { "vs_score", new BsonDocument("$meta", "vectorSearchScore") }
+        }));
+
+        // 3. Set all fields to preserve for union
+        pipeline.Add(new BsonDocument("$set", new BsonDocument { { "search_type", "vector" } }));
+
+        // 4. Union with text search results
+        var textSearchPipeline = new BsonArray
+        {
+            BuildTextSearchStage(userId, queryParameters),
+            new BsonDocument("$limit", 50),
+            new BsonDocument("$addFields", new BsonDocument
+            {
+                { "ts_score", new BsonDocument("$meta", "searchScore") }
+            }),
+            new BsonDocument("$set", new BsonDocument { { "search_type", "text" } })
+        };
+
+        pipeline.Add(new BsonDocument("$unionWith", new BsonDocument
+        {
+            { "coll", BookEntity.CollectionName },
+            { "pipeline", textSearchPipeline }
+        }));
+
+        // 5. Combine and normalize scores
+        // Give text search higher weight for exact matches
+        pipeline.Add(new BsonDocument("$addFields", new BsonDocument
+        {
+            { "combined_score", new BsonDocument("$add", new BsonArray
+                {
+                    new BsonDocument("$multiply", new BsonArray { new BsonDocument("$ifNull", new BsonArray { "$vs_score", 0.0 }), 1.0 }),
+                    new BsonDocument("$multiply", new BsonArray { new BsonDocument("$ifNull", new BsonArray { "$ts_score", 0.0 }), 2.0 }) // Text weighted 2x
+                })
+            }
+        }));
+
+        // 6. Group by _id to deduplicate (book might appear in both results)
+        pipeline.Add(new BsonDocument("$group", new BsonDocument
+        {
+            { "_id", "$_id" },
+            { "doc", new BsonDocument("$first", "$$ROOT") },
+            { "max_score", new BsonDocument("$max", "$combined_score") }
+        }));
+
+        // 7. Replace root with the document
+        pipeline.Add(new BsonDocument("$replaceRoot", new BsonDocument
+        {
+            { "newRoot", new BsonDocument("$mergeObjects", new BsonArray
+                {
+                    "$doc",
+                    new BsonDocument("combined_score", "$max_score")
+                })
+            }
+        }));
+
+        // 8. Sort by combined score
+        pipeline.Add(new BsonDocument("$sort", new BsonDocument("combined_score", -1)));
+
+        // 9. Pagination
+        pipeline.Add(new BsonDocument("$skip", (queryParameters.Page - 1) * queryParameters.PageSize));
+        pipeline.Add(new BsonDocument("$limit", queryParameters.PageSize));
+
+        // Execute
+        var books = await _booksCollection.Aggregate<BookEntity>(pipeline).ToListAsync();
+        var mappedBooks = books.Select(mapper.Map).ToList();
+
+        // For simplicity, return count as result size (can be improved with a separate count query)
+        var totalCount = mappedBooks.Count;
+
+        return new PagedResult<Book>(
+            mappedBooks,
+            totalCount,
+            queryParameters.Page,
+            queryParameters.PageSize);
+    }
+
+    private async Task<TryResult<PagedResult<Book>>> SearchTextOnlyAsync(ObjectId userId, SearchQueryParameters queryParameters)
+    {
+        var scoreBuilder = Builders<BookEntity>.SearchScore;
+        var searchBuilder = Builders<BookEntity>.Search;
         var looseFuzzy = new SearchFuzzyOptions { MaxEdits = 1, PrefixLength = 2 };
 
         var compoundBuilder = searchBuilder
             .Compound()
-            .Filter(searchBuilder.Equals(f => f.UserId, userObjectId));
+            .Filter(searchBuilder.Equals(f => f.UserId, userId));
 
-        // Add status filter if provided
         if (queryParameters.Status.HasValue)
         {
             compoundBuilder = compoundBuilder.Filter(searchBuilder.Equals(f => f.Status, queryParameters.Status.Value));
@@ -246,13 +375,115 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         var mappedBooks = books.Select(mapper.Map).ToList();
 
-        var pagedResult = new PagedResult<Book>(
+        return new PagedResult<Book>(
             mappedBooks,
             totalCount?.Count ?? 0,
             queryParameters.Page,
             queryParameters.PageSize);
+    }
 
-        return pagedResult;
+    private static BsonDocument BuildVectorSearchFilter(ObjectId userId, ReadingStatus? status)
+    {
+        var filters = new List<BsonDocument>
+        {
+            new("equals", new BsonDocument
+            {
+                { "path", "UserId" },
+                { "value", userId }
+            })
+        };
+
+        if (status.HasValue)
+        {
+            filters.Add(new BsonDocument("equals", new BsonDocument
+            {
+                { "path", "Status" },
+                { "value", status.Value.ToString() }
+            }));
+        }
+
+        if (filters.Count == 1)
+            return filters[0];
+
+        return new BsonDocument("and", new BsonArray(filters));
+    }
+
+    private static BsonDocument BuildTextSearchStage(ObjectId userId, SearchQueryParameters queryParameters)
+    {
+        var filters = new BsonArray
+        {
+            new BsonDocument("equals", new BsonDocument
+            {
+                { "path", "UserId" },
+                { "value", userId }
+            })
+        };
+
+        if (queryParameters.Status.HasValue)
+        {
+            filters.Add(new BsonDocument("equals", new BsonDocument
+            {
+                { "path", "Status" },
+                { "value", queryParameters.Status.Value.ToString() }
+            }));
+        }
+
+        var compound = new BsonDocument
+        {
+            { "filter", filters },
+            { "should", new BsonArray
+                {
+                    new BsonDocument("text", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Title" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 8.0)) }
+                    }),
+                    new BsonDocument("text", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Authors" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 8.0)) }
+                    }),
+                    new BsonDocument("autocomplete", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Title" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 3.0)) }
+                    }),
+                    new BsonDocument("autocomplete", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Authors" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 3.0)) }
+                    }),
+                    new BsonDocument("text", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Publisher" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 5.0)) }
+                    }),
+                    new BsonDocument("text", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Tags" },
+                        { "score", new BsonDocument("boost", new BsonDocument("value", 2.0)) }
+                    }),
+                    new BsonDocument("text", new BsonDocument
+                    {
+                        { "query", queryParameters.SearchTerm },
+                        { "path", "Description" }
+                    })
+                }
+            },
+            { "minimumShouldMatch", 1 }
+        };
+
+        return new BsonDocument("$search", new BsonDocument
+        {
+            { "index", "default" },
+            { "compound", compound }
+        });
     }
 
     public async Task<TryResult<long>> DeleteAllBooksByUserAsync(string userId)
