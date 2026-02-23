@@ -5,10 +5,10 @@ This file provides guidance to LLM agent when working with code in this reposito
 
 ```bash
 # Restore dependencies
-dotnet restore Intellishelf.Api.sln
+dotnet restore Intellishelf.Api.slnx
 
 # Build the solution
-dotnet build Intellishelf.Api.sln -c Release
+dotnet build Intellishelf.Api.slnx -c Release
 
 # Run the API locally (requires MongoDB and Azure Storage configuration)
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/Intellishelf.Api/Intellishelf.Api.csproj

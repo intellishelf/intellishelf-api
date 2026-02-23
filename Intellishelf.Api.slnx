@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Intellishelf.Api/Intellishelf.Api.csproj" />
+    <Project Path="src/Intellishelf.Common/Intellishelf.Common.csproj" />
+    <Project Path="src/Intellishelf.Data/Intellishelf.Data.csproj" />
+    <Project Path="src/Intellishelf.Domain/Intellishelf.Domain.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj" />
+    <Project Path="tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj" />
+  </Folder>
+</Solution>
