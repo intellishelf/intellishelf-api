@@ -52,8 +52,19 @@ public class McpToolsService(GetAllBooksTool getAllBooksTool, GetBooksByAuthorTo
 
     private async Task<string> ExecuteGetBooksByAuthorAsync(string userId, string argumentsJson)
     {
-        var args = JsonSerializer.Deserialize<GetBooksByAuthorArgs>(argumentsJson, new JsonSerializerOptions{ PropertyNameCaseInsensitive = true})
-            ?? throw new InvalidOperationException("Invalid arguments for get_books_by_author");
+        GetBooksByAuthorArgs args;
+        try
+        {
+            args = JsonSerializer.Deserialize<GetBooksByAuthorArgs>(argumentsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                ?? throw new InvalidOperationException("Invalid arguments for get_books_by_author");
+        }
+        catch (JsonException)
+        {
+            throw new InvalidOperationException("Invalid arguments for get_books_by_author");
+        }
+
+        if (string.IsNullOrWhiteSpace(args.Author))
+            throw new InvalidOperationException("Missing required 'author' argument for get_books_by_author");
 
         var books = await getBooksByAuthorTool.GetBooksByAuthor(userId, args.Author);
         return JsonSerializer.Serialize(books);
