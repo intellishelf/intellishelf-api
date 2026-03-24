@@ -22,4 +22,6 @@ public class Book
     public ReadingStatus Status { get; init; }
     public DateTime? StartedReadingDate { get; init; }
     public DateTime? FinishedReadingDate { get; init; }
+
+    public float[]? Embedding { get; init; }
 }

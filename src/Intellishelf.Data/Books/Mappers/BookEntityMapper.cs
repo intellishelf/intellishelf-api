@@ -24,6 +24,7 @@ public class BookEntityMapper : IBookEntityMapper
             Tags = bookEntity.Tags,
             Status = bookEntity.Status,
             StartedReadingDate = bookEntity.StartedReadingDate,
-            FinishedReadingDate = bookEntity.FinishedReadingDate
+            FinishedReadingDate = bookEntity.FinishedReadingDate,
+            Embedding = bookEntity.Embedding
         };
 }

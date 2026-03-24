@@ -5,7 +5,7 @@ Intellishelf is a comprehensive digital bookshelf management application (simila
 - Provide a robust bookshelf management system
 - Support user authentication and authorization
 - Enable book-related operations (add, update, delete)
-- Implement AI-assisted capabilites: book parsing, chatting to a bookshelf
+- Implement AI-assisted capabilities: book parsing, chatting to a bookshelf
 
 ## Key Components
 - intellishelf-api (this project)
