@@ -19,4 +19,6 @@ public interface IBookService
     Task<TryResult> TryDeleteBookAsync(string userId, string bookId);
 
     Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters);
+
+    Task<TryResult<List<Book>>> VectorSearchAsync(string userId, string searchTerm, int limit = 10);
 }

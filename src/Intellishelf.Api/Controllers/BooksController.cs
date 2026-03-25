@@ -138,6 +138,17 @@ public class BooksController(
             : HandleErrorResponse(result.Error);
     }
 
+    [HttpGet]
+    [Route("vector-search")]
+    public async Task<ActionResult<List<Book>>> VectorSearch([FromQuery] string searchTerm, [FromQuery] int limit = 10)
+    {
+        var result = await bookService.VectorSearchAsync(CurrentUserId, searchTerm, limit);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : HandleErrorResponse(result.Error);
+    }
+
     [HttpPost("parse-text")]
     public async Task<ActionResult<ParsedBook>> ParseText([FromBody] ParseFromTextContract contract)
     {

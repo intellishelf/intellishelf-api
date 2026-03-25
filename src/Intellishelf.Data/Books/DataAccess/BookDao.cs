@@ -261,4 +261,40 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         var result = await _booksCollection.DeleteManyAsync(b => b.UserId == userIdObject);
         return result.DeletedCount;
     }
+
+    public async Task<TryResult<List<Book>>> VectorSearchAsync(string userId, float[] queryVector, int limit = 10)
+    {
+        var userObjectId = ObjectId.Parse(userId);
+
+        var vectorOptions = new VectorSearchOptions<BookEntity>
+        {
+            IndexName = "vector_index",
+            NumberOfCandidates = limit * 10,
+            Filter = Builders<BookEntity>.Filter.Eq(b => b.UserId, userObjectId)
+        };
+
+        var books = await _booksCollection
+            .Aggregate()
+            .VectorSearch(b => b.Embedding, queryVector, limit, vectorOptions)
+            .ToListAsync();
+
+        return books.Select(mapper.Map).ToList();
+    }
+
+    public async Task<TryResult> UpdateEmbeddingAsync(string bookId, string userId, float[] embedding)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+
+        var filter = Builders<BookEntity>
+            .Filter
+            .Where(b => b.Id == bookId && b.UserId == userIdObject);
+
+        var update = Builders<BookEntity>.Update.Set(b => b.Embedding, embedding);
+
+        var result = await _booksCollection.UpdateOneAsync(filter, update);
+
+        return result.MatchedCount == 0
+            ? new Error(BookErrorCodes.BookNotFound, "Book not found or no permission to update")
+            : TryResult.Success();
+    }
 }

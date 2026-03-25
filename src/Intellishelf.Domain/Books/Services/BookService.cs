@@ -1,3 +1,4 @@
+using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Helpers;
@@ -10,7 +11,8 @@ public class BookService(
     IBookDao bookDao,
     IFileStorageService fileStorageService,
     IBookMetadataService bookMetadataService,
-    IHttpImageDownloader httpImageDownloader) : IBookService
+    IHttpImageDownloader httpImageDownloader,
+    IEmbeddingService embeddingService) : IBookService
 {
     public async Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId) =>
         await bookDao.GetBooksAsync(userId);
@@ -123,6 +125,13 @@ public class BookService(
 
     public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
-       return await bookDao.SearchAsync(userId, queryParameters);
+        var result = await bookDao.SearchAsync(userId, queryParameters);
+        return result;
+    }
+
+    public async Task<TryResult<List<Book>>> VectorSearchAsync(string userId, string searchTerm, int limit = 10)
+    {
+        var queryVector = await embeddingService.GenerateEmbeddingAsync(searchTerm);
+        return await bookDao.VectorSearchAsync(userId, queryVector, limit);
     }
 }

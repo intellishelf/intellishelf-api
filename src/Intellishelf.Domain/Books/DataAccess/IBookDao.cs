@@ -22,4 +22,8 @@ public interface IBookDao
     Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters);
 
     Task<TryResult<long>> DeleteAllBooksByUserAsync(string userId);
+
+    Task<TryResult<List<Book>>> VectorSearchAsync(string userId, float[] queryVector, int limit = 10);
+
+    Task<TryResult> UpdateEmbeddingAsync(string bookId, string userId, float[] embedding);
 }
