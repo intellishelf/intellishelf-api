@@ -170,8 +170,6 @@ Inherit from `BackgroundService`, use `IServiceProvider` to create scopes for tr
 
 **Pre-commit:** Run `dotnet format`. All tests must pass before merge.
 
-**Code Review:** Follow best practices. See `docs/code-review.md` for the full checklist.
-
 ## Extension Guide: Adding a New Feature
 
 **Quick Checklist:**
