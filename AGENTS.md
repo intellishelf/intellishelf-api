@@ -1,6 +1,10 @@
 
 This file provides guidance to LLM agent when working with code in this repository.
 
+## Mandatory Code Review Guide
+
+For any PR review or code review task, the agent MUST use and follow `docs/code-review-guide.md` in addition to this file.
+
 ## Build & Test Commands
 
 ```bash
