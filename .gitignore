@@ -6,6 +6,9 @@
 # Ignore real env files
 .env
 
+# Claude Code
+.claude/worktrees/**
+
 # User-specific files
 *.rsuser
 *.suo
