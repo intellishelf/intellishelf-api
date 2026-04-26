@@ -174,8 +174,6 @@ Inherit from `BackgroundService`, use `IServiceProvider` to create scopes for tr
 
 **Pre-commit:** Run `dotnet format`. All tests must pass before merge.
 
-**Code Review:** Verify TryResult usage, error codes mapped, integration tests added, no secrets committed, layer dependencies correct, async naming, proper DI lifecycle.
-
 ## Extension Guide: Adding a New Feature
 
 **Quick Checklist:**
