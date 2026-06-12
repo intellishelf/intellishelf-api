@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "2allocate-management": {
+      "type": "http",
+      "url": "https://intellishelf.2allocate.com/mcp"
+    }
+  }
+}
