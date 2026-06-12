@@ -27,23 +27,19 @@ public class BookService(
     public async Task<TryResult<Book>> TryAddBookFromIsbnAsync(string userId, string isbn)
     {
         // Validate ISBN format
+
         if (!IsbnHelper.IsValidIsbn(isbn))
         {
-            return new Error(BookErrorCodes.InvalidIsbn, "The provided ISBN format is invalid");
+            return new Error(BookErrorCodes.InvalidIsbn, "The provided ISBN format is invalid.");
         }
 
         // Normalize ISBN
         var normalizedIsbn = IsbnHelper.NormalizeIsbn(isbn);
 
-        // Fetch metadata from Google Books
-        var metadataResult = await bookMetadataService.TryGetBookMetadataAsync(normalizedIsbn);
-        if (!metadataResult.IsSuccess)
-            return new Error(metadataResult.Error!.Code, metadataResult.Error.Message);
-
-        var metadata = metadataResult.Value;
-
-        // Check for duplicate using ISBNs from Google Books response
-        var existingBookResult = await bookDao.FindByIsbnAsync(userId, metadata.Isbn10, metadata.Isbn13);
+        // Check for duplicate before hitting external APIs
+        var isbn10 = normalizedIsbn.Length == 10 ? normalizedIsbn : null;
+        var isbn13 = normalizedIsbn.Length == 13 ? normalizedIsbn : null;
+        var existingBookResult = await bookDao.FindByIsbnAsync(userId, isbn10, isbn13);
         if (!existingBookResult.IsSuccess)
             return new Error(existingBookResult.Error!.Code, existingBookResult.Error.Message);
 
@@ -53,6 +49,13 @@ public class BookService(
                 BookErrorCodes.DuplicateIsbn,
                 "You already have this book in your library");
         }
+
+        // Fetch metadata from Google Books
+        var metadataResult = await bookMetadataService.TryGetBookMetadataAsync(normalizedIsbn);
+        if (!metadataResult.IsSuccess)
+            return new Error(metadataResult.Error!.Code, metadataResult.Error.Message);
+
+        var metadata = metadataResult.Value;
 
         // Download and upload cover image if available
         string? coverImageUrl = null;

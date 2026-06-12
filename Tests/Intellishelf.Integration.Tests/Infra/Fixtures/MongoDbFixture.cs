@@ -95,7 +95,17 @@ public class MongoDbFixture : IAsyncLifetime
 
         while (DateTime.UtcNow - startTime < timeout)
         {
-            var indexes = (await collection.SearchIndexes.ListAsync()).ToList();
+            List<BsonDocument> indexes;
+            try
+            {
+                indexes = (await collection.SearchIndexes.ListAsync()).ToList();
+            }
+            catch (MongoException) when (DateTime.UtcNow - startTime < timeout)
+            {
+                await Task.Delay(pollInterval);
+                continue;
+            }
+
             var index = indexes.FirstOrDefault(i => i["name"] == indexName);
 
             if (index != null && index.Contains("status") && index["status"] == "READY")
