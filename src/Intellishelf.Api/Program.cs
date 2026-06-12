@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Intellishelf.Api.Modules;
+using Scalar.AspNetCore;
 
 [assembly: InternalsVisibleTo("Intellishelf.Integration.Tests")]
 
@@ -20,6 +21,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddOpenApi();
+
 DbModule.Register(builder);
 AzureModule.Register(builder);
 UsersModule.Register(builder);
@@ -32,6 +35,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseCors("LocalhostPolicy");
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UsePathBase(new PathString("/api"));
