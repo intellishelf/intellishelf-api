@@ -24,7 +24,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         _azuriteFixture = azuriteFixture;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _mongoDbFixture.ClearBooksAsync();
         await _mongoDbFixture.ClearUsersAsync();
@@ -187,5 +187,5 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
     }
 
     public void Dispose() => _factory.Dispose();
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

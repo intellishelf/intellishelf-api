@@ -99,6 +99,6 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
 
     public void Dispose() => _factory.Dispose();
 
-    public Task DisposeAsync() => Task.CompletedTask;
-    public Task InitializeAsync() => _mongoDbFixture.SeedDefaultUserAsync();
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask InitializeAsync() => new ValueTask(_mongoDbFixture.SeedDefaultUserAsync());
 }

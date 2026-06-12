@@ -15,7 +15,7 @@ public class MongoDbFixture : IAsyncLifetime
     private IContainer _container = default!;
     public string ConnectionString { get; private set; } = default!;
     public IMongoDatabase Database { get; private set; } = default!;
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _container = new ContainerBuilder()
             .WithImage("mongodb/mongodb-atlas-local:latest")
@@ -119,7 +119,7 @@ public class MongoDbFixture : IAsyncLifetime
         throw new TimeoutException("Search index did not become ready within the expected time.");
     }
 
-    public async Task DisposeAsync() =>
+    public async ValueTask DisposeAsync() =>
         await _container.DisposeAsync();
 
     private Task SeedUserAsync(UserEntity user)

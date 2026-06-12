@@ -23,7 +23,7 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         _mongoDbFixture = mongoDbFixture;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _mongoDbFixture.ClearBooksAsync();
         await _mongoDbFixture.SeedDefaultUserAsync();
@@ -162,5 +162,5 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
 
     public void Dispose() => _factory.Dispose();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

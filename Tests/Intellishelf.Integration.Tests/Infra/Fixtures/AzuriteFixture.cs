@@ -9,7 +9,7 @@ public class AzuriteFixture : IAsyncLifetime
     private AzuriteContainer _azuriteContainer;
     public string ConnectionString => _azuriteContainer.GetConnectionString();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _azuriteContainer = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:latest")
@@ -18,7 +18,7 @@ public class AzuriteFixture : IAsyncLifetime
         await _azuriteContainer.StartAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _azuriteContainer.DisposeAsync();
     }
