@@ -1,5 +1,5 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution and project files
@@ -12,7 +12,7 @@ COPY tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj ./tests/Intell
 COPY tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj ./tests/Intellishelf.Integration.Tests/
 
 # Restore dependencies
-RUN dotnet restore
+RUN dotnet restore Intellishelf.Api.slnx
 
 # Copy source code
 COPY . .
@@ -24,7 +24,7 @@ WORKDIR /src/src/Intellishelf.Api
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 # Install curl for healthcheck
