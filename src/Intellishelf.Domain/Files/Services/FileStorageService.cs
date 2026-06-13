@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Intellishelf.Common.TryResult;
 using Intellishelf.Domain.Files.ErrorCodes;
 
@@ -51,7 +52,7 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
             var prefix = $"userFiles/{userId}/";
             var deletedCount = 0;
 
-            await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: prefix))
+            await foreach (var blobItem in containerClient.GetBlobsAsync(BlobTraits.None, BlobStates.None, prefix, CancellationToken.None))
             {
                 try
                 {

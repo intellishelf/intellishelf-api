@@ -1,10 +1,6 @@
 using Intellishelf.Api.ImageProcessing;
 using Microsoft.AspNetCore.Http;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 using Xunit;
 
 namespace Intellishelf.Unit.Tests.ImageProcessing;
@@ -16,14 +12,14 @@ public class ImageFileProcessorTests
     [Fact]
     public async Task ProcessAsync_WithLargeJpeg_ResizesLongestSideToOneThousandPixels()
     {
-        var jpegBytes = CreateImageBytes(2000, 1500, new JpegEncoder { Quality = 90 });
+        var jpegBytes = CreateImageBytes(2000, 1500, SKEncodedImageFormat.Jpeg, 90);
         using var inputStream = new MemoryStream(jpegBytes);
         var formFile = CreateFormFile(inputStream, jpegBytes.Length, "image/jpeg", "cover.jpg");
 
         await using var processedStream = await _processor.ProcessAsync(formFile);
         processedStream.Seek(0, SeekOrigin.Begin);
 
-        using var processedImage = await Image.LoadAsync<Rgba32>(processedStream);
+        using var processedImage = SKBitmap.Decode(processedStream);
         Assert.Equal(1000, processedImage.Width);
         Assert.Equal(750, processedImage.Height);
     }
@@ -31,17 +27,18 @@ public class ImageFileProcessorTests
     [Fact]
     public async Task ProcessAsync_WithPng_KeepsFormatAndDimensions()
     {
-        var pngBytes = CreateImageBytes(640, 480, new PngEncoder());
+        var pngBytes = CreateImageBytes(640, 480, SKEncodedImageFormat.Png, 100);
         using var inputStream = new MemoryStream(pngBytes);
         var formFile = CreateFormFile(inputStream, pngBytes.Length, "image/png", "cover.png");
 
         await using var processedStream = await _processor.ProcessAsync(formFile);
         processedStream.Seek(0, SeekOrigin.Begin);
 
-        using var processedImage = await Image.LoadAsync<Rgba32>(processedStream);
+        using var processedCodec = SKCodec.Create(processedStream);
+        var processedImage = processedCodec.Info;
         Assert.Equal(640, processedImage.Width);
         Assert.Equal(480, processedImage.Height);
-        Assert.Same(PngFormat.Instance, processedImage.Metadata.DecodedImageFormat);
+        Assert.Equal(SKEncodedImageFormat.Png, processedCodec.EncodedFormat);
     }
 
     private static IFormFile CreateFormFile(Stream stream, long length, string contentType, string fileName)
@@ -55,11 +52,14 @@ public class ImageFileProcessorTests
         return formFile;
     }
 
-    private static byte[] CreateImageBytes(int width, int height, IImageEncoder encoder)
+    private static byte[] CreateImageBytes(int width, int height, SKEncodedImageFormat format, int quality)
     {
-        using var image = new Image<Rgba32>(width, height, new Rgba32(100, 150, 200));
+        using var bitmap = new SKBitmap(width, height);
+        bitmap.Erase(new SKColor(100, 150, 200));
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(format, quality);
         using var stream = new MemoryStream();
-        image.Save(stream, encoder);
+        data.SaveTo(stream);
         return stream.ToArray();
     }
 }

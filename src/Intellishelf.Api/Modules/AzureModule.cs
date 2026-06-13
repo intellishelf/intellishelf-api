@@ -16,7 +16,10 @@ public static class AzureModule
             .Get<AzureConfig>() ?? throw new InvalidOperationException("Azure  configuration is missing");
 
         builder.Services.AddSingleton(_ =>
-            new BlobContainerClient(azureConfig.StorageConnectionString, azureConfig.StorageContainer));
+            new BlobContainerClient(
+                azureConfig.StorageConnectionString,
+                azureConfig.StorageContainer,
+                new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05)));
 
         builder.Services.AddScoped<IFileStorageService, FileStorageService>();
     }

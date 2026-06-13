@@ -8,11 +8,11 @@ public class AzuriteFixture : IAsyncLifetime
 {
     private AzuriteContainer _azuriteContainer;
     public string ConnectionString => _azuriteContainer.GetConnectionString();
+    private static readonly BlobClientOptions BlobClientOptions = new(BlobClientOptions.ServiceVersion.V2025_11_05);
 
     public async ValueTask InitializeAsync()
     {
-        _azuriteContainer = new AzuriteBuilder()
-            .WithImage("mcr.microsoft.com/azure-storage/azurite:latest")
+        _azuriteContainer = new AzuriteBuilder("mcr.microsoft.com/azure-storage/azurite:latest")
             .Build();
 
         await _azuriteContainer.StartAsync();
@@ -25,7 +25,7 @@ public class AzuriteFixture : IAsyncLifetime
 
     public async Task<string> SeedBlobAsync(string blobPath, byte[] content)
     {
-        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName);
+        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName, BlobClientOptions);
         await containerClient.CreateIfNotExistsAsync();
 
         using var stream = new MemoryStream(content);
@@ -37,7 +37,7 @@ public class AzuriteFixture : IAsyncLifetime
 
     public async Task<bool> BlobExistsAsync(string blobPath)
     {
-        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName);
+        var containerClient = new BlobContainerClient(ConnectionString, TestConstants.StorageContainerName, BlobClientOptions);
         var blobClient = containerClient.GetBlobClient(blobPath);
         var exists = await blobClient.ExistsAsync();
         return exists.Value;
