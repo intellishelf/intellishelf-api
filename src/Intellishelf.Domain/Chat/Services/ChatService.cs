@@ -64,16 +64,12 @@ public class ChatService(IMcpToolsService mcpToolsService, ChatClient chatClient
             iteration++;
 
             var toolCallAccumulators = new Dictionary<int, ToolCallAccumulator>();
-            var hasContent = false;
-
             // Stream the response and collect tool call updates
             await foreach (var update in chatClient.CompleteChatStreamingAsync(messages, chatOptions))
             {
                 // Collect content
                 foreach (var contentPart in update.ContentUpdate)
                 {
-                    hasContent = true;
-
                     // Stream content to client
                     yield return new ChatStreamChunk
                     {

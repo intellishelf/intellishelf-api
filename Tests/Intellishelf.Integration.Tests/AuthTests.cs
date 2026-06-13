@@ -30,11 +30,11 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         var registerRequest = new RegisterUserRequestContract("newuser@test.com", DefaultTestUsers.Authenticated.Password);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var responseContent = await response.Content.ReadFromJsonAsync<LoginResultContract>();
+        var responseContent = await response.Content.ReadFromJsonAsync<LoginResultContract>(TestContext.Current.CancellationToken);
         Assert.NotNull(responseContent?.AccessToken);
     }
 
@@ -45,11 +45,11 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         var registerRequest = new RegisterUserRequestContract(DefaultTestUsers.Authenticated.Email, WeakPassword);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var responseContent = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        var responseContent = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken);
         Assert.NotNull(responseContent);
     }
 
@@ -60,7 +60,7 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         var loginRequest = new LoginRequestContract("nonexistinguser@test.com", DefaultTestUsers.Authenticated.Password);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -73,11 +73,11 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         var loginRequest = new LoginRequestContract(DefaultTestUsers.Authenticated.Email, DefaultTestUsers.Authenticated.Password);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var responseContent = await response.Content.ReadFromJsonAsync<LoginResultContract>();
+        var responseContent = await response.Content.ReadFromJsonAsync<LoginResultContract>(TestContext.Current.CancellationToken);
         Assert.NotNull(responseContent?.AccessToken);
     }
 
@@ -86,12 +86,12 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
     {
         // Arrange
         // Act
-        var response = await _client.GetAsync("/api/auth/me");
+        var response = await _client.GetAsync("/api/auth/me", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var responseContent = await response.Content.ReadFromJsonAsync<UserResponseContract>();
+        var responseContent = await response.Content.ReadFromJsonAsync<UserResponseContract>(TestContext.Current.CancellationToken);
         Assert.NotNull(responseContent);
         Assert.Equal(DefaultTestUsers.Authenticated.Id, responseContent.Id);
         Assert.Equal(DefaultTestUsers.Authenticated.Email, responseContent.Email);

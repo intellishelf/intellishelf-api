@@ -54,7 +54,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedRefreshTokenAsync(userId, "test-token-1");
 
         // Act
-        var response = await _client.DeleteAsync("/api/auth/account");
+        var response = await _client.DeleteAsync("/api/auth/account", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -82,7 +82,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         var userId = DefaultTestUsers.Authenticated.Id;
 
         // Act
-        var response = await _client.DeleteAsync("/api/auth/account");
+        var response = await _client.DeleteAsync("/api/auth/account", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -102,7 +102,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(books);
 
         // Act
-        var response = await _client.DeleteAsync("/api/auth/account");
+        var response = await _client.DeleteAsync("/api/auth/account", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -120,7 +120,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedRefreshTokenAsync(userId, "token-3");
 
         // Act
-        var response = await _client.DeleteAsync("/api/auth/account");
+        var response = await _client.DeleteAsync("/api/auth/account", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -151,7 +151,7 @@ public sealed class UserDeletionTests : IAsyncLifetime, IDisposable
         }
 
         // Act
-        var response = await _client.DeleteAsync("/api/auth/account");
+        var response = await _client.DeleteAsync("/api/auth/account", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

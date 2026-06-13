@@ -35,12 +35,12 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         // No seeding needed - testing empty state
 
         // Act
-        var response = await _client.GetAsync("/api/books/search?searchTerm=test");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=test", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(pagedResult);
         Assert.Empty(pagedResult.Items);
         Assert.Equal(0, pagedResult.TotalCount);
@@ -57,12 +57,12 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAndWaitForIndexing(prideAndPrejudice, wuthering, frankenstein);
 
         // Act
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Prejudice");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Prejudice", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(pagedResult);
         Assert.Single(pagedResult.Items);
         Assert.Equal(1, pagedResult.TotalCount);
@@ -80,12 +80,12 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAndWaitForIndexing(greatExpectations, atale, mobyDick);
 
         // Act
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Dickens");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Dickens", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(pagedResult);
         Assert.Equal(2, pagedResult.Items.Count);
         Assert.Equal(2, pagedResult.TotalCount);
@@ -105,12 +105,12 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAndWaitForIndexing(theBronteSisters, jane, wuthering);
 
         // Act - Search for "Brontë" which appears in 3 books
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Brontë");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Brontë", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(pagedResult);
         Assert.Equal(3, pagedResult.Items.Count);
         Assert.Equal(3, pagedResult.TotalCount);
@@ -132,12 +132,12 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAndWaitForIndexing(sherlock1, sherlock2, sherlock3);
 
         // Act - Search with page size of 2
-        var response = await _client.GetAsync("/api/books/search?searchTerm=Doyle&page=1&pageSize=2");
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Doyle&page=1&pageSize=2", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>();
+        var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(pagedResult);
         Assert.Equal(2, pagedResult.Items.Count); // Page size is 2
         Assert.Equal(3, pagedResult.TotalCount); // Total matching books is 3

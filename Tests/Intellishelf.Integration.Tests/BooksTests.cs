@@ -44,12 +44,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     private async Task GivenNoBooks_WhenGetBooks_ThenEmptyPagedResult()
     {
         // Act
-        var response = await _client.GetAsync("/api/books");
+        var response = await _client.GetAsync("/api/books", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>());
+        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken));
         Assert.Empty(pagedResult.Items);
         Assert.Equal(0, pagedResult.TotalCount);
     }
@@ -65,12 +65,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(firstBook, secondBook, thirdBook);
 
         // Act
-        var response = await _client.GetAsync("/api/books?page=1&pageSize=2&orderBy=Added&ascending=true");
+        var response = await _client.GetAsync("/api/books?page=1&pageSize=2&orderBy=Added&ascending=true", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>());
+        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken));
         Assert.Equal(3, pagedResult.TotalCount);
         Assert.Equal(2, pagedResult.Items.Count);
         Assert.Equal(1, pagedResult.Page);
@@ -93,12 +93,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(books);
 
         // Act
-        var response = await _client.GetAsync("/api/books?page=2&pageSize=2&orderBy=Added&ascending=false");
+        var response = await _client.GetAsync("/api/books?page=2&pageSize=2&orderBy=Added&ascending=false", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>());
+        var pagedResult = Assert.IsType<PagedResult<Book>>(await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken));
         Assert.Equal(5, pagedResult.TotalCount);
         Assert.Equal(2, pagedResult.Items.Count);
         Assert.Equal(2, pagedResult.Page);
@@ -112,12 +112,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     private async Task GivenNoBooks_WhenGetAllBooks_ThenEmptyList()
     {
         // Act
-        var response = await _client.GetAsync("/api/books/all");
+        var response = await _client.GetAsync("/api/books/all", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var books = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<Book>>();
+        var books = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(books);
         Assert.Empty(books);
     }
@@ -133,12 +133,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(firstBook, secondBook, thirdBook);
 
         // Act
-        var response = await _client.GetAsync("/api/books/all");
+        var response = await _client.GetAsync("/api/books/all", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var books = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<Book>>();
+        var books = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<Book>>(TestContext.Current.CancellationToken);
         Assert.NotNull(books);
         Assert.Equal(3, books.Count);
         Assert.Contains(books, b => b.Title == firstBook.Title);
@@ -155,12 +155,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(bookEntity);
 
         // Act
-        var response = await _client.GetAsync($"/api/books/{bookEntity.Id}");
+        var response = await _client.GetAsync($"/api/books/{bookEntity.Id}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
         Assert.Equal(bookEntity.Id, book.Id);
         Assert.Equal(bookEntity.Title, book.Title);
         Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
@@ -184,12 +184,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(imageContent, "ImageFile", "test-cover.jpg");
 
         // Act
-        var response = await _client.PostAsync("/api/books", content);
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
 
         Assert.False(string.IsNullOrWhiteSpace(book.Id));
         Assert.Equal("Test Book Title", book.Title);
@@ -225,12 +225,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(invalidFile, "ImageFile", "cover.pdf");
 
         // Act
-        var response = await _client.PostAsync("/api/books", content);
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.Equal(FileErrorCodes.InvalidFileType, problem.Type);
     }
 
@@ -251,7 +251,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(bookToDelete);
 
         // Act
-        var deleteResponse = await _client.DeleteAsync($"/api/books/{bookToDelete.Id}");
+        var deleteResponse = await _client.DeleteAsync($"/api/books/{bookToDelete.Id}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
@@ -275,7 +275,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         updatedBook.Add(new StringContent(DateTime.UtcNow.ToString("O")), "FinishedReadingDate");
 
         // Act
-        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook);
+        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
@@ -297,12 +297,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         await _mongoDbFixture.SeedBooksAsync(foreignBook);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/books/{foreignBook.Id}");
+        var response = await _client.DeleteAsync($"/api/books/{foreignBook.Id}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.Equal(BookErrorCodes.BookNotFound, problem.Type);
     }
 
@@ -330,12 +330,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         content.Add(imageContent, "ImageFile", "bad.jpg");
 
         // Act
-        var response = await client.PostAsync("/api/books", content);
+        var response = await client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.Equal(FileErrorCodes.UploadFailed, problem.Type);
     }
 
@@ -347,12 +347,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     //     var request = new { Isbn = "9780135957059" };
     //
     //     // Act
-    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request, TestContext.Current.CancellationToken);
     //
     //     // Assert
     //     Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     //
-    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
     //     Assert.NotNull(book);
     //     Assert.False(string.IsNullOrWhiteSpace(book.Id));
     //     Assert.False(string.IsNullOrWhiteSpace(book.Title));
@@ -375,12 +375,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     //     var request = new { Isbn = "0135957052" };
     //
     //     // Act
-    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+    //     var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request, TestContext.Current.CancellationToken);
     //
     //     // Assert
     //     Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     //
-    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>());
+    //     var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
     //     Assert.NotNull(book);
     //     Assert.Equal(DefaultTestUsers.Authenticated.Id, book.UserId);
     //
@@ -395,12 +395,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         var request = new { Isbn = "123" };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.Equal(BookErrorCodes.InvalidIsbn, problem.Type);
     }
 
@@ -415,12 +415,12 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         var request = new { Isbn = isbn13 };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.Equal(BookErrorCodes.DuplicateIsbn, problem.Type);
     }
 
@@ -431,14 +431,14 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         var request = new { Isbn = "9999999999999" };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request);
+        var response = await _client.PostAsJsonAsync("/api/books/from-isbn", request, TestContext.Current.CancellationToken);
 
         // Assert - Should get either NotFound or BadGateway depending on API response
         Assert.True(
             response.StatusCode == HttpStatusCode.NotFound ||
             response.StatusCode == HttpStatusCode.BadGateway);
 
-        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        var problem = Assert.IsType<ProblemDetails>(await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken));
         Assert.True(
             problem.Type == BookErrorCodes.IsbnNotFound ||
             problem.Type == BookErrorCodes.MetadataServiceError);

@@ -6,8 +6,9 @@ namespace Intellishelf.Integration.Tests.Infra.Fixtures;
 
 public class AzuriteFixture : IAsyncLifetime
 {
-    private AzuriteContainer _azuriteContainer;
-    public string ConnectionString => _azuriteContainer.GetConnectionString();
+    private AzuriteContainer? _azuriteContainer;
+    public string ConnectionString => _azuriteContainer?.GetConnectionString()
+        ?? throw new InvalidOperationException("Azurite fixture has not been initialized.");
     private static readonly BlobClientOptions BlobClientOptions = new(BlobClientOptions.ServiceVersion.V2025_11_05);
 
     public async ValueTask InitializeAsync()
@@ -20,7 +21,10 @@ public class AzuriteFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _azuriteContainer.DisposeAsync();
+        if (_azuriteContainer is not null)
+        {
+            await _azuriteContainer.DisposeAsync();
+        }
     }
 
     public async Task<string> SeedBlobAsync(string blobPath, byte[] content)

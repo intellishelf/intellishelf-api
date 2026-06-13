@@ -16,7 +16,7 @@ public class ImageFileProcessorTests
         using var inputStream = new MemoryStream(jpegBytes);
         var formFile = CreateFormFile(inputStream, jpegBytes.Length, "image/jpeg", "cover.jpg");
 
-        await using var processedStream = await _processor.ProcessAsync(formFile);
+        await using var processedStream = await _processor.ProcessAsync(formFile, TestContext.Current.CancellationToken);
         processedStream.Seek(0, SeekOrigin.Begin);
 
         using var processedImage = SKBitmap.Decode(processedStream);
@@ -31,7 +31,7 @@ public class ImageFileProcessorTests
         using var inputStream = new MemoryStream(pngBytes);
         var formFile = CreateFormFile(inputStream, pngBytes.Length, "image/png", "cover.png");
 
-        await using var processedStream = await _processor.ProcessAsync(formFile);
+        await using var processedStream = await _processor.ProcessAsync(formFile, TestContext.Current.CancellationToken);
         processedStream.Seek(0, SeekOrigin.Begin);
 
         using var processedCodec = SKCodec.Create(processedStream);
