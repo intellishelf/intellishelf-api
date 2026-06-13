@@ -2,16 +2,3 @@
 version = 1
 name = "intellishelf-api"
 
-[setup]
-script = "echo setup"
-
-[setup.darwin]
-script = "echo foo"
-
-[cleanup]
-script = "echo clean"
-
-[[actions]]
-name = "bar"
-icon = "tool"
-command = "echo bar"
