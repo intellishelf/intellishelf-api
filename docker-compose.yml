@@ -7,7 +7,7 @@ services:
       - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - Database__ConnectionString=mongodb://admin:admin@mongodb:27017/intellishelf?authSource=admin
+      - Database__ConnectionString=mongodb://admin:admin@mongodb:27017/intellishelf?authSource=admin&directConnection=true
       - Database__DatabaseName=intellishelf
       - Auth__Key=your-super-secret-jwt-key-that-should-be-at-least-32-characters-long
       - Auth__Google__ClientId=your-google-client-id
@@ -25,15 +25,16 @@ services:
       start_period: 40s
 
   mongodb:
-    image: mongo:7.0
+    image: mongodb/mongodb-atlas-local:8.0
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: intellishelf
+      MONGODB_INITDB_ROOT_USERNAME: admin
+      MONGODB_INITDB_ROOT_PASSWORD: admin
+      MONGODB_INITDB_DATABASE: intellishelf
     volumes:
       - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite:latest
@@ -47,4 +48,5 @@ services:
 
 volumes:
   mongodb_data:
+  mongodb_config:
   azurite_data:
