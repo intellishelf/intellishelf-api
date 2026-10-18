@@ -1,0 +1,21 @@
+version: 2
+
+security:
+  data-categories: [pii]
+  compliance-frameworks: [none]
+
+overrides:
+  research:
+    model: small
+    skills: [base]
+  implement:
+    model: medium
+    skills: [base]
+  review:
+    model: inherit
+    skills: [base]
+  verify:
+    model: medium
+    skills: [base, run-intellishelf-api]
+  deliver:
+    skills: [base]

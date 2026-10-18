@@ -1,0 +1,26 @@
+#!/bin/sh
+# empeek-adlc strip-ai-coauthors
+# Call from the repository's commit-msg hook: strip-ai-coauthors "$1"
+# Drops every Co-authored-by trailer except one naming the committer's own user.email, and every
+# Made-with and Claude-Session trailer, so Claude Code, Codex, Cursor, and other agents can't sign
+# commits.
+# POSIX sh + awk: runs under macOS /bin/sh (bash 3.2), Linux, and Git for Windows.
+set -eu
+
+message_file="$1"
+user_email=$(git config user.email || true)
+tmp_file="$message_file.empeek-adlc.tmp"
+trap 'rm -f "$tmp_file"' EXIT
+
+awk -v email="$user_email" '
+  BEGIN { own = "<" tolower(email) ">" }
+  {
+    line = tolower($0)
+    sub(/\r$/, "", line)
+    if (line ~ /^co-authored-by:/ && (email == "" || index(line, own) == 0)) next
+    if (line ~ /^(made-with|claude-session):/) next
+    print
+  }
+' "$message_file" > "$tmp_file"
+
+cat "$tmp_file" > "$message_file"

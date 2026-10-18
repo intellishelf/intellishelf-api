@@ -28,3 +28,11 @@ Intellishelf is a comprehensive, open-source digital bookshelf management applic
 ## Technical Stack
 - .NET Core
 - C#
+
+## Git hook setup
+
+After cloning, activate the repository hooks:
+
+```bash
+git config core.hooksPath .githooks
+```

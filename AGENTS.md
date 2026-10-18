@@ -174,6 +174,9 @@ Inherit from `BackgroundService`, use `IServiceProvider` to create scopes for tr
 
 **Pre-commit:** Run `dotnet format`. All tests must pass before merge.
 
+Don't add AI attribution to commits or pull request descriptions: no agent `Co-authored-by`
+trailers and no "Generated with" lines.
+
 ## Extension Guide: Adding a New Feature
 
 **Quick Checklist:**
