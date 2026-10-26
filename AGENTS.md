@@ -174,6 +174,11 @@ Inherit from `BackgroundService`, use `IServiceProvider` to create scopes for tr
 
 **Pre-commit:** Run `dotnet format`. All tests must pass before merge.
 
+Include AI co-author attribution in commits containing AI-written changes. Use the contributing
+agent's established Co-authored-by identity and include its actual model when known. Attribute
+contributors who wrote the committed changes, not an orchestrator or reviewer who only supervised.
+Preserve the developer's Git author identity. Never invent model names or email addresses.
+
 ## Extension Guide: Adding a New Feature
 
 **Quick Checklist:**
