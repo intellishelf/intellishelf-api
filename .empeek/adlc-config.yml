@@ -1,0 +1,39 @@
+version: 2
+
+autopilot: allowed
+
+security:
+  data-categories:
+    - pii
+  compliance-frameworks:
+    - none
+
+connectors:
+  project-tracker: 2allocate
+
+stages:
+  research:
+    model: small
+    extend-with: []
+    checks: []
+  implement:
+    model: medium
+    extend-with: []
+    checks:
+      - dotnet build Intellishelf.Api.slnx -c Release
+      - dotnet format Intellishelf.Api.slnx --verify-no-changes
+      - dotnet test tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj
+  review:
+    model: inherit
+    extend-with:
+      - document: docs/code-review-guide.md
+    checks: []
+  verify:
+    model: medium
+    extend-with:
+      - skill: run-intellishelf-api
+    checks:
+      - dotnet test tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj
+  deliver:
+    extend-with: []
+    checks: []
