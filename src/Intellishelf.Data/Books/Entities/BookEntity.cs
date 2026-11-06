@@ -1,8 +1,10 @@
 using Intellishelf.Domain.Books.Models;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Intellishelf.Data.Books.Entities;
 
+[BsonIgnoreExtraElements]
 public class BookEntity : EntityBase
 {
     public const string CollectionName = "Books";

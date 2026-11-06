@@ -150,6 +150,8 @@ Api/Controllers|Contracts/{Feature}|Mappers
 
 ## Configuration Management
 
+**Local database:** The API project’s .NET user secrets contain `Database:ConnectionString`; the database name comes from the active environment configuration (for local development, `appsettings.Development.json`). Use the configured connection when inspecting MongoDB; it may point to a shared database. Never expose secret values.
+
 **Config Classes:** Define `SectionName` constant, use `required` for mandatory values, nullable for optional (see `DatabaseConfig`, `AiConfig`, `AuthConfig`).
 
 **Module Pattern:** Load config via `GetSection()`, bind with `Configure<T>()`, access via `IOptions<T>` injection. Modules register services in `Program.cs`.
