@@ -1,11 +1,8 @@
 {
   "mcpServers": {
-    "playwright-test": {
-      "command": "npx",
-      "args": [
-        "playwright",
-        "run-test-mcp-server"
-      ]
+    "2allocate-management": {
+      "type": "http",
+      "url": "https://intellishelf.2allocate.com/mcp"
     }
   }
 }
