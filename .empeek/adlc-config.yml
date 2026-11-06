@@ -2,8 +2,6 @@ version: 2
 
 autopilot: allowed
 
-model-selection-policy: docs/adlc-model-selection.md
-
 security:
   data-categories:
     - pii
