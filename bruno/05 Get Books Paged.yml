@@ -1,0 +1,10 @@
+info:
+  name: Get Books Paged
+  type: http
+  seq: 5
+http:
+  method: GET
+  url: '{{base_url}}/books?page=1&pageSize=10&orderBy=Title&Ascending=true'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}

@@ -1,0 +1,15 @@
+info:
+  name: Login
+  type: http
+  seq: 2
+http:
+  method: POST
+  url: '{{base_url}}/auth/login'
+  body:
+    type: json
+    data: "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\"\
+      \n}"
+runtime:
+  scripts:
+  - type: after-response
+    code: if (res.status === 200 && res.body.accessToken) bru.setVar("token", res.body.accessToken);

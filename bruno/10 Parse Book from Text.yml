@@ -1,0 +1,17 @@
+info:
+  name: Parse Book from Text
+  type: http
+  seq: 10
+http:
+  method: POST
+  url: '{{base_url}}/books/parse-text'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  - name: X-Mock-Ai
+    value: 'true'
+  body:
+    type: json
+    data: "{\n  \"text\": \"The Great Gatsby by F. Scott Fitzgerald. Published in\
+      \ 1925. ISBN: 978-0-7432-7356-5. A classic American novel set in the Jazz Age\
+      \ of the 1920s.\"\n}"

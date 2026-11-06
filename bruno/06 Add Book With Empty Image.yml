@@ -1,0 +1,38 @@
+info:
+  name: Add Book With Empty Image
+  type: http
+  seq: 6
+http:
+  method: POST
+  url: '{{base_url}}/books'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  body:
+    type: multipart-form
+    data:
+    - name: title
+      type: text
+      value: The Art of Testing
+    - name: authors
+      type: text
+      value: Quality Assurance
+    - name: isbn
+      type: text
+      value: 000-0-0000-0000-0
+    - name: description
+      type: text
+      value: Testing empty file upload scenario
+    - name: pages
+      type: text
+      value: '100'
+    - name: imageFile
+      type: file
+      value:
+      - fixtures/foo.jpg
+      contentType: application/octet-stream
+runtime:
+  scripts:
+  - type: after-response
+    code: if (res.status >= 200 && res.status < 300 && res.body.id) bru.setVar("book_id",
+      res.body.id);

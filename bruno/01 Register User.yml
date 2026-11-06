@@ -1,0 +1,11 @@
+info:
+  name: Register User
+  type: http
+  seq: 1
+http:
+  method: POST
+  url: '{{base_url}}/auth/register'
+  body:
+    type: json
+    data: "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\"\
+      ,\n  \"name\": \"Test User\"\n}"

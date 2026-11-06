@@ -1,0 +1,12 @@
+opencollection: 1.0.0
+info:
+  name: Intellishelf API
+request:
+  variables:
+  - name: base_url
+    value: http://localhost:8080/api
+docs:
+  type: text/markdown
+  content: Run Register if needed, then Login and Get Current User. Create a book
+    before the book detail, update, or delete requests. Select an image for Parse
+    Book from Image.

@@ -2,6 +2,8 @@ version: 2
 
 autopilot: allowed
 
+model-selection-policy: docs/adlc-model-selection.md
+
 security:
   data-categories:
     - pii
@@ -13,23 +15,25 @@ connectors:
 
 stages:
   research:
-    model: small
+    extend-with: []
+    checks: []
+  plan:
     extend-with: []
     checks: []
   implement:
-    model: medium
     extend-with: []
     checks:
       - dotnet build Intellishelf.Api.slnx -c Release
       - dotnet format Intellishelf.Api.slnx --verify-no-changes
       - dotnet test tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj
   review:
-    model: inherit
     extend-with:
       - document: docs/code-review-guide.md
     checks: []
+  security:
+    extend-with: []
+    checks: []
   verify:
-    model: medium
     extend-with:
       - skill: run-intellishelf-api
     checks:

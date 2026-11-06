@@ -1,0 +1,19 @@
+info:
+  name: Update Book
+  type: http
+  seq: 8
+http:
+  method: PUT
+  url: '{{base_url}}/books/{{book_id}}'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  body:
+    type: multipart-form
+    data:
+    - name: title
+      type: text
+      value: The Art of Testing - Updated Edition
+    - name: description
+      type: text
+      value: An updated description of this testing book

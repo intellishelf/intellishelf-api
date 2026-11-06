@@ -1,0 +1,18 @@
+info:
+  name: Parse Book from Image
+  type: http
+  seq: 11
+http:
+  method: POST
+  url: '{{base_url}}/books/parse-image'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  body:
+    type: multipart-form
+    data:
+    - name: file
+      type: file
+      value:
+      - ./path/to/your/book-image.jpg
+      contentType: image/jpeg
