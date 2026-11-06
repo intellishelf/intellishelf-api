@@ -14,6 +14,7 @@ public class BookRequestContractBase
     public int? Pages { get; init; }
     public DateTime? PublicationDate { get; init; }
     public string? Publisher { get; init; }
+    public string? Subtitle { get; init; }
     public string[]? Tags { get; init; }
     public IFormFile? ImageFile { get; init; }
 

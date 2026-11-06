@@ -14,6 +14,9 @@ http:
     - name: title
       type: text
       value: The Art of Testing - Updated Edition
+    - name: subtitle
+      type: text
+      value: Second Edition
     - name: description
       type: text
       value: An updated description of this testing book

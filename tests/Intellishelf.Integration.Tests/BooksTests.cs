@@ -289,6 +289,132 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
+    private async Task GivenSubtitle_WhenPostNewBook_ThenReturnsAndStoresSubtitle()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Subtitled Book"), "Title");
+        content.Add(new StringContent("A practical guide"), "Subtitle");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("A practical guide", book.Subtitle);
+
+        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(persistedBook);
+        Assert.Equal("A practical guide", persistedBook.Subtitle);
+    }
+
+    [Fact]
+    private async Task GivenNoSubtitle_WhenPostNewBook_ThenSubtitleIsNull()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Plain Book"), "Title");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Null(book.Subtitle);
+
+        var persistedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(persistedBook);
+        Assert.Null(persistedBook.Subtitle);
+    }
+
+    [Fact]
+    private async Task GivenBookWithSubtitle_WhenGetBookAndLists_ThenReturnsSubtitle()
+    {
+        // Arrange
+        var bookEntity = CreateBookEntity("Subtitled", "Author", subtitle: "A practical guide");
+        await _mongoDbFixture.SeedBooksAsync(bookEntity);
+
+        // Act
+        var byIdResponse = await _client.GetAsync($"/api/books/{bookEntity.Id}", TestContext.Current.CancellationToken);
+        var pagedResponse = await _client.GetAsync("/api/books", TestContext.Current.CancellationToken);
+        var allResponse = await _client.GetAsync("/api/books/all", TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, byIdResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, pagedResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, allResponse.StatusCode);
+
+        var byId = Assert.IsType<Book>(await byIdResponse.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("A practical guide", byId.Subtitle);
+
+        var paged = Assert.IsType<PagedResult<Book>>(await pagedResponse.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken));
+        Assert.Equal("A practical guide", Assert.Single(paged.Items).Subtitle);
+
+        var all = await allResponse.Content.ReadFromJsonAsync<IReadOnlyCollection<Book>>(TestContext.Current.CancellationToken);
+        Assert.NotNull(all);
+        Assert.Equal("A practical guide", Assert.Single(all).Subtitle);
+    }
+
+    [Fact]
+    private async Task GivenBookWithSubtitle_WhenUpdateBookWithNewSubtitle_ThenReplacesSubtitle()
+    {
+        // Arrange
+        var book = CreateBookEntity("Original", "Mallory", subtitle: "Old subtitle");
+        await _mongoDbFixture.SeedBooksAsync(book);
+
+        using var updatedBook = new MultipartFormDataContent();
+        updatedBook.Add(new StringContent("Original"), "Title");
+        updatedBook.Add(new StringContent("New subtitle"), "Subtitle");
+
+        // Act
+        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var getResponse = await _client.GetAsync($"/api/books/{book.Id}", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var fetchedBook = Assert.IsType<Book>(await getResponse.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("New subtitle", fetchedBook.Subtitle);
+
+        var storedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Equal("New subtitle", storedBook.Subtitle);
+    }
+
+    [Fact]
+    private async Task GivenBookWithSubtitle_WhenUpdateBookWithoutSubtitle_ThenSubtitleIsNull()
+    {
+        // Arrange
+        var book = CreateBookEntity("Original", "Mallory", subtitle: "Old subtitle");
+        await _mongoDbFixture.SeedBooksAsync(book);
+
+        using var updatedBook = new MultipartFormDataContent();
+        updatedBook.Add(new StringContent("Original"), "Title");
+
+        // Act
+        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", updatedBook, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var getResponse = await _client.GetAsync($"/api/books/{book.Id}", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var fetchedBook = Assert.IsType<Book>(await getResponse.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Null(fetchedBook.Subtitle);
+
+        var storedBook = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.NotNull(storedBook);
+        Assert.Null(storedBook.Subtitle);
+    }
+
+    [Fact]
     private async Task GivenBookOwnedByAnotherUser_WhenDeleteBook_ThenNotFound()
     {
         // Arrange
@@ -452,7 +578,8 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         DateTime? createdDate = null,
         string? coverImageUrl = null,
         string? isbn10 = null,
-        string? isbn13 = null)
+        string? isbn13 = null,
+        string? subtitle = null)
     {
         var timestamp = createdDate ?? DateTime.UtcNow;
         return new BookEntity
@@ -466,6 +593,7 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
             CoverImageUrl = coverImageUrl,
             Isbn10 = isbn10,
             Isbn13 = isbn13,
+            Subtitle = subtitle,
             Status = ReadingStatus.Unread
         };
     }

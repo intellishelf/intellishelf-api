@@ -20,6 +20,9 @@ http:
     - name: isbn
       type: text
       value: 000-0-0000-0000-0
+    - name: subtitle
+      type: text
+      value: A Practical Guide
     - name: description
       type: text
       value: Testing empty file upload scenario

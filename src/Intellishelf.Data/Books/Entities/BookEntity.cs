@@ -17,6 +17,7 @@ public class BookEntity : EntityBase
     public string? Isbn10 { get; init; }
     public string? Isbn13 { get; init; }
     public string? Publisher { get; init; }
+    public string? Subtitle { get; init; }
     public int? Pages { get; init; }
     public string? CoverImageUrl { get; init; }
     public string? Annotation { get; init; }

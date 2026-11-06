@@ -13,6 +13,7 @@ public class BookRequestBase
     public int? Pages { get; init; }
     public DateTime? PublicationDate { get; init; }
     public string? Publisher { get; init; }
+    public string? Subtitle { get; init; }
     public string[]? Tags { get; init; }
     public string? CoverImageUrl { get; init; }
     public required ReadingStatus Status { get; init; }
