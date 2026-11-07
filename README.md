@@ -26,5 +26,5 @@ Intellishelf is a comprehensive, open-source digital bookshelf management applic
 - Subscriptions: free and pro version
 
 ## Technical Stack
-- .NET Core
+- .NET 10 (SDK version specified in [global.json](global.json))
 - C#

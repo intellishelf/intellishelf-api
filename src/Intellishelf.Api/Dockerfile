@@ -4,6 +4,7 @@ WORKDIR /src
 
 # Copy solution and project files
 COPY *.slnx ./
+COPY global.json ./
 COPY src/Intellishelf.Api/Intellishelf.Api.csproj ./src/Intellishelf.Api/
 COPY src/Intellishelf.Data/Intellishelf.Data.csproj ./src/Intellishelf.Data/
 COPY src/Intellishelf.Domain/Intellishelf.Domain.csproj ./src/Intellishelf.Domain/

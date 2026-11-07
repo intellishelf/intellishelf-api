@@ -18,13 +18,13 @@ dotnet build Intellishelf.Api.slnx -c Release
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/Intellishelf.Api/Intellishelf.Api.csproj
 
 # Run unit tests
-dotnet test tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj
+dotnet test --project tests/Intellishelf.Unit.Tests/Intellishelf.Unit.Tests.csproj
 
 # Run integration tests (requires Docker running for Testcontainers)
-dotnet test tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj
+dotnet test --project tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj
 
 # Run a specific test class
-dotnet test --filter "FullyQualifiedName~BooksTests"
+dotnet test --project tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj --filter-class "*BooksTests"
 
 # Format code
 dotnet format
@@ -32,7 +32,7 @@ dotnet format
 
 ## Architecture Overview
 
-This is a .NET 9 Web API following **Clean Architecture** with 4 main layers:
+This is a .NET 10 Web API following **Clean Architecture** with 4 main layers:
 
 ```
 src/

@@ -4,7 +4,7 @@ Quick-reference for reviewing PRs in this codebase. For full architecture detail
 
 ## Style Fingerprint
 
-- .NET 9, C# with `nullable enable`, `ImplicitUsings`
+- .NET 10, C# with `nullable enable`, `ImplicitUsings`
 - Primary constructors for DI injection (no field assignments)
 - `required` + `init` for immutability; `null!` for sentinel defaults
 - Arrow-body (`=>`) for single-expression methods and mappers
