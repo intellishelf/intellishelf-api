@@ -126,6 +126,6 @@ public class BookService(
 
     public async Task<TryResult<PagedResult<Book>>> SearchAsync(string userId, SearchQueryParameters queryParameters)
     {
-       return await bookDao.SearchAsync(userId, queryParameters);
+        return await bookDao.SearchAsync(userId, queryParameters);
     }
 }

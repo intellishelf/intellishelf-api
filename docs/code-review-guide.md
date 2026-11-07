@@ -33,7 +33,7 @@ Quick-reference for reviewing PRs in this codebase. For full architecture detail
 - Stateful service registered as Singleton
 - Mapper or validator registered as Transient (waste; should be Singleton)
 - DAO or Service registered as Singleton (holds MongoDB collection refs that may go stale)
-- Missing registration in the feature Module
+- Missing registration in the feature `Add[Feature]` extension method
 
 ### MongoDB gotchas
 - Forgetting `UserId` filter (multi-tenant data leak)
@@ -66,8 +66,8 @@ Quick-reference for reviewing PRs in this codebase. For full architecture detail
 - [ ] DAO interface in Domain, implementation in Data
 - [ ] Entity inherits `EntityBase`, has `CollectionName`
 - [ ] Mapper is pure (no side effects, no async)
-- [ ] Module registers all types with correct lifetimes
-- [ ] Module's `Register()` called in `Program.cs`
+- [ ] `Add[Feature]` extension registers all types with correct lifetimes
+- [ ] `Add[Feature]` chained in `Program.cs`
 - [ ] Controller inherits `ApiControllerBase`, uses `CurrentUserId`
 - [ ] All DAO queries include `UserId` filter
 - [ ] Integration test covers happy path + key error paths

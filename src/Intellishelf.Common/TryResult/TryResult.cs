@@ -23,7 +23,7 @@ public record TryResult
 
 public record TryResult<TResult> : TryResult
 {
-    protected internal  TryResult(TResult item) => (Value, IsSuccess) = (item, true);
+    protected internal TryResult(TResult item) => (Value, IsSuccess) = (item, true);
     private TryResult(Error error) : base(error) { }
 
     [MemberNotNullWhen(true, nameof(Value))]

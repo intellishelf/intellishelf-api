@@ -30,7 +30,7 @@ public class BooksController(
             return HandleErrorResponse(result.Error);
         return Ok(result.Value);
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<IReadOnlyCollection<Book>>> GetAllBooks()
     {

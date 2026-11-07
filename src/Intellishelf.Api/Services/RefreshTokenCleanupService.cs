@@ -14,14 +14,14 @@ public class RefreshTokenCleanupService(
         while (!stoppingToken.IsCancellationRequested)
         {
             logger.LogInformation("Running refresh token cleanup at {Time}", DateTime.UtcNow);
-            
+
             try
             {
                 using var scope = serviceProvider.CreateScope();
                 var refreshTokenDao = scope.ServiceProvider.GetRequiredService<IRefreshTokenDao>();
-                
+
                 var result = await refreshTokenDao.TryDeleteExpiredTokensAsync();
-                
+
                 if (result.IsSuccess)
                     logger.LogInformation("Successfully cleaned up expired refresh tokens");
                 else
@@ -31,7 +31,7 @@ public class RefreshTokenCleanupService(
             {
                 logger.LogError(ex, "Error occurred during refresh token cleanup");
             }
-            
+
             await Task.Delay(_interval, stoppingToken);
         }
     }

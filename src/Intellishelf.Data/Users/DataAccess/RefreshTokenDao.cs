@@ -14,33 +14,33 @@ public class RefreshTokenDao(IMongoDatabase database, IRefreshTokenMapper mapper
     public async Task<TryResult<RefreshToken>> TryAddAsync(RefreshToken refreshToken)
     {
         var entity = mapper.Map(refreshToken);
-        
+
         await _refreshTokensCollection.InsertOneAsync(entity);
-        
+
         return mapper.Map(entity);
     }
 
     public async Task<TryResult<RefreshToken>> TryFindByTokenAsync(string token)
     {
         var refreshToken = await _refreshTokensCollection.Find(rt => rt.Token == token).FirstOrDefaultAsync();
-        
+
         if (refreshToken == null)
             return new Error(UserErrorCodes.RefreshTokenNotFound, "Refresh token not found");
-        
+
         return mapper.Map(refreshToken);
     }
 
     public async Task<TryResult<bool>> TryUpdateAsync(RefreshToken refreshToken)
     {
         var entity = mapper.Map(refreshToken);
-        
+
         var result = await _refreshTokensCollection.ReplaceOneAsync(
             rt => rt.Id == refreshToken.Id,
             entity);
-        
+
         if (result.ModifiedCount == 0)
             return new Error(UserErrorCodes.RefreshTokenNotFound, "Refresh token not found");
-        
+
         return true;
     }
 
@@ -48,7 +48,7 @@ public class RefreshTokenDao(IMongoDatabase database, IRefreshTokenMapper mapper
     {
         await _refreshTokensCollection.DeleteManyAsync(
             rt => rt.ExpiryDate < DateTime.UtcNow || rt.IsRevoked);
-        
+
         return true;
     }
 
