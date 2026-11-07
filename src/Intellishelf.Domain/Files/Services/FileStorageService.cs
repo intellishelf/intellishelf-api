@@ -13,13 +13,13 @@ public class FileStorageService(BlobContainerClient containerClient) : IFileStor
         {
             // Ensure the container exists (create if it doesn't)
             await containerClient.CreateIfNotExistsAsync();
-     
+
             // Generate a unique filename inside the service
             var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(originalFileName)}";
             var blobClient = containerClient.GetBlobClient(GetUserFilePath(userId, uniqueFileName));
-     
+
             await blobClient.UploadAsync(fileStream, true);
-     
+
             return blobClient.Uri.ToString();
         }
         catch (Exception ex)

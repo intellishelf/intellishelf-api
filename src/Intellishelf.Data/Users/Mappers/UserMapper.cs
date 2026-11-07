@@ -7,9 +7,9 @@ public class UserMapper : IUserMapper
 {
     public User Map(UserEntity entity) =>
         new(
-            Id: entity.Id, 
-            Email: entity.Email, 
-            PasswordHash: entity.PasswordHash, 
+            Id: entity.Id,
+            Email: entity.Email,
+            PasswordHash: entity.PasswordHash,
             PasswordSalt: entity.PasswordSalt,
             AuthProvider: entity.AuthProvider,
             ExternalId: entity.ExternalId);

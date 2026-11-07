@@ -23,7 +23,7 @@ public abstract class ApiControllerBase : ControllerBase
         UserErrorCodes.UserNotFound or
         UserErrorCodes.Unauthorized or
         UserErrorCodes.RefreshTokenExpired or
-        UserErrorCodes.RefreshTokenNotFound  or
+        UserErrorCodes.RefreshTokenNotFound or
         UserErrorCodes.RefreshTokenRevoked or
         UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
 
