@@ -7,11 +7,12 @@ using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Services;
 using Intellishelf.Domain.Files.Services;
 
-namespace Intellishelf.Api.Modules;
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class BooksModule
+public static class BooksExtensions
 {
-    public static void Register(IServiceCollection services)
+    public static IServiceCollection AddBooks(this IServiceCollection services)
     {
         services.AddSingleton<IBookEntityMapper, BookEntityMapper>();
         services.AddSingleton<IBookMapper, BookMapper>();
@@ -23,5 +24,7 @@ public static class BooksModule
         // ISBN import services
         services.AddHttpClient<IBookMetadataService, GoogleBooksMetadataService>();
         services.AddHttpClient<IHttpImageDownloader, HttpImageDownloader>();
+
+        return services;
     }
 }

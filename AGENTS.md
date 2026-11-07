@@ -36,7 +36,7 @@ This is a .NET 10 Web API following **Clean Architecture** with 4 main layers:
 
 ```
 src/
-├── Intellishelf.Api/              Web API, Controllers, Modules (DI configuration)
+├── Intellishelf.Api/              Web API, Controllers, DI extension methods
 ├── Intellishelf.Domain/           Business logic, Service interfaces, Domain models
 ├── Intellishelf.Data/             Data access implementations, MongoDB repositories
 └── Intellishelf.Common/           Shared utilities (TryResult pattern)
@@ -62,11 +62,11 @@ Railway-oriented programming instead of exceptions. Service/DAO methods return `
 
 Map error codes to HTTP status in `MapErrorToStatusCode()` switch. Add new error codes to switch (404 for NotFound, 401 for Unauthorized, 409 for AlreadyExists, 400 for InvalidInput, 502 for external service errors, 500 default).
 
-## Module System (Dependency Injection)
+## Dependency Injection (Extension Methods)
 
-**Location:** `src/Intellishelf.Api/Modules/`
+**Location:** `src/Intellishelf.Api/DependencyInjection/`
 
-DI organized into modules per feature: `DbModule`, `UsersModule`, `BooksModule`, `AzureModule`, `AiModule`. Each module has static `Register()` method called in `Program.cs`.
+DI organized into `IServiceCollection` extension methods per feature: `AddApiDefaults`, `AddDatabase`, `AddAzureStorage`, `AddUsers`, `AddBooks`, `AddAi`, `AddMcp` (each in `[Feature]Extensions.cs`, namespace `Microsoft.Extensions.DependencyInjection`). `Program.cs` chains them on `builder.Services`; `UseApiPipeline()` and `MapMcpEndpoints()` configure the pipeline.
 
 **Lifecycle:** Singleton (mappers, validators, processors - stateless), Transient (DAOs, services - per injection), Scoped (per-request state, rare), HttpClient (for HTTP services).
 
@@ -92,7 +92,7 @@ Use real MongoDB and Azure Storage containers (not mocks). Fixtures (`MongoDbFix
 
 ## Authentication Architecture
 
-**Location:** `src/Intellishelf.Api/Modules/UsersModule.cs`
+**Location:** `src/Intellishelf.Api/DependencyInjection/UsersExtensions.cs`
 
 Three schemes routed by policy: JWT Bearer (mobile, `Authorization` header), Cookie (web sessions), Google OAuth (external provider). Policy selector checks Authorization header to route between JWT/Cookie.
 
@@ -118,7 +118,7 @@ Parse OCR text to structured book data using OpenAI with JSON schema validation 
 
 **Configuration:**
 - `src/Intellishelf.Api/Program.cs` - Application startup
-- `src/Intellishelf.Api/Modules/` - DI configuration per feature
+- `src/Intellishelf.Api/DependencyInjection/` - DI extension methods per feature
 - `src/Intellishelf.Api/appsettings.json` - App configuration (do not commit secrets)
 
 **Test infrastructure:**
@@ -127,7 +127,7 @@ Parse OCR text to structured book data using OpenAI with JSON schema validation 
 
 ## Naming Conventions
 
-**Files:** `[Domain]Controller.cs`, `I[Domain]Service.cs`, `[Domain]Service.cs`, `I[Entity]Dao.cs`, `[Entity]Dao.cs`, `[Entity]Entity.cs`, `[Domain]ErrorCodes.cs`, `[Feature]Module.cs`, `[Service]Config.cs`, `[Domain]Helper.cs`
+**Files:** `[Domain]Controller.cs`, `I[Domain]Service.cs`, `[Domain]Service.cs`, `I[Entity]Dao.cs`, `[Entity]Dao.cs`, `[Entity]Entity.cs`, `[Domain]ErrorCodes.cs`, `[Feature]Extensions.cs`, `[Service]Config.cs`, `[Domain]Helper.cs`
 
 **Methods:** `Try[Action]Async` (returns TryResult), `[Action]Async` (async), `Map[Target]` (mappers)
 
@@ -154,7 +154,7 @@ Api/Controllers|Contracts/{Feature}|Mappers
 
 **Config Classes:** Define `SectionName` constant, use `required` for mandatory values, nullable for optional (see `DatabaseConfig`, `AiConfig`, `AuthConfig`).
 
-**Module Pattern:** Load config via `GetSection()`, bind with `Configure<T>()`, access via `IOptions<T>` injection. Modules register services in `Program.cs`.
+**Options Pattern:** Bind config in `Add[Feature](IConfiguration)` with `AddOptionsWithValidateOnStart<T>().Bind(configuration.GetRequiredSection(T.SectionName)).ValidateDataAnnotations()`, put `[Required]` on mandatory members, access via `IOptions<T>` injection. `Program.cs` chains the `Add[Feature]` calls.
 
 ## File Processing Pipeline
 
@@ -194,7 +194,7 @@ Preserve the developer's Git author identity. Never invent model names or email 
 8. API contracts in `Api/Contracts/{Feature}/`
 9. API mapper in `Api/Mappers/`
 10. Controller (inherit `ApiControllerBase`, use `CurrentUserId`) in `Api/Controllers/`
-11. Module (register with correct lifetimes) in `Api/Modules/` + add to `Program.cs`
+11. `Add[Feature]` extension method (register with correct lifetimes) in `Api/DependencyInjection/` + chain it in `Program.cs`
 12. Integration tests in `tests/Intellishelf.Integration.Tests/Features/`
 
 **Reference existing features** (Books, Users, Chat) for implementation patterns.

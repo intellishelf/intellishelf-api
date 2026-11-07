@@ -1,31 +1,32 @@
 using Intellishelf.Api.Mcp.Tools;
 using Intellishelf.Api.Services;
 using Intellishelf.Domain.Chat.Services;
-using ModelContextProtocol.AspNetCore;
 
-namespace Intellishelf.Api.Modules;
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class McpModule
+public static class McpExtensions
 {
-    public static void Register(IServiceCollection services)
+    public static IServiceCollection AddMcp(this IServiceCollection services)
     {
-        // Register MCP tools
         services.AddTransient<GetAllBooksTool>();
         services.AddTransient<GetBooksByAuthorTool>();
 
-        // Register MCP tools service for ChatService integration
+        // ChatService integration
         services.AddTransient<IMcpToolsService, McpToolsService>();
 
-        // Register MCP server with HTTP transport
         services
             .AddMcpServer()
             .WithHttpTransport()
             .WithToolsFromAssembly();
+
+        return services;
     }
 
-    public static void MapMcpEndpoints(WebApplication app)
+    public static WebApplication MapMcpEndpoints(this WebApplication app)
     {
-        // Map MCP endpoints at /mcp
         app.MapMcp("/mcp");
+
+        return app;
     }
 }
