@@ -24,15 +24,15 @@ public static class MongoIndexSetup
 
         var textIndex = BookSearchIndexes.Text();
         var vectorIndex = BookSearchIndexes.Vector();
-        await EnsureSearchIndexAsync(books, textIndex, textIndex.Definition, cancellationToken, updateExisting: updateExisting);
-        await EnsureSearchIndexAsync(books, vectorIndex, BookSearchIndexes.VectorDefinition(vectorIndex), cancellationToken, recreateVectorIndexOnUpdateFailure, updateExisting);
+        await EnsureSearchIndexAsync(books, textIndex, cancellationToken, updateExisting: updateExisting);
+        await EnsureSearchIndexAsync(books, vectorIndex, cancellationToken, recreateVectorIndexOnUpdateFailure, updateExisting);
     }
 
     private static async Task EnsureSearchIndexAsync(
-        IMongoCollection<BookEntity> books, CreateSearchIndexModel model, BsonDocument definition,
-        CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = false)
+        IMongoCollection<BookEntity> books, CreateSearchIndexModel model, CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = false)
     {
         var name = model.Name;
+        var definition = model.Definition;
         var stopwatch = Stopwatch.StartNew();
         var updateSubmitted = false;
         var waitingForDrop = false;
