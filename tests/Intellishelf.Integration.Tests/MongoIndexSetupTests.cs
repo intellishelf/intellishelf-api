@@ -2,6 +2,7 @@ using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Indexes;
 using Intellishelf.Data.Users.Entities;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
+using Intellishelf.Integration.Tests.Infra;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
@@ -9,8 +10,50 @@ using Xunit;
 namespace Intellishelf.Integration.Tests;
 
 [Collection("Integration Tests")]
-public class MongoIndexSetupTests(MongoDbFixture fixture)
+public class MongoIndexSetupTests(MongoDbFixture fixture, AzuriteFixture azuriteFixture)
 {
+    [Fact]
+    public async Task ApplicationStartup_CreatesIndexesOnEmptyDatabase()
+    {
+        var database = new MongoClient(fixture.ConnectionString).GetDatabase("startup-indexes-" + ObjectId.GenerateNewId());
+        try
+        {
+            using var factory = new TestWebApplicationFactory(fixture, azuriteFixture, database);
+            using var client = factory.CreateClient();
+            var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
+            var indexes = await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken);
+            Assert.Contains(indexes, index => index["name"] == "default" && index["status"] == "READY");
+            Assert.Contains(indexes, index => index["name"] == "vector_index" && index["status"] == "READY");
+        }
+        finally
+        {
+            await database.Client.DropDatabaseAsync(database.DatabaseNamespace.DatabaseName, TestContext.Current.CancellationToken);
+        }
+    }
+
+    [Fact]
+    public async Task ApplicationStartup_DoesNotReplaceAnOutdatedIndex()
+    {
+        var database = new MongoClient(fixture.ConnectionString).GetDatabase("startup-existing-" + ObjectId.GenerateNewId());
+        try
+        {
+            var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
+            await books.Indexes.CreateOneAsync(new CreateIndexModel<BookEntity>(Builders<BookEntity>.IndexKeys.Ascending(x => x.UserId)), cancellationToken: TestContext.Current.CancellationToken);
+            await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel("default", BsonDocument.Parse("{ mappings: { dynamic: true } }")), TestContext.Current.CancellationToken);
+            using var factory = new TestWebApplicationFactory(fixture, azuriteFixture, database);
+            var error = Record.Exception(() => factory.CreateClient());
+            Assert.NotNull(error);
+            Assert.Contains("differs from its configured definition", error.ToString());
+            var indexes = await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken);
+            var index = Assert.Single(indexes, item => item["name"] == "default");
+            Assert.True(index["latestDefinition"]["mappings"]["dynamic"].AsBoolean);
+        }
+        finally
+        {
+            await database.Client.DropDatabaseAsync(database.DatabaseNamespace.DatabaseName, TestContext.Current.CancellationToken);
+        }
+    }
+
     [Fact]
     public async Task Ensure_CreatesIndexesAndDoesNotRebuildAnUnchangedSearchIndex()
     {

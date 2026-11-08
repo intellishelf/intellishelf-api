@@ -11,7 +11,7 @@ using MongoDB.Driver;
 
 namespace Intellishelf.Integration.Tests.Infra;
 
-internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFixture azuriteFixture) : WebApplicationFactory<Program>
+internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFixture azuriteFixture, IMongoDatabase? database = null) : WebApplicationFactory<Program>
 {
     protected override IHost CreateHost(IHostBuilder builder)
     {
@@ -23,7 +23,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
                 var testConfig = new Dictionary<string, string?>
                 {
                     [$"{DatabaseConfig.SectionName}:ConnectionString"] = mongoFixture.ConnectionString,
-                    [$"{DatabaseConfig.SectionName}:DatabaseName"] = mongoFixture.Database.DatabaseNamespace.DatabaseName,
+                    [$"{DatabaseConfig.SectionName}:DatabaseName"] = (database ?? mongoFixture.Database).DatabaseNamespace.DatabaseName,
                     [$"{AuthConfig.SectionName}:Google:ClientId"] = "fake",
                     [$"{AuthConfig.SectionName}:Google:ClientSecret"] = "fake",
                     [$"{AiConfig.SectionName}:OpenAiApiKey"] = "fake",
@@ -36,7 +36,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
             .ConfigureServices(services =>
             {
                 services.RemoveAll<IMongoDatabase>();
-                services.AddSingleton(mongoFixture.Database);
+                services.AddSingleton(database ?? mongoFixture.Database);
 
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });

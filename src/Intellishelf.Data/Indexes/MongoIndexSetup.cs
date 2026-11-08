@@ -9,7 +9,7 @@ namespace Intellishelf.Data.Indexes;
 /// <summary>Explicitly provisions the indexes required by the application.</summary>
 public static class MongoIndexSetup
 {
-    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false)
+    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false, bool updateExisting = true)
     {
         var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
         var users = database.GetCollection<UserEntity>(UserEntity.CollectionName);
@@ -22,18 +22,17 @@ public static class MongoIndexSetup
         await tokens.Indexes.CreateOneAsync(new CreateIndexModel<RefreshTokenEntity>(
             Builders<RefreshTokenEntity>.IndexKeys.Ascending(x => x.Token)), cancellationToken: cancellationToken);
 
-        await EnsureSearchIndexAsync(books, "default", "books-search-index.json", SearchIndexType.Search, cancellationToken);
-        await EnsureSearchIndexAsync(books, "vector_index", "books-vector-index.json", SearchIndexType.VectorSearch, cancellationToken, recreateVectorIndexOnUpdateFailure);
+        var textIndex = BookSearchIndexes.Text();
+        var vectorIndex = BookSearchIndexes.Vector();
+        await EnsureSearchIndexAsync(books, textIndex, textIndex.Definition, cancellationToken, updateExisting: updateExisting);
+        await EnsureSearchIndexAsync(books, vectorIndex, BookSearchIndexes.VectorDefinition(vectorIndex), cancellationToken, recreateVectorIndexOnUpdateFailure, updateExisting);
     }
 
     private static async Task EnsureSearchIndexAsync(
-        IMongoCollection<BookEntity> books, string name, string resourceName, SearchIndexType type, CancellationToken cancellationToken,
-        bool recreateOnUpdateFailure = false)
+        IMongoCollection<BookEntity> books, CreateSearchIndexModel model, BsonDocument definition,
+        CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = true)
     {
-        using var stream = typeof(MongoIndexSetup).Assembly.GetManifestResourceStream($"Intellishelf.Data.Indexes.{resourceName}")
-            ?? throw new InvalidOperationException($"Index definition {resourceName} is missing.");
-        using var reader = new StreamReader(stream);
-        var definition = BsonDocument.Parse(await reader.ReadToEndAsync(cancellationToken));
+        var name = model.Name;
         var stopwatch = Stopwatch.StartNew();
         var updateSubmitted = false;
         var waitingForDrop = false;
@@ -48,7 +47,7 @@ public static class MongoIndexSetup
 
                 if (index is null && !updateSubmitted)
                 {
-                    await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel(name, type, definition), cancellationToken);
+                    await books.SearchIndexes.CreateOneAsync(model, cancellationToken);
                     updateSubmitted = true;
                     waitingForDrop = false;
                 }
@@ -60,12 +59,15 @@ public static class MongoIndexSetup
 
                     if (!matches && !updateSubmitted)
                     {
+                        if (!updateExisting)
+                            throw new InvalidOperationException($"Search index {name} differs from its configured definition. Update it before starting the application.");
+
                         try
                         {
                             await books.SearchIndexes.UpdateAsync(name, definition, cancellationToken);
                             updateSubmitted = true;
                         }
-                        catch (MongoCommandException ex) when (recreateOnUpdateFailure && type == SearchIndexType.VectorSearch && ex.Message.Contains("\"mappings\" is required"))
+                        catch (MongoCommandException ex) when (recreateOnUpdateFailure && model.Type == SearchIndexType.VectorSearch && ex.Message.Contains("\"mappings\" is required"))
                         {
                             // Explicitly enabled for disposable local databases; book documents are retained.
                             await books.SearchIndexes.DropOneAsync(name, cancellationToken);

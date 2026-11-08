@@ -1,7 +1,0 @@
-{
-  "fields": [
-    { "type": "vector", "path": "Embedding", "numDimensions": 1536, "similarity": "cosine" },
-    { "type": "filter", "path": "UserId" },
-    { "type": "filter", "path": "Status" }
-  ]
-}

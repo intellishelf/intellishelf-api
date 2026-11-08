@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using Intellishelf.Data.Indexes;
+using MongoDB.Driver;
 
 [assembly: InternalsVisibleTo("Intellishelf.Integration.Tests")]
 
@@ -14,6 +16,8 @@ builder.Services
     .AddMcp();
 
 var app = builder.Build();
+
+await MongoIndexSetup.EnsureAsync(app.Services.GetRequiredService<IMongoDatabase>(), updateExisting: false);
 
 app.UseApiPipeline();
 app.MapMcpEndpoints();

@@ -78,9 +78,8 @@ This is a good conservative default. It catches simple typos while avoiding over
 
 ## Current Atlas Search Index
 
-The shared index definitions are `src/Intellishelf.Data/Indexes/books-search-index.json` and
-`src/Intellishelf.Data/Indexes/books-vector-index.json`. The integration fixture calls
-`MongoIndexSetup.EnsureAsync` to create or update them.
+The shared definitions are in `src/Intellishelf.Data/Indexes/BookSearchIndexes.cs`.
+`MongoIndexSetup.EnsureAsync` creates the indexes for the API and integration tests.
 
 The lexical Atlas Search index should include:
 
@@ -288,12 +287,11 @@ correctly in Atlas environments.
 - `default` Atlas Search index,
 - `vector_index` Atlas Vector Search index.
 
-The integration fixture calls this setup. A standalone command and Docker Compose integration are
-not implemented yet; production index changes must be applied through a controlled deployment step.
-The integration fixture enables an opt-in fallback that recreates a changed vector index when Atlas
-Local rejects its update. Rebuilding makes vector search unavailable temporarily but retains book data.
-The default setup never drops an index. The existing `docs/search/setup-hybrid-search-indexes.js`
-remains available for manual use until a standalone C# setup command exists.
+The API runs setup on startup for its configured database. It creates missing indexes and waits
+until they are ready; if an existing search index differs, startup fails rather than replacing it.
+Update existing production indexes deliberately before deploying a changed definition. The integration
+fixture enables an opt-in fallback that recreates a changed vector index when Atlas Local rejects its
+update. Rebuilding temporarily makes vector search unavailable but retains book data.
 
 For the first iteration, only the lexical `default` index is required by application code. The vector
 index can exist ahead of time, but application code should not depend on it until embeddings and
