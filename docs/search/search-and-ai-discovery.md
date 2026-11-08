@@ -11,7 +11,7 @@ Intellishelf should have **two understandable user journeys**, without exposing 
 - **Find my books (Free/default):** instant search for a known book by title, author, publisher, ISBN, tags or text; autocomplete and conservative typo tolerance. Results are actionable as the user types.
 - **Explore with AI (Pro):** a visible secondary action **below the normal search results** opens a distinct discovery experience. Queries can describe themes, ideas, moods, or related books. Initially it returns a book list; a generative assistant is optional later.
 
-This **replaces the older assumption** that all completed search queries must automatically run hybrid lexical/vector ranking. The default journey remains lexical. The Pro journey may combine lexical and vector retrieval **internally** when evaluation shows that improves discovery.
+This **replaces the older assumption** that all completed search queries must automatically run hybrid lexical/vector ranking. The default journey remains lexical. The Pro journey runs **hybrid retrieval by default**: lexical/fuzzy and vector search are both executed for a submitted Explore query, then fused and reranked. No query-intent classifier is required to decide whether to run vectors. Exceptions such as embedding-service outages are explicit degraded/fallback behavior, not routine routing decisions.
 
 Guiding principles:
 1. **Find what the user clearly asked for first; then expand to plausible alternatives.**
@@ -38,7 +38,7 @@ Typing should favor high-signal fields (title/author, publisher if useful) rathe
    - "Stories of loneliness and isolation"
    - "What do I own about scientific explanations?"
    - "Books similar to The Beginning of Infinity"
-3. On submit, fetch a query embedding and retrieve relevant user-scoped semantic candidates. Optionally retrieve lexical candidates and fuse/rerank.
+3. On submit, run **both** user-scoped lexical/fuzzy retrieval and vector retrieval (after obtaining the query embedding), then fuse/rerank them into one stable list.
 4. Show **one stable final result list**; do not first paint lexical results and later reorder them when vector retrieval completes.
 5. Selecting a book opens its normal detail page. Free users see an accurate Pro explanation/upgrade affordance instead of a fake AI result.
 
@@ -80,7 +80,7 @@ Expected behavior examples (preserved from earlier search specs):
 | `Harry Potter` | Exact title/books first | Protect exact match if hybrid retrieval is used |
 | `Dune` | Exact book above loosely related science fiction | May additionally suggest thematic neighbors |
 | `Shakespeare` | Author/title signal dominates | Can explore related literature without burying known author matches |
-| `Shakespare` | Fuzzy recovery of author | No need for semantics to fix simple typo |
+| `Shakespare` | Fuzzy recovery of author | Hybrid still runs both lexical and vector; fuzzy author result must outrank thematic neighbors |
 | `ha` | Prefix autocomplete, fast | Do not embed every keystroke |
 | `dark fantasy` | Tags/description if present; avoid accidental title-word dominance | Theme/genre discovery |
 | `books about loneliness and isolation` | May find little lexical overlap | Conceptual discovery |
@@ -88,7 +88,7 @@ Expected behavior examples (preserved from earlier search specs):
 
 For default search, prioritize: exact/strong title-author, partial/prefix, typo-tolerant, then metadata matches. Treat these as product acceptance criteria, not proof that fixed numerical boosts guarantee that order.
 
-For Pro discovery, compare pure vector retrieval, vector + lexical exact-match rescue, and weighted fusion (e.g. RRF). RRF merges rankings, not incompatible raw scores, and **does not automatically guarantee exact-match dominance**. Use tests and explicit policy.
+For Pro discovery, **always retrieve lexical and vector candidates** on a normal completed query, then merge them via a tuned hybrid strategy (initial candidate: weighted RRF plus explicit exact-title/author protection). Evaluate ranking weights and alternatives, not whether to switch either retrieval engine off per query. RRF merges rankings, not incompatible raw scores, and **does not automatically guarantee exact-match dominance**. Use tests and explicit policy.
 
 ## 5. Embedding lifecycle
 
@@ -194,7 +194,7 @@ Implement with existing .NET Clean Architecture, `TryResult`, authenticated `Cur
 4. Benchmark whole-pipeline p50/p95 latency and cost: query embeddings, MongoDB ENN/ANN, optional fusion; do not infer total latency from the size of the per-user vector set.
 5. Add durable backfill jobs, retries, version-safe writes, progress, entitlement gates and account/book deletion handling.
 6. Beta **Explore with AI** with honest index-preparation/error/empty states. Observe discovery quality, search-to-book-open rate and failure modes.
-7. Add hybrid ranking **only where measurement shows it improves the Pro discovery experience**; avoid mixing extra semantic work into default keystroke search.
+7. Implement and evaluate **hybrid ranking by default for submitted Pro discovery**; tune its weights and exact-match protections. Avoid semantic work in default keystroke search.
 8. Later: similar-books recommendations (reuse stored book vectors without a query embedding) or conversational/explanatory responses as distinct features.
 
 No runtime changes are proposed by this documentation PR.
@@ -208,7 +208,7 @@ No runtime changes are proposed by this documentation PR.
 - Which metadata providers have usable licensing/attribution/retention rights?
 - How should Pro and any future chat credits differ? What are fair-use and cancellation/retention policies?
 - When does semantic search return "no relevant books", and how is that measured?
-- ANN vs ENN for small personal libraries; vector-only vs hybrid ranking in Pro Explore?
+- ANN vs ENN for small personal libraries; which hybrid fusion/reranking formula and weights give the best Pro Explore results?
 - How to paginate stable results and define meaningful counts for semantic Top-K?
 - How to avoid unexpected metadata replacement, duplicate jobs and stale embeddings during edits/backfills?
 
