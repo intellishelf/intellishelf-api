@@ -22,44 +22,49 @@ public static class MongoIndexSetup
         await tokens.Indexes.CreateOneAsync(new CreateIndexModel<RefreshTokenEntity>(
             Builders<RefreshTokenEntity>.IndexKeys.Ascending(x => x.Token)), cancellationToken: cancellationToken);
 
+        await EnsureSearchIndexAsync(books, cancellationToken);
+    }
+
+    private static async Task EnsureSearchIndexAsync(IMongoCollection<BookEntity> books, CancellationToken cancellationToken)
+    {
         using var stream = typeof(MongoIndexSetup).Assembly.GetManifestResourceStream("Intellishelf.Data.Indexes.books-search-index.json")
             ?? throw new InvalidOperationException("Books search index definition is missing.");
         using var reader = new StreamReader(stream);
         var definition = BsonDocument.Parse(await reader.ReadToEndAsync(cancellationToken));
         var stopwatch = Stopwatch.StartNew();
-        var timeout = TimeSpan.FromMinutes(2);
-        var submitted = false;
+        var updateSubmitted = false;
 
-        while (stopwatch.Elapsed < timeout)
+        while (stopwatch.Elapsed < TimeSpan.FromMinutes(2))
         {
-            cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 using var cursor = await books.SearchIndexes.ListAsync(cancellationToken: cancellationToken);
-                var existing = (await cursor.ToListAsync(cancellationToken)).FirstOrDefault(i => i.GetValue("name", "") == "default");
-                if (existing is null && !submitted)
+                var indexes = await cursor.ToListAsync(cancellationToken);
+                var index = indexes.FirstOrDefault(i => i.GetValue("name", "") == "default");
+
+                if (index is null && !updateSubmitted)
                 {
                     await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel("default", definition), cancellationToken);
-                    submitted = true;
+                    updateSubmitted = true;
                 }
-                else if (existing is not null)
+                else if (index is not null)
                 {
-                    var matches = existing.TryGetValue("latestDefinition", out var current) && Equivalent(current, definition);
-                    if (!matches && !submitted)
+                    var matches = index.TryGetValue("latestDefinition", out var current) && Equivalent(current, definition);
+                    if (matches && index.GetValue("status", "") == "READY")
+                        return;
+
+                    if (!matches && !updateSubmitted)
                     {
                         await books.SearchIndexes.UpdateAsync("default", definition, cancellationToken);
-                        submitted = true;
-                    }
-                    else if (matches && existing.GetValue("status", "") == "READY")
-                    {
-                        return;
+                        updateSubmitted = true;
                     }
                 }
             }
-            catch (MongoCommandException ex) when ((ex.Message.Contains("connecting to Search Index Management service") || ex.Message.Contains("mongot is shutting down")))
+            catch (MongoCommandException ex) when (ex.Message.Contains("connecting to Search Index Management service") || ex.Message.Contains("mongot is shutting down"))
             {
                 // Atlas Local starts its search service separately from MongoDB.
             }
+
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
         }
 
