@@ -282,16 +282,14 @@ For integration tests, remember that Atlas Search indexing is asynchronous. Use 
 Atlas Search indexes are not ordinary MongoDB indexes. They must exist before search behaves
 correctly in Atlas environments.
 
-`MongoIndexSetup.EnsureAsync` creates or updates:
+`MongoIndexSetup.EnsureAsync` creates missing indexes and waits until they are ready:
 
 - `default` Atlas Search index,
 - `vector_index` Atlas Vector Search index.
 
-The API runs setup on startup for its configured database. It creates missing indexes and waits
-until they are ready; if an existing search index differs, startup fails rather than replacing it.
-Update existing production indexes deliberately before deploying a changed definition. The integration
-fixture enables an opt-in fallback that recreates a changed vector index when Atlas Local rejects its
-update. Rebuilding temporarily makes vector search unavailable but retains book data.
+The API runs setup on startup for its configured database. Existing indexes are not compared with
+or updated to match the definitions in code. Update existing indexes deliberately when their
+requirements change.
 
 For the first iteration, only the lexical `default` index is required by application code. The vector
 index can exist ahead of time, but application code should not depend on it until embeddings and

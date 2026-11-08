@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Intellishelf.Data.Indexes;
@@ -9,7 +8,7 @@ namespace Intellishelf.Data.Indexes;
 /// <summary>Explicitly provisions the indexes required by the application.</summary>
 public static class MongoIndexSetup
 {
-    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false, bool updateExisting = false)
+    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default)
     {
         var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
         var users = database.GetCollection<UserEntity>(UserEntity.CollectionName);
@@ -22,20 +21,15 @@ public static class MongoIndexSetup
         await tokens.Indexes.CreateOneAsync(new CreateIndexModel<RefreshTokenEntity>(
             Builders<RefreshTokenEntity>.IndexKeys.Ascending(x => x.Token)), cancellationToken: cancellationToken);
 
-        var textIndex = BookSearchIndexes.Text();
-        var vectorIndex = BookSearchIndexes.Vector();
-        await EnsureSearchIndexAsync(books, textIndex, cancellationToken, updateExisting: updateExisting);
-        await EnsureSearchIndexAsync(books, vectorIndex, cancellationToken, recreateVectorIndexOnUpdateFailure, updateExisting);
+        await EnsureSearchIndexAsync(books, BookSearchIndexes.Text(), cancellationToken);
+        await EnsureSearchIndexAsync(books, BookSearchIndexes.Vector(), cancellationToken);
     }
 
     private static async Task EnsureSearchIndexAsync(
-        IMongoCollection<BookEntity> books, CreateSearchIndexModel model, CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = false)
+        IMongoCollection<BookEntity> books, CreateSearchIndexModel model, CancellationToken cancellationToken)
     {
-        var name = model.Name;
-        var definition = model.Definition;
         var stopwatch = Stopwatch.StartNew();
-        var updateSubmitted = false;
-        var waitingForDrop = false;
+        var created = false;
 
         while (stopwatch.Elapsed < TimeSpan.FromMinutes(2))
         {
@@ -43,37 +37,16 @@ public static class MongoIndexSetup
             {
                 using var cursor = await books.SearchIndexes.ListAsync(cancellationToken: cancellationToken);
                 var indexes = await cursor.ToListAsync(cancellationToken);
-                var index = indexes.FirstOrDefault(i => i.GetValue("name", "") == name);
+                var index = indexes.FirstOrDefault(i => i.GetValue("name", "") == model.Name);
 
-                if (index is null && !updateSubmitted)
+                if (index is null && !created)
                 {
                     await books.SearchIndexes.CreateOneAsync(model, cancellationToken);
-                    updateSubmitted = true;
-                    waitingForDrop = false;
+                    created = true;
                 }
-                else if (index is not null && !waitingForDrop)
+                else if (index is not null && index.GetValue("status", "") == "READY")
                 {
-                    var matches = index.TryGetValue("latestDefinition", out var current) && Equivalent(current, definition);
-                    if (matches && index.GetValue("status", "") == "READY")
-                        return;
-
-                    if (!matches && !updateSubmitted)
-                    {
-                        if (!updateExisting)
-                            throw new InvalidOperationException($"Search index {name} differs from its configured definition. Update it before starting the application.");
-
-                        try
-                        {
-                            await books.SearchIndexes.UpdateAsync(name, definition, cancellationToken);
-                            updateSubmitted = true;
-                        }
-                        catch (MongoCommandException ex) when (recreateOnUpdateFailure && model.Type == SearchIndexType.VectorSearch && ex.Message.Contains("\"mappings\" is required"))
-                        {
-                            // Explicitly enabled for disposable local databases; book documents are retained.
-                            await books.SearchIndexes.DropOneAsync(name, cancellationToken);
-                            waitingForDrop = true;
-                        }
-                    }
+                    return;
                 }
             }
             catch (MongoCommandException ex) when (ex.Message.Contains("connecting to Search Index Management service") || ex.Message.Contains("mongot is shutting down"))
@@ -84,31 +57,6 @@ public static class MongoIndexSetup
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
         }
 
-        throw new TimeoutException($"Search index {name} did not become ready within two minutes.");
+        throw new TimeoutException($"Search index {model.Name} did not become ready within two minutes.");
     }
-
-    // Atlas returns implicit field defaults and may reorder multi-type mappings.
-    private static BsonValue Normalize(BsonValue value)
-    {
-        if (value.IsBsonArray)
-            return new BsonArray(value.AsBsonArray.Select(Normalize).OrderBy(x => x.ToJson(), StringComparer.Ordinal));
-        if (!value.IsBsonDocument)
-            return value;
-
-        var document = value.AsBsonDocument;
-        var type = document.GetValue("type", "").ToString();
-        var defaults = type switch
-        {
-            "string" => new BsonDocument { { "indexOptions", "offsets" }, { "store", true }, { "norms", "include" } },
-            "autocomplete" => new BsonDocument { { "minGrams", 2 }, { "maxGrams", 15 }, { "foldDiacritics", true }, { "tokenization", "edgeGram" } },
-            "number" => new BsonDocument { { "representation", "double" }, { "indexDoubles", true }, { "indexIntegers", true } },
-            _ => new BsonDocument()
-        };
-        return new BsonDocument(document
-            .Where(e => !defaults.TryGetValue(e.Name, out var defaultValue) || !e.Value.Equals(defaultValue))
-            .OrderBy(e => e.Name, StringComparer.Ordinal)
-            .Select(e => new BsonElement(e.Name, Normalize(e.Value))));
-    }
-
-    private static bool Equivalent(BsonValue left, BsonValue right) => Normalize(left).Equals(Normalize(right));
 }

@@ -28,3 +28,7 @@ Intellishelf is a comprehensive, open-source digital bookshelf management applic
 ## Technical Stack
 - .NET 10 (SDK version specified in [global.json](global.json))
 - C#
+
+## Testing
+
+See [integration tests and Docker troubleshooting](docs/testing/integration-tests.md) for setup and environment notes.
