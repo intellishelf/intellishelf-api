@@ -37,6 +37,9 @@
       ],
       "UserId": {
         "type": "objectId"
+      },
+      "Status": {
+        "type": "number"
       }
     }
   }
