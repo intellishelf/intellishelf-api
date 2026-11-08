@@ -11,13 +11,9 @@ const lexicalDefinition = JSON.parse(
   require("fs").readFileSync("src/Intellishelf.Data/Indexes/books-search-index.json", "utf8")
 );
 
-const vectorDefinition = {
-  fields: [
-    { type: "vector", path: "Embedding", numDimensions: 1536, similarity: "cosine" },
-    { type: "filter", path: "UserId" },
-    { type: "filter", path: "Status" }
-  ]
-};
+const vectorDefinition = JSON.parse(
+  require("fs").readFileSync("src/Intellishelf.Data/Indexes/books-vector-index.json", "utf8")
+);
 
 function createOrUpdateIndex(name, definition, type = "search") {
   const existing = db.getCollection(collectionName).getSearchIndexes(name);

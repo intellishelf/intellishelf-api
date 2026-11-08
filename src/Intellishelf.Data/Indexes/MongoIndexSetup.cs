@@ -9,7 +9,7 @@ namespace Intellishelf.Data.Indexes;
 /// <summary>Explicitly provisions the indexes required by the application.</summary>
 public static class MongoIndexSetup
 {
-    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default)
+    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false)
     {
         var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
         var users = database.GetCollection<UserEntity>(UserEntity.CollectionName);
@@ -22,17 +22,21 @@ public static class MongoIndexSetup
         await tokens.Indexes.CreateOneAsync(new CreateIndexModel<RefreshTokenEntity>(
             Builders<RefreshTokenEntity>.IndexKeys.Ascending(x => x.Token)), cancellationToken: cancellationToken);
 
-        await EnsureSearchIndexAsync(books, cancellationToken);
+        await EnsureSearchIndexAsync(books, "default", "books-search-index.json", SearchIndexType.Search, cancellationToken);
+        await EnsureSearchIndexAsync(books, "vector_index", "books-vector-index.json", SearchIndexType.VectorSearch, cancellationToken, recreateVectorIndexOnUpdateFailure);
     }
 
-    private static async Task EnsureSearchIndexAsync(IMongoCollection<BookEntity> books, CancellationToken cancellationToken)
+    private static async Task EnsureSearchIndexAsync(
+        IMongoCollection<BookEntity> books, string name, string resourceName, SearchIndexType type, CancellationToken cancellationToken,
+        bool recreateOnUpdateFailure = false)
     {
-        using var stream = typeof(MongoIndexSetup).Assembly.GetManifestResourceStream("Intellishelf.Data.Indexes.books-search-index.json")
-            ?? throw new InvalidOperationException("Books search index definition is missing.");
+        using var stream = typeof(MongoIndexSetup).Assembly.GetManifestResourceStream($"Intellishelf.Data.Indexes.{resourceName}")
+            ?? throw new InvalidOperationException($"Index definition {resourceName} is missing.");
         using var reader = new StreamReader(stream);
         var definition = BsonDocument.Parse(await reader.ReadToEndAsync(cancellationToken));
         var stopwatch = Stopwatch.StartNew();
         var updateSubmitted = false;
+        var waitingForDrop = false;
 
         while (stopwatch.Elapsed < TimeSpan.FromMinutes(2))
         {
@@ -40,14 +44,15 @@ public static class MongoIndexSetup
             {
                 using var cursor = await books.SearchIndexes.ListAsync(cancellationToken: cancellationToken);
                 var indexes = await cursor.ToListAsync(cancellationToken);
-                var index = indexes.FirstOrDefault(i => i.GetValue("name", "") == "default");
+                var index = indexes.FirstOrDefault(i => i.GetValue("name", "") == name);
 
                 if (index is null && !updateSubmitted)
                 {
-                    await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel("default", definition), cancellationToken);
+                    await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel(name, type, definition), cancellationToken);
                     updateSubmitted = true;
+                    waitingForDrop = false;
                 }
-                else if (index is not null)
+                else if (index is not null && !waitingForDrop)
                 {
                     var matches = index.TryGetValue("latestDefinition", out var current) && Equivalent(current, definition);
                     if (matches && index.GetValue("status", "") == "READY")
@@ -55,8 +60,17 @@ public static class MongoIndexSetup
 
                     if (!matches && !updateSubmitted)
                     {
-                        await books.SearchIndexes.UpdateAsync("default", definition, cancellationToken);
-                        updateSubmitted = true;
+                        try
+                        {
+                            await books.SearchIndexes.UpdateAsync(name, definition, cancellationToken);
+                            updateSubmitted = true;
+                        }
+                        catch (MongoCommandException ex) when (recreateOnUpdateFailure && type == SearchIndexType.VectorSearch && ex.Message.Contains("\"mappings\" is required"))
+                        {
+                            // Explicitly enabled for disposable local databases; book documents are retained.
+                            await books.SearchIndexes.DropOneAsync(name, cancellationToken);
+                            waitingForDrop = true;
+                        }
                     }
                 }
             }
@@ -68,7 +82,7 @@ public static class MongoIndexSetup
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
         }
 
-        throw new TimeoutException("The books search index did not become ready within two minutes.");
+        throw new TimeoutException($"Search index {name} did not become ready within two minutes.");
     }
 
     // Atlas returns implicit field defaults and may reorder multi-type mappings.

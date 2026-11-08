@@ -39,7 +39,7 @@ public class MongoDbFixture : IAsyncLifetime
         var client = new MongoClient(ConnectionString);
         Database = client.GetDatabase("intellishelf-test");
 
-        await MongoIndexSetup.EnsureAsync(Database);
+        await MongoIndexSetup.EnsureAsync(Database, recreateVectorIndexOnUpdateFailure: true);
     }
 
     public async ValueTask DisposeAsync() =>

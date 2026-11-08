@@ -78,20 +78,9 @@ This is a good conservative default. It catches simple typos while avoiding over
 
 ## Current Atlas Search Index
 
-The integration test fixture index is:
-
-```text
-tests/Intellishelf.Integration.Tests/Infra/Fixtures/search-index.json
-```
-
-The setup script for real Atlas environments is:
-
-```text
-docs/search/setup-hybrid-search-indexes.js
-```
-
-Keep the JavaScript setup script. It is useful as the practical, executable reference for index
-creation and updates.
+The shared index definitions are `src/Intellishelf.Data/Indexes/books-search-index.json` and
+`src/Intellishelf.Data/Indexes/books-vector-index.json`. The integration fixture calls
+`MongoIndexSetup.EnsureAsync` to create or update them.
 
 The lexical Atlas Search index should include:
 
@@ -294,22 +283,17 @@ For integration tests, remember that Atlas Search indexing is asynchronous. Use 
 Atlas Search indexes are not ordinary MongoDB indexes. They must exist before search behaves
 correctly in Atlas environments.
 
-Use:
-
-```text
-docs/search/setup-hybrid-search-indexes.js
-```
-
-Example:
-
-```bash
-mongosh "<connection-string>/<database-name>" docs/search/setup-hybrid-search-indexes.js
-```
-
-The script creates or updates:
+`MongoIndexSetup.EnsureAsync` creates or updates:
 
 - `default` Atlas Search index,
 - `vector_index` Atlas Vector Search index.
+
+The integration fixture calls this setup. A standalone command and Docker Compose integration are
+not implemented yet; production index changes must be applied through a controlled deployment step.
+The integration fixture enables an opt-in fallback that recreates a changed vector index when Atlas
+Local rejects its update. Rebuilding makes vector search unavailable temporarily but retains book data.
+The default setup never drops an index. The existing `docs/search/setup-hybrid-search-indexes.js`
+remains available for manual use until a standalone C# setup command exists.
 
 For the first iteration, only the lexical `default` index is required by application code. The vector
 index can exist ahead of time, but application code should not depend on it until embeddings and
