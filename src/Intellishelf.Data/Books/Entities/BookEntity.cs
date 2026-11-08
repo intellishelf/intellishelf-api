@@ -22,7 +22,6 @@ public class BookEntity : EntityBase
     public string? Annotation { get; init; }
     public string? Description { get; init; }
 
-    [BsonIgnoreIfNull]
     public float[]? Embedding { get; init; }
     public string[]? Tags { get; init; }
     public required DateTime CreatedDate { get; init; }
