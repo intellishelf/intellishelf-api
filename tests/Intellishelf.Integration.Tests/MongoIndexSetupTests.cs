@@ -4,6 +4,7 @@ using Intellishelf.Data.Users.Entities;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
 using Intellishelf.Integration.Tests.Infra;
 using MongoDB.Bson;
+using MongoDB.Driver.Core.Events;
 using MongoDB.Driver;
 using Xunit;
 
@@ -151,14 +152,14 @@ public class MongoIndexSetupTests(MongoDbFixture fixture, AzuriteFixture azurite
                 if (indexes.Any(index => index["name"] == "vector_index" && index["status"] == "READY")) break;
                 await Task.Delay(500, timeout.Token);
             }
-            var updateError = await Record.ExceptionAsync(() => MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken));
+            var updateError = await Record.ExceptionAsync(() => MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken, updateExisting: true));
             if (updateError is not null)
             {
                 Assert.IsType<MongoCommandException>(updateError);
                 Assert.Contains("\"mappings\" is required", updateError.Message);
                 var existing = await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken);
                 Assert.Contains(existing, index => index["name"] == "vector_index");
-                await MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken, recreateVectorIndexOnUpdateFailure: true);
+                await MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken, recreateVectorIndexOnUpdateFailure: true, updateExisting: true);
             }
             var result = await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken);
             var vector = Assert.Single(result, index => index["name"] == "vector_index");
@@ -166,6 +167,40 @@ public class MongoIndexSetupTests(MongoDbFixture fixture, AzuriteFixture azurite
             Assert.Equal(1536, field["numDimensions"].AsInt32);
             Assert.Equal("READY", vector["status"].AsString);
             Assert.Equal(1, await rawBooks.CountDocumentsAsync(new BsonDocument("Title", "preserved book"), cancellationToken: TestContext.Current.CancellationToken));
+        }
+        finally
+        {
+            await database.Client.DropDatabaseAsync(database.DatabaseNamespace.DatabaseName, TestContext.Current.CancellationToken);
+        }
+    }
+
+    [Fact]
+    public async Task VectorDefinition_MatchesTheDriversCreateCommandWithOptionalSettings()
+    {
+        BsonDocument? command = null;
+        var settings = MongoClientSettings.FromConnectionString(fixture.ConnectionString);
+        settings.ClusterConfigurator = cluster => cluster.Subscribe<CommandStartedEvent>(e =>
+        {
+            if (e.CommandName == "createSearchIndexes") command = e.Command.DeepClone().AsBsonDocument;
+        });
+        var database = new MongoClient(settings).GetDatabase("vector-render-" + ObjectId.GenerateNewId());
+        try
+        {
+            var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
+            await books.Indexes.CreateOneAsync(new CreateIndexModel<BookEntity>(Builders<BookEntity>.IndexKeys.Ascending(x => x.UserId)), cancellationToken: TestContext.Current.CancellationToken);
+            var model = new CreateVectorSearchIndexModel<BookEntity>(
+                book => book.Embedding!, "render_test", VectorSimilarity.DotProduct, 1536,
+                book => book.UserId, book => book.Status)
+            {
+                Quantization = VectorQuantization.Scalar,
+                HnswMaxEdges = 20,
+                HnswNumEdgeCandidates = 120,
+                IndexingMethod = VectorIndexingMethod.Hnsw
+            }.WithIncludedStoredFields(book => book.Title);
+            await books.SearchIndexes.CreateOneAsync(model, TestContext.Current.CancellationToken);
+            Assert.NotNull(command);
+            var driverDefinition = command["indexes"][0]["definition"].AsBsonDocument;
+            Assert.Equal(driverDefinition, BookSearchIndexes.VectorDefinition(model));
         }
         finally
         {
@@ -182,7 +217,10 @@ public class MongoIndexSetupTests(MongoDbFixture fixture, AzuriteFixture azurite
             var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
             await books.Indexes.CreateOneAsync(new CreateIndexModel<BookEntity>(Builders<BookEntity>.IndexKeys.Ascending(x => x.UserId)), cancellationToken: TestContext.Current.CancellationToken);
             await books.SearchIndexes.CreateOneAsync(new CreateSearchIndexModel("default", BsonDocument.Parse("{ mappings: { dynamic: true } }")), TestContext.Current.CancellationToken);
-            await MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken));
+            var before = await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken);
+            Assert.True(Assert.Single(before, index => index["name"] == "default")["latestDefinition"]["mappings"]["dynamic"].AsBoolean);
+            await MongoIndexSetup.EnsureAsync(database, TestContext.Current.CancellationToken, updateExisting: true);
             var index = (await (await books.SearchIndexes.ListAsync(cancellationToken: TestContext.Current.CancellationToken)).ToListAsync(TestContext.Current.CancellationToken)).Single(x => x["name"] == "default");
             Assert.Equal("READY", index["status"].AsString);
             Assert.Equal("number", index["latestDefinition"]["mappings"]["fields"]["Status"]["type"].AsString);

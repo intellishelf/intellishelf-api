@@ -9,7 +9,7 @@ namespace Intellishelf.Data.Indexes;
 /// <summary>Explicitly provisions the indexes required by the application.</summary>
 public static class MongoIndexSetup
 {
-    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false, bool updateExisting = true)
+    public static async Task EnsureAsync(IMongoDatabase database, CancellationToken cancellationToken = default, bool recreateVectorIndexOnUpdateFailure = false, bool updateExisting = false)
     {
         var books = database.GetCollection<BookEntity>(BookEntity.CollectionName);
         var users = database.GetCollection<UserEntity>(UserEntity.CollectionName);
@@ -30,7 +30,7 @@ public static class MongoIndexSetup
 
     private static async Task EnsureSearchIndexAsync(
         IMongoCollection<BookEntity> books, CreateSearchIndexModel model, BsonDocument definition,
-        CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = true)
+        CancellationToken cancellationToken, bool recreateOnUpdateFailure = false, bool updateExisting = false)
     {
         var name = model.Name;
         var stopwatch = Stopwatch.StartNew();

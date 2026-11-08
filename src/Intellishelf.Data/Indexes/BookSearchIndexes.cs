@@ -43,16 +43,32 @@ public static class BookSearchIndexes
     public static BsonDocument VectorDefinition(CreateVectorSearchIndexModel<BookEntity> model)
     {
         var args = new RenderArgs<BookEntity>(BsonSerializer.LookupSerializer<BookEntity>(), BsonSerializer.SerializerRegistry);
-        var fields = new BsonArray
+        var vectorPath = model.Field.Render(args).FieldName;
+        var vector = new BsonDocument
         {
-            new BsonDocument
-            {
-                { "type", "vector" }, { "path", model.Field.Render(args).FieldName },
-                { "numDimensions", model.Dimensions }, { "similarity", JsonNamingPolicy.CamelCase.ConvertName(model.Similarity.ToString()) }
-            }
+            { "type", "vector" }, { "path", vectorPath },
+            { "numDimensions", model.Dimensions }, { "similarity", JsonNamingPolicy.CamelCase.ConvertName(model.Similarity.ToString()) }
         };
+        if (model.IndexingMethod == VectorIndexingMethod.Flat && (model.HnswMaxEdges.HasValue || model.HnswNumEdgeCandidates.HasValue))
+            throw new InvalidOperationException("HNSW options cannot be used with flat indexing.");
+        if (model.Quantization is not null and not VectorQuantization.None)
+            vector.Add("quantization", JsonNamingPolicy.CamelCase.ConvertName(model.Quantization.ToString()!));
+        if (model.HnswMaxEdges.HasValue || model.HnswNumEdgeCandidates.HasValue)
+            vector.Add("hnswOptions", new BsonDocument { { "maxEdges", model.HnswMaxEdges ?? 16 }, { "numEdgeCandidates", model.HnswNumEdgeCandidates ?? 100 } });
+        if (model.IndexingMethod.HasValue)
+            vector.Add("indexingMethod", JsonNamingPolicy.CamelCase.ConvertName(model.IndexingMethod.ToString()!));
+
+        var fields = new BsonArray { vector };
         foreach (var field in model.FilterFields)
             fields.Add(new BsonDocument { { "type", "filter" }, { "path", field.Render(args).FieldName } });
-        return new BsonDocument("fields", fields);
+        var definition = new BsonDocument("fields", fields);
+        var dot = vectorPath.LastIndexOf('.');
+        if (dot > 0)
+            definition.Add("nestedRoot", vectorPath[..dot]);
+        var excluded = model.ExcludedStoredFields?.Count > 0;
+        var storedFields = excluded ? model.ExcludedStoredFields : model.IncludedStoredFields;
+        if (storedFields?.Count > 0)
+            definition.Add("storedSource", new BsonDocument(excluded ? "exclude" : "include", new BsonArray(storedFields.Select(field => field.Render(args).FieldName))));
+        return definition;
     }
 }
