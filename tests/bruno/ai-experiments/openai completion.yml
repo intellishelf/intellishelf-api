@@ -1,0 +1,13 @@
+info:
+  name: OpenAI completion
+  type: http
+  seq: 18
+http:
+  method: POST
+  url: https://api.openai.com/v1/responses
+  body:
+    type: json
+    data: "{\n  \"model\": \"gpt-5.4-mini\",\n  \"input\": \"Say hello in one sentence.\"\n}"
+  auth:
+    type: bearer
+    token: '{{open_ai_api_key}}'

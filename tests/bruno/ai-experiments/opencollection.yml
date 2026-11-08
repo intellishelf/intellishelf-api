@@ -1,0 +1,6 @@
+opencollection: 1.0.0
+info:
+  name: AI API Experiments
+docs:
+  type: text/markdown
+  content: Configure open_ai_api_key and perplexity_api_key as Bruno secret variables.

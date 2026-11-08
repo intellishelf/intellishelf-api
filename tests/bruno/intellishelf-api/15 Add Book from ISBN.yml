@@ -1,0 +1,13 @@
+info:
+  name: Add Book from ISBN
+  type: http
+  seq: 15
+http:
+  method: POST
+  url: '{{base_url}}/books/from-isbn'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  body:
+    type: json
+    data: '{"isbn":"0-86975-159-X"}'
