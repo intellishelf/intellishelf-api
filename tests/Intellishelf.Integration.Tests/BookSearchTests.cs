@@ -145,7 +145,22 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
         Assert.Equal(2, pagedResult.PageSize);
     }
 
-    private static BookEntity CreateBookEntity(string title, string author)
+    [Fact]
+    private async Task GivenMatchingBooks_WhenFilteringByStatus_ThenReturnsOnlyThatStatus()
+    {
+        var unread = CreateBookEntity("Shared title unread", "Author");
+        var read = CreateBookEntity("Shared title read", "Author", ReadingStatus.Read);
+        await _mongoDbFixture.SeedBooksAndWaitForIndexing(unread, read);
+
+        var response = await _client.GetAsync("/api/books/search?searchTerm=Shared&status=Read", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await response.Content.ReadFromJsonAsync<PagedResult<Book>>(TestContext.Current.CancellationToken);
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal(read.Id, result.Items.First().Id);
+    }
+
+    private static BookEntity CreateBookEntity(string title, string author, ReadingStatus status = ReadingStatus.Unread)
     {
         var timestamp = DateTime.UtcNow;
         return new BookEntity
@@ -156,7 +171,7 @@ public sealed class BookSearchTests : IAsyncLifetime, IDisposable
             CreatedDate = timestamp,
             ModifiedDate = timestamp,
             UserId = ObjectId.Parse(DefaultTestUsers.Authenticated.Id),
-            Status = ReadingStatus.Unread
+            Status = status
         };
     }
 

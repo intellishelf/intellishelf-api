@@ -78,10 +78,10 @@ This is a good conservative default. It catches simple typos while avoiding over
 
 ## Current Atlas Search Index
 
-The integration test fixture index is:
+The shared lexical index definition used by the integration fixture and setup script is:
 
 ```text
-tests/Intellishelf.Integration.Tests/Infra/Fixtures/search-index.json
+src/Intellishelf.Data/Indexes/books-search-index.json
 ```
 
 The setup script for real Atlas environments is:
@@ -107,8 +107,12 @@ The lexical Atlas Search index should include:
 Today `ReadingStatus` is a C# enum without custom string serialization, so Atlas Search setup should
 treat `Status` as numeric unless serialization changes.
 
-The test fixture currently focuses on the fields needed by existing search tests. If status-filtered
-search gets integration coverage, the fixture should include `Status` too.
+The fixture applies this definition through `DatabaseIndexes.EnsureAsync`, which also creates the
+ordinary `Books.UserId`, unique `Users.Email`, and `RefreshTokens.Token` indexes. The API does not
+apply them automatically. Applying them to an existing database requires an explicit, reviewed
+operation: duplicate emails prevent the unique index from being created, and a search definition
+change can rebuild the search index. The hybrid setup script also creates the experimental vector
+index and updates existing search indexes; it does not provision the ordinary indexes.
 
 ## First Iteration Target
 

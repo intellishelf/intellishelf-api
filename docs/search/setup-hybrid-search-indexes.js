@@ -1,26 +1,14 @@
 // Usage:
-//   mongosh "<connection-string>/intellishelf-experiment" scripts/setup-hybrid-search-indexes.js
+//   mongosh "<connection-string>/intellishelf-experiment" docs/search/setup-hybrid-search-indexes.js
 //
 // Optional env:
 //   BOOKS_COLLECTION=Books
 
 const collectionName = process.env.BOOKS_COLLECTION || "Books";
 
-const lexicalDefinition = {
-  mappings: {
-    dynamic: false,
-    fields: {
-      Title: [{ type: "string" }, { type: "autocomplete" }],
-      Authors: [{ type: "string" }, { type: "autocomplete" }],
-      Tags: { type: "string" },
-      Description: { type: "string" },
-      Annotation: { type: "string" },
-      Publisher: [{ type: "string" }, { type: "autocomplete" }],
-      UserId: { type: "objectId" },
-      Status: { type: "number" }
-    }
-  }
-};
+// Run from the repository root. This is the same definition embedded by the API data layer.
+const lexicalDefinition = JSON.parse(require("fs").readFileSync(
+  "src/Intellishelf.Data/Indexes/books-search-index.json", "utf8"));
 
 const vectorDefinition = {
   fields: [

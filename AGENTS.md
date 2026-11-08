@@ -82,7 +82,7 @@ HTTP Request → Auth Middleware (JWT/Cookie/Google) → Controller (extract Use
 
 Use real MongoDB and Azure Storage containers (not mocks). Fixtures (`MongoDbFixture`, `AzuriteFixture`) spin up containers via Testcontainers. Tests use `[Collection("Integration Tests")]` to share fixtures. `TestWebApplicationFactory` swaps dependencies and uses `TestAuthHandler` for auth bypass.
 
-**Requirements:** Docker running. Tests isolated per collection. Seed data via fixtures (`SeedDefaultUserAsync()`, `ClearBooksAsync()`).
+**Requirements:** Docker running. Tests isolated per collection. Seed data via fixtures (`SeedDefaultUserAsync()`, `ClearBooksAsync()`). See `docs/testing/integration-tests.md` for environment setup and troubleshooting.
 
 ## Data Access Patterns
 

@@ -3,7 +3,7 @@ using DotNet.Testcontainers.Containers;
 using Intellishelf.Data.Books.Entities;
 using Intellishelf.Data.Users.Entities;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
+using Intellishelf.Data.Indexes;
 using MongoDB.Driver;
 using Xunit;
 
@@ -39,83 +39,7 @@ public class MongoDbFixture : IAsyncLifetime
         var client = new MongoClient(ConnectionString);
         Database = client.GetDatabase("intellishelf-test");
 
-        // Create Atlas Search index for books collection
-        await CreateSearchIndexAsync();
-    }
-
-    private async Task CreateSearchIndexAsync()
-    {
-        // Ensure the collection exists by creating it if it doesn't
-        try
-        {
-            await Database.CreateCollectionAsync(BookEntity.CollectionName);
-        }
-        catch (MongoCommandException ex) when (ex.Message.Contains("already exists"))
-        {
-            // Collection already exists, that's fine
-        }
-
-        var booksCollection = Database.GetCollection<BookEntity>(BookEntity.CollectionName);
-        var searchIndexJson = await File.ReadAllTextAsync(
-            Path.Combine(AppContext.BaseDirectory, "Infra", "Fixtures", "search-index.json"));
-        var searchIndexDefinition = BsonSerializer.Deserialize<BsonDocument>(searchIndexJson);
-
-        const string indexName = "default";
-        const int maxRetries = 10;
-        var retryDelay = TimeSpan.FromSeconds(1);
-        var indexReadyTimeout = TimeSpan.FromMinutes(1);
-        var pollInterval = TimeSpan.FromSeconds(1);
-
-        for (int attempt = 0; attempt < maxRetries; attempt++)
-        {
-            try
-            {
-                // Create the search index
-                await booksCollection.SearchIndexes.CreateOneAsync(
-                    new CreateSearchIndexModel(indexName, searchIndexDefinition));
-
-                // Wait for index to become READY
-                await WaitForIndexReadyAsync(booksCollection, indexName, indexReadyTimeout, pollInterval);
-                return;
-            }
-            catch (MongoCommandException ex) when (ex.Message.Contains("connecting to Search Index Management service") && attempt < maxRetries - 1)
-            {
-                // Search service not ready, retry after delay
-                await Task.Delay(retryDelay);
-            }
-        }
-
-        throw new TimeoutException("Failed to create search index after multiple retries. Search service may not be available.");
-    }
-
-    private async Task WaitForIndexReadyAsync(IMongoCollection<BookEntity> collection, string indexName, TimeSpan timeout, TimeSpan pollInterval)
-    {
-        var startTime = DateTime.UtcNow;
-
-        while (DateTime.UtcNow - startTime < timeout)
-        {
-            List<BsonDocument> indexes;
-            try
-            {
-                indexes = (await collection.SearchIndexes.ListAsync()).ToList();
-            }
-            catch (MongoException) when (DateTime.UtcNow - startTime < timeout)
-            {
-                await Task.Delay(pollInterval);
-                continue;
-            }
-
-            var index = indexes.FirstOrDefault(i => i["name"] == indexName);
-
-            if (index != null && index.Contains("status") && index["status"] == "READY")
-            {
-                return; // Index is ready
-            }
-
-            await Task.Delay(pollInterval);
-        }
-
-        throw new TimeoutException("Search index did not become ready within the expected time.");
+        await DatabaseIndexes.EnsureAsync(Database);
     }
 
     public async ValueTask DisposeAsync() =>
