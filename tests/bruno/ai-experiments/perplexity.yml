@@ -1,0 +1,19 @@
+info:
+  name: perplexity
+  type: http
+  seq: 19
+http:
+  method: POST
+  url: https://api.perplexity.ai/v1/agent
+  body:
+    type: json
+    data: "{\n  \"effort\": \"low\",\n  \"input\": \"What is the capital of France?\"\n}"
+  auth:
+    type: bearer
+    token: '{{perplexity_api_key}}'
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

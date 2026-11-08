@@ -1,0 +1,13 @@
+info:
+  name: Chat
+  type: http
+  seq: 16
+http:
+  method: POST
+  url: '{{base_url}}/chat-stream'
+  headers:
+  - name: Authorization
+    value: Bearer {{token}}
+  body:
+    type: json
+    data: '{"message":"What is on the shelf?"}'

@@ -1,0 +1,14 @@
+info:
+  name: Refresh Token
+  type: http
+  seq: 13
+http:
+  method: POST
+  url: '{{base_url}}/auth/refresh'
+  body:
+    type: json
+    data: '{}'
+runtime:
+  scripts:
+  - type: after-response
+    code: if (res.status === 200 && res.body.accessToken) bru.setVar("token", res.body.accessToken);
