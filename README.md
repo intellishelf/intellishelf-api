@@ -31,4 +31,4 @@ Intellishelf is a comprehensive, open-source digital bookshelf management applic
 
 ## Testing
 
-See [integration tests and Docker troubleshooting](docs/testing/integration-tests.md) for setup and environment notes.
+See [integration tests and Docker troubleshooting](docs/integration-tests.md) for setup and environment notes.
