@@ -15,6 +15,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
 {
     protected override IHost CreateHost(IHostBuilder builder)
     {
+        var testDatabase = database ?? mongoFixture.Database;
         builder.UseEnvironment("Test");
 
         builder
@@ -23,7 +24,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
                 var testConfig = new Dictionary<string, string?>
                 {
                     [$"{DatabaseConfig.SectionName}:ConnectionString"] = mongoFixture.ConnectionString,
-                    [$"{DatabaseConfig.SectionName}:DatabaseName"] = (database ?? mongoFixture.Database).DatabaseNamespace.DatabaseName,
+                    [$"{DatabaseConfig.SectionName}:DatabaseName"] = testDatabase.DatabaseNamespace.DatabaseName,
                     [$"{AuthConfig.SectionName}:Google:ClientId"] = "fake",
                     [$"{AuthConfig.SectionName}:Google:ClientSecret"] = "fake",
                     [$"{AiConfig.SectionName}:OpenAiApiKey"] = "fake",
@@ -36,7 +37,7 @@ internal class TestWebApplicationFactory(MongoDbFixture mongoFixture, AzuriteFix
             .ConfigureServices(services =>
             {
                 services.RemoveAll<IMongoDatabase>();
-                services.AddSingleton(database ?? mongoFixture.Database);
+                services.AddSingleton(testDatabase);
 
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
