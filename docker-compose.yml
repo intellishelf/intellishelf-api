@@ -26,6 +26,8 @@ services:
 
   mongodb:
     image: mongodb/mongodb-atlas-local:8.0
+    # The replica set stores this hostname in the data volume.
+    hostname: mongodb
     ports:
       - "27017:27017"
     environment:
