@@ -1,4 +1,5 @@
 using Intellishelf.Api.Configuration;
+using Intellishelf.Data.Indexes;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -21,4 +22,8 @@ public static class DatabaseExtensions
 
         return services;
     }
+
+    public static Task InitializeDatabaseAsync(this WebApplication app) =>
+        MongoIndexSetup.EnsureAsync(app.Services.GetRequiredService<IMongoDatabase>());
+
 }

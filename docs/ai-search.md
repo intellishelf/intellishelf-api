@@ -2,7 +2,7 @@
 
 **Status:** Proposed product direction; existing lexical search is implemented, AI discovery is not.
 **Scope:** Personal bookshelf search, Pro semantic discovery, embedding lifecycle, bulk backfill, metadata enrichment, and validation.
-**Supersedes:** `search-behavior.md` and `search-technical-design.md`; useful examples and current implementation details are consolidated below. Keep executable index/setup scripts and test fixtures.
+**Supersedes:** `search-behavior.md` and `search-technical-design.md`; useful examples and current implementation details are consolidated below.
 
 ## 1. Product decision
 
@@ -65,11 +65,11 @@ When a Free account with many books upgrades to Pro, show **Preparing your libra
 - fuzzy `MaxEdits = 1`, `PrefixLength = 2`;
 - `MinimumShouldMatch(1)`, skip/limit pagination and a separate count aggregation.
 
-The integration fixture uses **`mongodb/mongodb-atlas-local:latest`** in Testcontainers, creates the lexical search index, and polls for index readiness. Search seeding currently uses a fixed indexing delay.
+`MongoIndexSetup.EnsureAsync` runs on API startup and in the integration fixture. It creates missing lexical and vector indexes and waits for them to become ready. Existing indexes are not compared with or updated to match the code; update them separately when their definitions change. The fixture uses **`mongodb/mongodb-atlas-local:latest`** in Testcontainers. Search seeding currently uses a fixed indexing delay.
 
-**Not implemented:** stored book embeddings, query embeddings, `$vectorSearch` from app code, fusion, semantic/Pro discovery API, embedding jobs and backfill.
+`BookEntity` has an optional `Embedding` field, and `BookSearchIndexes` defines a 1536-dimensional `vector_index`. The vector index does not make vector retrieval live, and 1536 dimensions are not a final model selection. An integration test verifies vector queries against synthetic vectors in MongoDB.
 
-`docs/search/setup-hybrid-search-indexes.js` currently contains an illustrative `vector_index` alongside the lexical index. **Its existence does not make vector retrieval live**. The 1536-dimensional example is not a final model selection.
+**Not implemented:** generating or populating book embeddings, query embeddings, `$vectorSearch` from app code, fusion, semantic/Pro discovery API, embedding jobs and backfill.
 
 ## 4. Ranking and quality contract
 
@@ -188,7 +188,7 @@ Implement with existing .NET Clean Architecture, `TryResult`, authenticated `Cur
 
 ## 9. Testing and release plan
 
-1. **Strengthen existing lexical behavior:** exact title/author over fuzzy/description, typo tolerance, prefix queries, cross-user isolation, pagination, reading-status filtering. Align the test search index with the production index (`Status` is currently missing in the fixture).
+1. **Strengthen existing lexical behavior:** exact title/author over fuzzy/description, typo tolerance, prefix queries, cross-user isolation, pagination, reading-status filtering. The shared test index includes `Status`; verify that deployed indexes match the application definition.
 2. Build a realistic labeled corpus with hundreds/thousands of books and sparse metadata. Measure Top-3/Top-5 relevance across named books, typos, themes, similar books, and "no answer" cases.
 3. Evaluate approved description-enrichment sources, edition matching, provenance and licensing **before** relying on enriched descriptions.
 4. Benchmark whole-pipeline p50/p95 latency and cost: query embeddings, MongoDB ENN/ANN, optional fusion; do not infer total latency from the size of the per-user vector set.

@@ -15,6 +15,8 @@ builder.Services
 
 var app = builder.Build();
 
+await app.InitializeDatabaseAsync();
+
 app.UseApiPipeline();
 app.MapMcpEndpoints();
 app.Run();
