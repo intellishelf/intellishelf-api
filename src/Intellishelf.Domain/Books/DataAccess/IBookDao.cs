@@ -1,4 +1,5 @@
 using Intellishelf.Common.TryResult;
+using Intellishelf.Domain.Explore;
 using Intellishelf.Domain.Books.Models;
 
 namespace Intellishelf.Domain.Books.DataAccess;
@@ -11,11 +12,13 @@ public interface IBookDao
 
     Task<TryResult<Book>> GetBookAsync(string userId, string bookId);
 
+    Task<TryResult<BookIndexState>> GetIndexStateAsync(string userId, string bookId);
+
     Task<TryResult<Book?>> FindByIsbnAsync(string userId, string? isbn10, string? isbn13);
 
-    Task<TryResult<Book>> AddBookAsync(AddBookRequest request);
+    Task<TryResult<Book>> AddBookAsync(AddBookRequest request, BookIndexUpdate index);
 
-    Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request);
+    Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request, BookIndexUpdate index);
 
     Task<TryResult> DeleteBookAsync(string userId, string bookId);
 
