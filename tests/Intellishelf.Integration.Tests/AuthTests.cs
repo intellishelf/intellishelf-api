@@ -3,7 +3,9 @@ using System.Net.Http.Json;
 using Intellishelf.Api.Contracts.Auth;
 using Intellishelf.Integration.Tests.Infra;
 using Intellishelf.Integration.Tests.Infra.Fixtures;
+using Intellishelf.Data.Users.Entities;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using Xunit;
 
 namespace Intellishelf.Integration.Tests;
@@ -95,6 +97,25 @@ public sealed class AuthTests : IAsyncLifetime, IDisposable
         Assert.NotNull(responseContent);
         Assert.Equal(DefaultTestUsers.Authenticated.Id, responseContent.Id);
         Assert.Equal(DefaultTestUsers.Authenticated.Email, responseContent.Email);
+        Assert.False(responseContent.IsPro);
+    }
+
+    [Fact]
+    private async Task GivenProFlagChanged_WhenRequestingProfileAgain_ThenUpdatedFlagIsReturned()
+    {
+        var before = await _client.GetFromJsonAsync<UserResponseContract>("/api/auth/me", TestContext.Current.CancellationToken);
+        Assert.NotNull(before);
+        Assert.False(before.IsPro);
+
+        var users = _mongoDbFixture.Database.GetCollection<UserEntity>(UserEntity.CollectionName);
+        await users.UpdateOneAsync(
+            user => user.Id == DefaultTestUsers.Authenticated.Id,
+            Builders<UserEntity>.Update.Set(user => user.IsPro, true),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var after = await _client.GetFromJsonAsync<UserResponseContract>("/api/auth/me", TestContext.Current.CancellationToken);
+        Assert.NotNull(after);
+        Assert.True(after.IsPro);
     }
 
     public void Dispose() => _factory.Dispose();
