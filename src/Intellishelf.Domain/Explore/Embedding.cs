@@ -50,7 +50,7 @@ public sealed class OpenAiEmbeddingProvider(IOptions<ExploreOptions> options, Em
 
 public sealed class StandInEmbeddingProvider(IOptions<ExploreOptions> options) : IEmbeddingProvider
 {
-    public string ModelId => "stand-in-v1";
+    public string ModelId => "stand-in-v2";
     public Task<float[]?> GenerateAsync(string text, CancellationToken cancellationToken)
     {
         var vector = new float[options.Value.Dimensions];
@@ -58,19 +58,20 @@ public sealed class StandInEmbeddingProvider(IOptions<ExploreOptions> options) :
         {
             var word = match.Value switch
             {
-                "loneliness" or "lonely" or "isolation" or "isolated" => "loneliness",
+                "loneliness" or "lonely" or "isolation" or "isolated" or "alone" or "solitude" => "loneliness",
                 "knowledge" or "learning" or "learn" => "knowledge",
                 "science" or "scientific" => "science",
                 _ => match.Value
             };
             var hash = SHA256.HashData(Encoding.UTF8.GetBytes(word));
-            vector[BitConverter.ToUInt32(hash, 0) % (uint)vector.Length] += 1;
+            vector[BitConverter.ToUInt32(hash, 0) % (uint)vector.Length] += word == "loneliness" ? 3 : 1;
         }
         if (vector.All(v => v == 0)) vector[0] = 1;
         return Task.FromResult<float[]?>(vector);
     }
 }
 
+public record BookEditState(string? CoverImageUrl, BookIndexState Index);
 public record BookIndexState(float[]? Embedding, string? Hash, string? Model);
 public record BookIndexUpdate(float[]? Embedding, string? Hash, string? Model);
 

@@ -1,6 +1,6 @@
 # Implemented Explore API and operations
 
-The sections below this notice preserve the original proposal and may describe future behavior. The implemented Explore feature is the Library AI mode and `POST /api/books/explore`; it uses a Pro flag, synchronous best-effort indexing on save, no backfill and no keyword fallback on provider failure. Results are user-scoped, ranked once and bounded; `truncated` identifies a cut. Existing keyword search is unchanged.
+The sections below this notice preserve the original proposal and may describe future behavior. The implemented Explore feature is the Library AI mode and `POST /api/books/explore`; it uses a Pro flag, synchronous best-effort indexing on save, no backfill and no keyword fallback on provider failure. Results are user-scoped, ranked once and bounded; `truncated` identifies a cut. Existing keyword search is unchanged. Each Explore request must include `X-Explore-User-Id` with the authenticated subject ID returned by `/api/auth/me`; a missing or mismatched value returns `409 Explore.SessionChanged` before account lookup or embedding generation. Clients must reload the current account before retrying.
 
 Before enabling Pro on a deployed database, list the search indexes for `Books` and verify `vector_index` uses cosine, 1536 dimensions, and a `UserId` filter. Startup creates missing indexes but does not update existing definitions. In `mongosh` use `db.Books.getSearchIndexes()` and inspect the returned definition.
 

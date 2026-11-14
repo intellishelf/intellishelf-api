@@ -26,10 +26,11 @@ public sealed class RecordedExploreTests(MongoDbFixture mongo, AzuriteFixture az
         await mongo.Database.GetCollection<UserEntity>(UserEntity.CollectionName).UpdateOneAsync(u => u.Id == DefaultTestUsers.Authenticated.Id, Builders<UserEntity>.Update.Set(u => u.IsPro, true));
         _factory = new TestWebApplicationFactory(mongo, azurite).WithWebHostBuilder(b => b.ConfigureServices(s => { s.RemoveAll<IEmbeddingProvider>(); s.AddSingleton<IEmbeddingProvider>(_provider); }));
         _client = _factory.CreateClient();
+        _client.DefaultRequestHeaders.Add("X-Explore-User-Id", DefaultTestUsers.Authenticated.Id);
     }
     public async ValueTask DisposeAsync() { _client.Dispose(); await _factory.DisposeAsync(); }
     [Fact]
-    public async Task RecordedVectorsExerciseRankingAndCutoff()
+    public async Task GivenRecordedVectors_WhenExploring_ThenRanksAndAppliesCutoff()
     {
         var corpus = RecordedVectorsTests.ReadCorpus();
         var books = corpus.Books.Select(b =>
@@ -49,7 +50,10 @@ public sealed class RecordedExploreTests(MongoDbFixture mongo, AzuriteFixture az
         ExploreResult dune;
         do { dune = await Search("Dune"); if (dune.Items.Any(b => b.Title == "Dune")) break; await Task.Delay(250, TestContext.Current.CancellationToken); } while (DateTime.UtcNow < until);
         Assert.Equal("Dune", dune.Items.First().Title);
-        Assert.All((await Search("Shakespeare")).Items.Take(2), b => Assert.Contains("Shakespeare", b.Authors));
+        ExploreResult author;
+        do { author = await Search("Shakespeare"); if (author.Items.Count(b => b.Authors!.Contains("Shakespeare")) >= 2) break; await Task.Delay(250, TestContext.Current.CancellationToken); } while (DateTime.UtcNow < until);
+        Assert.True(author.Items.Count >= 2);
+        Assert.Equal(new[] { "Hamlet", "King Lear" }.Order(), author.Items.Take(2).Select(b => b.Title).Order());
         var fuzzy = await Search("Shakespare");
         Assert.Contains(fuzzy.Items.Take(2), b => b.Title == "Hamlet");
         Assert.Contains(fuzzy.Items.Take(2), b => b.Title == "King Lear");

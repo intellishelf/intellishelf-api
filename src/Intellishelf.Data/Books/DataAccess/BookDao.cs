@@ -18,13 +18,13 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
     private static readonly ProjectionDefinition<BookEntity, BookEntity> WithoutIndex = new BsonDocumentProjectionDefinition<BookEntity, BookEntity>(
         new BsonDocument { { "Embedding", 0 }, { "EmbeddingHash", 0 }, { "EmbeddingModel", 0 } });
 
-    public async Task<TryResult<BookIndexState>> GetIndexStateAsync(string userId, string bookId)
+    public async Task<TryResult<BookEditState>> GetEditStateAsync(string userId, string bookId)
     {
         var userIdObject = ObjectId.Parse(userId);
         var state = await _booksCollection.Find(b => b.Id == bookId && b.UserId == userIdObject)
-            .Project(b => new { b.Embedding, b.EmbeddingHash, b.EmbeddingModel })
+            .Project(b => new { b.CoverImageUrl, b.Embedding, b.EmbeddingHash, b.EmbeddingModel })
             .FirstOrDefaultAsync();
-        return state == null ? new Error(BookErrorCodes.BookNotFound, "Book not found") : new BookIndexState(state.Embedding, state.EmbeddingHash, state.EmbeddingModel);
+        return state == null ? new Error(BookErrorCodes.BookNotFound, "Book not found") : new BookEditState(state.CoverImageUrl, new BookIndexState(state.Embedding, state.EmbeddingHash, state.EmbeddingModel));
     }
 
     public async Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId)

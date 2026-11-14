@@ -1,4 +1,5 @@
 using Intellishelf.Api.Contracts.Books;
+using Intellishelf.Common.TryResult;
 using Intellishelf.Api.ImageProcessing;
 using Intellishelf.Api.Mappers.Books;
 using Intellishelf.Api.Services;
@@ -145,7 +146,10 @@ public class BooksController(
     [HttpPost("explore")]
     public async Task<ActionResult<ExploreResult>> Explore([FromBody] ExploreRequest request, CancellationToken cancellationToken)
     {
-        var result = await exploreService.SearchAsync(CurrentUserId, request.Prompt, cancellationToken);
+        if (!Request.Headers.TryGetValue("X-Explore-User-Id", out var expectedUserId) ||
+            expectedUserId.Count != 1 || !string.Equals(expectedUserId[0], CurrentUserId, StringComparison.Ordinal))
+            return HandleErrorResponse(new Error(ExploreErrorCodes.SessionChanged, "Your session changed. Reload and try again."));
+        var result = await exploreService.TrySearchAsync(CurrentUserId, request.Prompt, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : HandleErrorResponse(result.Error);
     }
 

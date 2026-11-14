@@ -16,7 +16,9 @@ internal class TestAuthHandler(
     {
         if (Request.Headers.ContainsKey("X-Test-Anonymous"))
             return Task.FromResult(AuthenticateResult.NoResult());
-        var claims = DefaultTestUsers.Authenticated.ToClaims();
+        var claims = Request.Headers.TryGetValue("X-Test-User", out var userId)
+            ? [new Claim(ClaimTypes.NameIdentifier, userId.ToString())]
+            : DefaultTestUsers.Authenticated.ToClaims();
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);

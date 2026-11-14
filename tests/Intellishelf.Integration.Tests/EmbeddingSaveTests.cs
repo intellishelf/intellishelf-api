@@ -51,7 +51,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     private UpdateBookRequest Edit(string id, string annotation = "first", ReadingStatus status = ReadingStatus.Unread) => new() { UserId = UserId, Id = id, Title = "Synthetic", Annotation = annotation, Status = status };
 
     [Fact]
-    public async Task SaveKeepsMatchingVectorAndRemovesStaleVectorOnFailureOrDowngrade()
+    public async Task GivenBookIndex_WhenSavingEdits_ThenKeepsMatchingAndRemovesStaleVectors()
     {
         var nonPro = await _books.TryAddBookAsync(Add());
         Assert.True(nonPro.IsSuccess);
@@ -65,10 +65,14 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
         Assert.Equal(1, _provider.Calls);
         Assert.True((await _books.TryUpdateBookAsync(Edit(nonPro.Value.Id, status: ReadingStatus.Read))).IsSuccess);
         Assert.Equal(1, _provider.Calls);
-        Assert.Equal(indexed.EmbeddingHash, (await mongo.FindBookByIdAsync(nonPro.Value.Id))!.EmbeddingHash);
+        var unchanged = (await mongo.FindBookByIdAsync(nonPro.Value.Id))!;
+        Assert.Equal(indexed.EmbeddingHash, unchanged.EmbeddingHash);
+        Assert.Equal(indexed.Embedding, unchanged.Embedding);
         Assert.True((await _books.TryUpdateBookAsync(Edit(nonPro.Value.Id, "changed"))).IsSuccess);
         Assert.Equal(2, _provider.Calls);
-        Assert.NotEqual(indexed.EmbeddingHash, (await mongo.FindBookByIdAsync(nonPro.Value.Id))!.EmbeddingHash);
+        var changed = (await mongo.FindBookByIdAsync(nonPro.Value.Id))!;
+        Assert.NotEqual(indexed.EmbeddingHash, changed.EmbeddingHash);
+        Assert.NotEqual(indexed.Embedding, changed.Embedding);
         _provider.Fail = true;
         Assert.True((await _books.TryUpdateBookAsync(Edit(nonPro.Value.Id, "again"))).IsSuccess);
         Assert.Null((await mongo.FindBookByIdAsync(nonPro.Value.Id))!.Embedding);
@@ -81,7 +85,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     }
 
     [Fact]
-    public async Task NonProIsbnAddAndEditNeverCallProvider()
+    public async Task GivenNonProAccount_WhenAddingIsbnOrEditing_ThenProviderIsNotCalled()
     {
         var isbnBook = await _books.TryAddBookFromIsbnAsync(UserId, "9780140328721");
         Assert.True(isbnBook.IsSuccess);
@@ -102,7 +106,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     [InlineData("missing")]
     [InlineData("error")]
     [InlineData("throw")]
-    public async Task FailedUserLookupStillSavesWithoutProvider(string mode)
+    public async Task GivenFailedUserLookup_WhenSaving_ThenBookSavesWithoutProvider(string mode)
     {
         using var factory = new TestWebApplicationFactory(mongo, azurite).WithWebHostBuilder(builder =>
             builder.ConfigureServices(services =>
@@ -120,7 +124,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     }
 
     [Fact]
-    public async Task ProviderExceptionAndAnnotationDoNotLeakIntoUpdateResponseOrLogs()
+    public async Task GivenProviderException_WhenEditing_ThenPrivateTextDoesNotLeak()
     {
         const string sentinel = "synthetic-private-sentinel";
         await SetPro(true);
@@ -143,20 +147,30 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     }
 
     [Fact]
-    public async Task ForeignEditCannotCallProvider()
+    public async Task GivenAnotherProUsersBook_WhenEditing_ThenReturnsNotFoundWithoutProviderCall()
     {
         await SetPro(true);
         var book = await _books.TryAddBookAsync(Add());
         Assert.True(book.IsSuccess);
+        var before = (await mongo.FindBookByIdAsync(book.Value.Id))!;
+        var requester = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+        await mongo.Database.GetCollection<UserEntity>(UserEntity.CollectionName).InsertOneAsync(new UserEntity { Id = requester, Email = "foreign-editor@example.test", AuthProvider = AuthProvider.Email, IsPro = true }, cancellationToken: TestContext.Current.CancellationToken);
         _provider.Calls = 0;
-        var result = await _books.TryUpdateBookAsync(new UpdateBookRequest { UserId = MongoDB.Bson.ObjectId.GenerateNewId().ToString(), Id = book.Value!.Id, Title = "Other", Status = ReadingStatus.Unread });
-        Assert.False(result.IsSuccess);
+        using var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-User", requester);
+        using var form = new MultipartFormDataContent();
+        form.Add(new StringContent("Other"), "Title");
+        form.Add(new StringContent("Unread"), "Status");
+        using var result = await client.PutAsync($"/api/books/{book.Value.Id}", form, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         Assert.Equal(0, _provider.Calls);
-        Assert.NotNull((await mongo.FindBookByIdAsync(book.Value.Id))!.Embedding);
+        var after = (await mongo.FindBookByIdAsync(book.Value.Id))!;
+        Assert.Equal(before.EmbeddingHash, after.EmbeddingHash);
+        Assert.Equal(before.Embedding, after.Embedding);
     }
 
     [Fact]
-    public async Task IndexedBookReadsDoNotExposeIndexFields()
+    public async Task GivenIndexedBook_WhenReading_ThenIndexFieldsAreExcluded()
     {
         await SetPro(true);
         var book = await _books.TryAddBookAsync(Add());
@@ -173,7 +187,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     }
 
     [Fact]
-    public async Task IndexedSearchResultDoesNotExposeIndexFields()
+    public async Task GivenIndexedBook_WhenSearching_ThenIndexFieldsAreExcluded()
     {
         await SetPro(true);
         var book = await _books.TryAddBookAsync(Add());
@@ -202,7 +216,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
     [InlineData("wrong", true)]
     [InlineData("hang", true)]
     [InlineData("fail", true)]
-    public async Task UnusableProviderStillSaves(string mode, bool edit)
+    public async Task GivenUnusableProvider_WhenAddingOrEditing_ThenBookStillSaves(string mode, bool edit)
     {
         await SetPro(true);
         var initial = edit ? await _books.TryAddBookAsync(Add()) : null;
@@ -266,7 +280,7 @@ public sealed class EmbeddingSaveTests(MongoDbFixture mongo, AzuriteFixture azur
             if (Mode == "hang") return Hang();
             if (Mode == "wrong") return Task.FromResult<float[]?>([1]);
             if (Fail || Mode == "fail") throw new InvalidOperationException(ExceptionMessage);
-            var vector = new float[1536]; vector[0] = 1;
+            var vector = new float[1536]; vector[0] = 1; vector[1] = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(text))[0] + 1;
             return Task.FromResult<float[]?>(vector);
         }
         private static async Task<float[]?> Hang() { await Task.Delay(Timeout.InfiniteTimeSpan); return null; }

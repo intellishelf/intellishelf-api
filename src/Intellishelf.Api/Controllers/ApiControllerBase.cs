@@ -4,6 +4,7 @@ using Intellishelf.Domain.Ai.Errors;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Chat.Errors;
 using Intellishelf.Domain.Files.ErrorCodes;
+using Intellishelf.Domain.Explore;
 using Intellishelf.Domain.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,20 +28,21 @@ public abstract class ApiControllerBase : ControllerBase
         UserErrorCodes.RefreshTokenRevoked or
         UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
 
-        "Explore.ProRequired" => StatusCodes.Status403Forbidden,
+        ExploreErrorCodes.ProRequired => StatusCodes.Status403Forbidden,
 
         // 409 Conflict
+        ExploreErrorCodes.SessionChanged or
         UserErrorCodes.AlreadyExists or
         BookErrorCodes.DuplicateIsbn => StatusCodes.Status409Conflict,
 
         // 400 Bad Request
-        "Explore.InvalidPrompt" or
+        ExploreErrorCodes.InvalidPrompt or
         FileErrorCodes.InvalidFileType or
         FileErrorCodes.FileTooLarge or
         BookErrorCodes.InvalidIsbn => StatusCodes.Status400BadRequest,
 
         // 502 Bad Gateway (external service errors)
-        "Explore.Unavailable" or
+        ExploreErrorCodes.Unavailable or
         BookErrorCodes.MetadataServiceError or
         BookErrorCodes.CoverImageDownloadFailed => StatusCodes.Status502BadGateway,
 

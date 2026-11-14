@@ -103,17 +103,14 @@ public class BookService(
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
     {
-        var existingBook = await TryGetBookAsync(request.UserId, request.Id);
-
-        if (!existingBook.IsSuccess) return new Error(existingBook.Error!.Code, existingBook.Error.Message);
-        var state = await bookDao.GetIndexStateAsync(request.UserId, request.Id);
+        var state = await bookDao.GetEditStateAsync(request.UserId, request.Id);
         if (!state.IsSuccess) return new Error(state.Error!.Code, state.Error.Message);
-        var index = await indexer.PrepareAsync(request, state.Value);
+        var index = await indexer.PrepareAsync(request, state.Value.Index);
 
         if (request.CoverImageUrl != null &&
-            !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
+            !string.IsNullOrEmpty(state.Value.CoverImageUrl))
         {
-            await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
+            await fileStorageService.DeleteFileFromUrlAsync(state.Value.CoverImageUrl);
         }
 
         return await bookDao.TryUpdateBookAsync(request, index);

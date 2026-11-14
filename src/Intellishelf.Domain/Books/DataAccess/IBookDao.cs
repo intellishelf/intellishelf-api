@@ -12,7 +12,7 @@ public interface IBookDao
 
     Task<TryResult<Book>> GetBookAsync(string userId, string bookId);
 
-    Task<TryResult<BookIndexState>> GetIndexStateAsync(string userId, string bookId);
+    Task<TryResult<BookEditState>> GetEditStateAsync(string userId, string bookId);
 
     Task<TryResult<Book?>> FindByIsbnAsync(string userId, string? isbn10, string? isbn13);
 
