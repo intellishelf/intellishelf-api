@@ -6,6 +6,7 @@ using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
 using Intellishelf.Domain.Files.Services;
+using Intellishelf.Domain.Explore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,8 @@ public class BooksController(
     IBookService bookService,
     IFileStorageService fileStorageService,
     IImageFileValidator imageFileValidator,
-    IImageFileProcessor imageFileProcessor) : ApiControllerBase
+    IImageFileProcessor imageFileProcessor,
+    ExploreService exploreService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<Book>>> GetBooks([FromQuery] BookQueryParameters queryParameters)
@@ -136,6 +138,15 @@ public class BooksController(
         return result.IsSuccess
             ? Ok(result.Value)
             : HandleErrorResponse(result.Error);
+    }
+
+    public record ExploreRequest(string? Prompt);
+
+    [HttpPost("explore")]
+    public async Task<ActionResult<ExploreResult>> Explore([FromBody] ExploreRequest request, CancellationToken cancellationToken)
+    {
+        var result = await exploreService.SearchAsync(CurrentUserId, request.Prompt, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : HandleErrorResponse(result.Error);
     }
 
     [HttpPost("parse-text")]

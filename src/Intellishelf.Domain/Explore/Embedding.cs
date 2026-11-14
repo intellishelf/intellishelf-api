@@ -14,7 +14,7 @@ public class ExploreOptions
     public string Provider { get; set; } = "OpenAI";
     public string Model { get; set; } = "text-embedding-3-large";
     public int Dimensions { get; set; } = 1536;
-    public double RelevanceCutoff { get; set; } = 0.7;
+    public double RelevanceCutoff { get; set; } = 0.7285;
     public int SafetyBound { get; set; } = 1000;
     public int PromptLimit { get; set; } = 500;
     public int EmbeddingTimeoutSeconds { get; set; } = 5;

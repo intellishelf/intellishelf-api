@@ -14,6 +14,8 @@ internal class TestAuthHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        if (Request.Headers.ContainsKey("X-Test-Anonymous"))
+            return Task.FromResult(AuthenticateResult.NoResult());
         var claims = DefaultTestUsers.Authenticated.ToClaims();
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);

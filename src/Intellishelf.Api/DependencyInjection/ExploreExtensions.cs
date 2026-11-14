@@ -1,4 +1,5 @@
 using Intellishelf.Api.Configuration;
+using Intellishelf.Data.Books.DataAccess;
 using Intellishelf.Domain.Explore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
@@ -21,6 +22,8 @@ public static class ExploreExtensions
             return new OpenAiEmbeddingProvider(options, new EmbeddingClient(options.Value.Model, key));
         });
         services.AddTransient<BookIndexer>();
+        services.AddTransient<ExploreService>();
+        services.AddTransient<IExploreDao, ExploreDao>();
         return services;
     }
 }

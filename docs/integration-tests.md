@@ -11,8 +11,8 @@ initializes the indexes in its MongoDB container, and the API runs in the test p
 authentication. The tests do not use the API's configured remote database, and they do not test
 the API Docker image or Docker Compose.
 
-The fixture uses `mongodb/mongodb-atlas-local:latest` and `mcr.microsoft.com/azure-storage/azurite:latest`.
-Compose uses Atlas Local `:8.0`. The `latest` images can change between runs.
+The fixture uses `mongodb/mongodb-atlas-local:8.0` and `mcr.microsoft.com/azure-storage/azurite:latest`.
+The Atlas image matches Compose; the Azurite `latest` image can change between runs.
 
 ## Troubleshooting
 
@@ -39,3 +39,13 @@ In one Codex Cloud run, Atlas Local failed to unpack on a 7.9 GiB filesystem usi
 driver. A separate image download was blocked by a registry redirect. Those were environment
 constraints, not evidence of an application memory limit. If image pulls fail, inspect disk and
 network errors and use the environment's supported configuration. Do not disable TLS verification.
+
+## Recording Explore vectors
+
+The committed corpus is synthetic. Normal tests replay `Fixtures/explore-vectors.json` without a key or network fallback. To explicitly re-record, configure `Ai:OpenAiApiKey` as the API project's user secret or `Ai__OpenAiApiKey` in the environment, then run from the API repository root:
+
+```bash
+RECORD_EXPLORE_VECTORS=1 dotnet test --project tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj --filter-method '*RecordOnlyWhenExplicitlyRequested'
+```
+
+The recorder uses the product's indexed-text builder and OpenAI adapter and writes only hashes, float32 vectors and model metadata. Re-run the drift, cutoff and Explore integration tests after recording and recalibrate the provisional cutoff if labels move. Never add a key or real book data to the corpus.

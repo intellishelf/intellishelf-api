@@ -27,16 +27,20 @@ public abstract class ApiControllerBase : ControllerBase
         UserErrorCodes.RefreshTokenRevoked or
         UserErrorCodes.OAuthError => StatusCodes.Status401Unauthorized,
 
+        "Explore.ProRequired" => StatusCodes.Status403Forbidden,
+
         // 409 Conflict
         UserErrorCodes.AlreadyExists or
         BookErrorCodes.DuplicateIsbn => StatusCodes.Status409Conflict,
 
         // 400 Bad Request
+        "Explore.InvalidPrompt" or
         FileErrorCodes.InvalidFileType or
         FileErrorCodes.FileTooLarge or
         BookErrorCodes.InvalidIsbn => StatusCodes.Status400BadRequest,
 
         // 502 Bad Gateway (external service errors)
+        "Explore.Unavailable" or
         BookErrorCodes.MetadataServiceError or
         BookErrorCodes.CoverImageDownloadFailed => StatusCodes.Status502BadGateway,
 
