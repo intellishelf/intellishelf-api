@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Intellishelf.Data.Users.Entities;
 
+[BsonIgnoreExtraElements]
 public class UserEntity : EntityBase
 {
     public static string CollectionName => "Users";
@@ -17,4 +18,7 @@ public class UserEntity : EntityBase
     public required AuthProvider AuthProvider { get; init; }
 
     public string? ExternalId { get; init; }
+
+    [BsonIgnoreIfDefault]
+    public bool IsPro { get; init; }
 }

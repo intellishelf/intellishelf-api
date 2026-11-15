@@ -1,8 +1,44 @@
+# Implemented Explore API and operations
+
+The sections below this notice preserve the original proposal and may describe future behavior. The implemented Explore feature is the Library AI mode and `POST /api/books/explore`; it uses a Pro flag, synchronous best-effort indexing on save, no backfill and no keyword fallback on provider failure. Results are user-scoped, ranked once and bounded; `truncated` identifies a cut. Existing keyword search is unchanged. Each Explore request must include `X-Explore-User-Id` with the authenticated subject ID returned by `/api/auth/me`; a missing or mismatched value returns `409 Explore.SessionChanged` before account lookup or embedding generation. Clients must reload the current account before retrying.
+
+Before enabling Pro on a deployed database, list the search indexes for `Books` and verify `vector_index` uses cosine, 1536 dimensions, and a `UserId` filter. Startup creates missing indexes but does not update existing definitions. In `mongosh` use `db.Books.getSearchIndexes()` and inspect the returned definition.
+
+Set an account flag with `db.Users.updateOne({ Email: "<account email>" }, { $set: { IsPro: true } })`; remove it with `$unset: { IsPro: "" }`. This takes effect on the next request. Removing Pro retains existing embeddings for unchanged books; to purge them explicitly use `db.Books.updateMany({ UserId: ObjectId("<user id>") }, { $unset: { Embedding: "", EmbeddingHash: "", EmbeddingModel: "" } })`. Before rolling back to an API version that cannot read `IsPro`, run `db.Users.updateMany({}, { $unset: { IsPro: "" } })`.
+
+The optional `Explore` configuration section defaults to `OpenAI`, `text-embedding-3-large`, 1536 dimensions, cutoff 0.7285, safety bound 1000, prompt limit 500 characters, save/search deadlines 5/10 seconds, fusion weights 1/1 and input character budget 12000. Set `Explore:Provider` to `StandIn` only for Development or Test; Compose selects it. The input builder also caps UTF-8 bytes. Changes to the model or text cause re-indexing on the next Pro save.
+
+The cutoff remains provisional. In the synthetic recorded corpus the lowest labelled relevant score is 0.6515 and the highest labelled non-relevant score is 0.6972, so the labels overlap. The required loneliness examples have scores at least 0.7598, while the highest unrelated-physics score is 0.6972; 0.7285 is their midpoint (margin about 0.0313). The following pairs overlap the global label boundaries; they illustrate why no single cutoff separates this small corpus:
+
+- Books similar to The Beginning of Infinity / Scientific Explanations: 0.6515 (relevant)
+- Books similar to The Beginning of Infinity / History of Bridges: 0.6528 (not relevant)
+- books about loneliness and isolation / Mountain Trails: 0.6560 (not relevant)
+- books about gardening / Practical Pottery: 0.6565 (not relevant)
+- books about gardening / Mountain Trails: 0.6569 (not relevant)
+- Books about how knowledge grows / Ancient Cities: 0.6574 (not relevant)
+- Books about how knowledge grows / History of Bridges: 0.6578 (not relevant)
+- books about gardening / Cooking With Beans: 0.6587 (not relevant)
+- Books about how knowledge grows / Garden Seasons: 0.6637 (not relevant)
+- Books similar to The Beginning of Infinity / Growing Knowledge: 0.6638 (relevant)
+- What do I own about scientific explanations? / The Beginning of Infinity: 0.6697 (relevant)
+- books about loneliness and isolation / The Painted Door: 0.6718 (not relevant)
+- books about loneliness and isolation / Winter Journey: 0.6758 (not relevant)
+- Stories of loneliness and isolation / Winter Journey: 0.6758 (not relevant)
+- Books about how knowledge grows / Scientific Explanations: 0.6841 (not relevant)
+- Stories of loneliness and isolation / The Painted Door: 0.6938 (not relevant)
+- books about quantum physics / The Beginning of Infinity: 0.6972 (not relevant)
+
+Live broad and narrow prompt counts are to be recorded by verification against the isolated synthetic stack.
+
+---
+
 # Search and AI Library Discovery — Product & Technical Design
 
 **Status:** Proposed product direction; existing lexical search is implemented, AI discovery is not.
 **Scope:** Personal bookshelf search, Pro semantic discovery, embedding lifecycle, bulk backfill, metadata enrichment, and validation.
 **Supersedes:** `search-behavior.md` and `search-technical-design.md`; useful examples and current implementation details are consolidated below.
+
+Live verification on an isolated three-book synthetic library stored three 1536-dimensional vectors. At the default cutoff, the broad prompt `knowledge` returned 1 result and the narrow prompt `loneliness isolation` returned 0. The loneliness reference returned the intended book (1 result), and the unrelated physics prompt returned 0. These counts represent this sample only.
 
 ## 1. Product decision
 
@@ -65,7 +101,7 @@ When a Free account with many books upgrades to Pro, show **Preparing your libra
 - fuzzy `MaxEdits = 1`, `PrefixLength = 2`;
 - `MinimumShouldMatch(1)`, skip/limit pagination and a separate count aggregation.
 
-`MongoIndexSetup.EnsureAsync` runs on API startup and in the integration fixture. It creates missing lexical and vector indexes and waits for them to become ready. Existing indexes are not compared with or updated to match the code; update them separately when their definitions change. The fixture uses **`mongodb/mongodb-atlas-local:latest`** in Testcontainers. Search seeding currently uses a fixed indexing delay.
+`MongoIndexSetup.EnsureAsync` runs on API startup and in the integration fixture. It creates missing lexical and vector indexes and waits for them to become ready. Existing indexes are not compared with or updated to match the code; update them separately when their definitions change. The fixture uses **`mongodb/mongodb-atlas-local:8.0`** in Testcontainers. Search seeding currently uses a fixed indexing delay.
 
 `BookEntity` has an optional `Embedding` field, and `BookSearchIndexes` defines a 1536-dimensional `vector_index`. The vector index does not make vector retrieval live, and 1536 dimensions are not a final model selection. An integration test verifies vector queries against synthetic vectors in MongoDB.
 
@@ -213,3 +249,56 @@ No runtime changes are proposed by this documentation PR.
 - How to avoid unexpected metadata replacement, duplicate jobs and stale embeddings during edits/backfills?
 
 **Decision boundary:** user flows and first-pass billing principle are proposed; routes, data contracts, model/provider, indexing strategy, enrichment policy and operational thresholds remain tentative.
+
+### Thematic relevance evaluation (2026-11-15; unresolved)
+
+The provisional `0.7285` cutoff remains unchanged. A frozen synthetic set of 36 works and 36
+queries is in `tests/Intellishelf.Integration.Tests/Fixtures/thematic-corpus.json` (SHA-256
+`0d36fae51ac228f2e7a1b4913086d56d4b25fa8614f8fb919391fdaf9c128cc3`). It has 18 calibration
+and 18 held-out queries, with 32 held-out clearly relevant pairs. Titles and authors are public;
+the descriptions and labels are independently created. The held-out cases were not scored.
+
+The recording uses `text-embedding-3-large`, 1536 dimensions and the production indexed-text
+builder. It required 70 outbound attempts and reused two exact earlier input vectors. Local replay
+uses the recorded vectors and an isolated Atlas Local 8.0 Testcontainer. Baseline calibration
+through the authenticated Pro Explore endpoint returned 10/11 clearly judged displayed pairs
+(precision 90.9%) and 10/83 expected pairs (recall 12.0%). English was 10/11 precision and
+10/60 recall; Ukrainian was 0/0 and 0/23. Enriched records were 10/11 and 10/73; sparse records
+were 0/0 and 0/10. Both calibration no-match prompts were empty. Per-query and subgroup results
+can be regenerated from `thematic-baseline-results.json` with `Tools/thematic-report.py`.
+These are calibration observations, not a delivery-quality claim.
+
+There is no passing rule within the approved scalar-cutoff forms. For `ancient Greek works`,
+Philebus scores 0.658534 and the required excluded Mesopotamian Gilgamesh scores 0.661489;
+neither is a keyword hit. Any effective cutoff that includes the first therefore includes the
+second, including a query-relative cutoff. At 0.6585, the normal endpoint returned both and also
+returned a result for the unrelated quantum-physics prompt. A 649-breakpoint global sweep and
+4,681 bounded relative combinations found no candidate satisfying the named calibration cases.
+The sweep, per-pair misses and false positives, and subgroup report can be reproduced with
+`Tools/thematic-calibrate.py` and `Tools/thematic-report.py` against the recorded fixture and
+`thematic-keyword-results.json`. No candidate was selected and no held-out acceptance result is
+claimed. A change beyond cutoff selection needs a separate decision before further tuning.
+
+The endpoint's 0.6585 calibration probe had 31/55 precision and 31/83 recall; it failed the
+focused dialogue ordering and the unrelated no-match case. English was 26/45 and 26/60;
+Ukrainian was 5/10 and 5/23. Enriched records were 25/45 and 25/73; sparse records were
+6/10 and 6/10. The relative sweep used floors 0.600–0.750 in 0.001 steps and margins
+0–0.150 in 0.005 steps. It evaluates admission against recorded cosine scores plus the
+endpoint's keyword-only results; it does not establish ranking. The ordering statement above
+comes from the endpoint replay, not the offline sweep.
+
+From the API repository root, reproduce the calibration reports without a key:
+
+```sh
+python3 tests/Intellishelf.Integration.Tests/Tools/thematic-report.py calibration tests/Intellishelf.Integration.Tests/Fixtures/thematic-baseline-results.json
+python3 tests/Intellishelf.Integration.Tests/Tools/thematic-report.py calibration tests/Intellishelf.Integration.Tests/Fixtures/thematic-overlap-results.json
+python3 tests/Intellishelf.Integration.Tests/Tools/thematic-calibrate.py tests/Intellishelf.Integration.Tests/Fixtures/thematic-keyword-results.json /tmp/thematic-calibration-sweep.json
+THEMATIC_SPLIT=calibration THEMATIC_CUTOFF=0.6585 THEMATIC_OUTPUT=/tmp/thematic-overlap-replay.json dotnet test --project tests/Intellishelf.Integration.Tests/Intellishelf.Integration.Tests.csproj --filter-method '*ReplayThroughAuthenticatedExplore'
+```
+
+The last command uses Docker/Testcontainers and the recorded vectors, not OpenAI. The sweep output
+contains all evaluated parameter combinations and their calibration misses and false positives.
+
+The original calibration sweep output is also preserved as
+`tests/Intellishelf.Integration.Tests/Fixtures/thematic-calibration-sweep.json.gz`; use
+`gzip -dc` to inspect it. Baseline, keyword-only and 0.6585 endpoint outputs are saved beside it.

@@ -1,0 +1,52 @@
+{
+  "original__original": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "original__library_request": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "original__matching_book": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "original__hybrid_original_matching": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "original__hybrid_both_templates": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "context__original": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "context__library_request": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "context__matching_book": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "context__hybrid_original_matching": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  },
+  "context__hybrid_both_templates": {
+    "number_passing": 0,
+    "best": null,
+    "relative_number_passing": 0
+  }
+}

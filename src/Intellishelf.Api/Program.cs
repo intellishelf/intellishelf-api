@@ -11,6 +11,7 @@ builder.Services
     .AddUsers(builder.Configuration)
     .AddBooks()
     .AddAi(builder.Configuration)
+    .AddExplore(builder.Configuration, builder.Environment)
     .AddMcp();
 
 var app = builder.Build();

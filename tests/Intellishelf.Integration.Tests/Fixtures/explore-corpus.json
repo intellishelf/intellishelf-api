@@ -1,0 +1,224 @@
+{
+  "books": [
+    {
+      "title": "Dune",
+      "authors": [
+        "Frank Herbert"
+      ],
+      "description": "A desert world and its ecological transformation."
+    },
+    {
+      "title": "Hamlet",
+      "authors": [
+        "William Shakespeare"
+      ],
+      "description": "A prince wrestles with grief and revenge."
+    },
+    {
+      "title": "King Lear",
+      "authors": [
+        "William Shakespeare"
+      ],
+      "description": "A king loses power and family ties."
+    },
+    {
+      "title": "The Lonely Room",
+      "authors": [
+        "Mira Vale"
+      ],
+      "description": "A solitary traveler seeks connection in an empty city."
+    },
+    {
+      "title": "Island Silence",
+      "authors": [
+        "Jon Reed"
+      ],
+      "description": "A person survives alone on a remote island."
+    },
+    {
+      "title": "Growing Knowledge",
+      "authors": [
+        "Ada North"
+      ],
+      "description": "How conjectures and criticism improve understanding."
+    },
+    {
+      "title": "The Beginning of Infinity",
+      "authors": [
+        "David Deutsch"
+      ],
+      "description": "Explanations, knowledge and the growth of science."
+    },
+    {
+      "title": "Scientific Explanations",
+      "authors": [
+        "Ruth Ash"
+      ],
+      "description": "The role of explanatory theories in discovery."
+    },
+    {
+      "title": "Ocean Currents",
+      "authors": [
+        "Leah Tide"
+      ],
+      "description": "The movement of water around the planet."
+    },
+    {
+      "title": "Garden Seasons",
+      "authors": [
+        "Eli Green"
+      ],
+      "description": "A practical guide to tending flowers through the year."
+    },
+    {
+      "title": "Cooking With Beans",
+      "authors": [
+        "Tara Field"
+      ],
+      "description": "Recipes for simple meals using beans."
+    },
+    {
+      "title": "Mountain Trails",
+      "authors": [
+        "Noah Ridge"
+      ],
+      "description": "Walking paths among high peaks."
+    },
+    {
+      "title": "History of Bridges",
+      "authors": [
+        "Ira Stone"
+      ],
+      "description": "A history of bridge design and engineering."
+    },
+    {
+      "title": "Birdsong",
+      "authors": [
+        "June Sky"
+      ],
+      "description": "A guide to recognizing birds by sound."
+    },
+    {
+      "title": "Ancient Cities",
+      "authors": [
+        "Mara Clay"
+      ],
+      "description": "The development of early urban settlements."
+    },
+    {
+      "title": "Music and Rhythm",
+      "authors": [
+        "Leo Bell"
+      ],
+      "description": "An introduction to patterns in music."
+    },
+    {
+      "title": "The Painted Door",
+      "authors": [
+        "Ava Gray"
+      ],
+      "description": "An artist discovers an unexpected friendship."
+    },
+    {
+      "title": "Winter Journey",
+      "authors": [
+        "Nia Snow"
+      ],
+      "description": "Friends travel together across a snowy landscape."
+    },
+    {
+      "title": "River Life",
+      "authors": [
+        "Owen Brook"
+      ],
+      "description": "Plants and animals in freshwater habitats."
+    },
+    {
+      "title": "Practical Pottery",
+      "authors": [
+        "Uma Clay"
+      ],
+      "description": "Techniques for shaping and firing clay."
+    }
+  ],
+  "prompts": [
+    {
+      "text": "Dune",
+      "relevant": [
+        "Dune"
+      ]
+    },
+    {
+      "text": "Shakespeare",
+      "relevant": [
+        "Hamlet",
+        "King Lear"
+      ]
+    },
+    {
+      "text": "Shakespare",
+      "relevant": [
+        "Hamlet",
+        "King Lear"
+      ]
+    },
+    {
+      "text": "books about loneliness and isolation",
+      "relevant": [
+        "The Lonely Room",
+        "Island Silence"
+      ]
+    },
+    {
+      "text": "books about quantum physics",
+      "relevant": []
+    },
+    {
+      "text": "Books about how knowledge grows",
+      "relevant": [
+        "Growing Knowledge",
+        "The Beginning of Infinity"
+      ]
+    },
+    {
+      "text": "Stories of loneliness and isolation",
+      "relevant": [
+        "The Lonely Room",
+        "Island Silence"
+      ]
+    },
+    {
+      "text": "What do I own about scientific explanations?",
+      "relevant": [
+        "The Beginning of Infinity",
+        "Scientific Explanations"
+      ]
+    },
+    {
+      "text": "Books similar to The Beginning of Infinity",
+      "relevant": [
+        "Growing Knowledge",
+        "The Beginning of Infinity",
+        "Scientific Explanations"
+      ]
+    },
+    {
+      "text": "Dune Herbert",
+      "relevant": [
+        "Dune"
+      ]
+    },
+    {
+      "text": "Dune ecology",
+      "relevant": [
+        "Dune"
+      ]
+    },
+    {
+      "text": "books about gardening",
+      "relevant": [
+        "Garden Seasons"
+      ]
+    }
+  ]
+}

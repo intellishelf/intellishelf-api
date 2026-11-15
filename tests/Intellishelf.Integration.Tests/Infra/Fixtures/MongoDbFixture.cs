@@ -17,13 +17,13 @@ public class MongoDbFixture : IAsyncLifetime
     public IMongoDatabase Database { get; private set; } = default!;
     public async ValueTask InitializeAsync()
     {
-        _container = new ContainerBuilder("mongodb/mongodb-atlas-local:latest")
+        _container = new ContainerBuilder("mongodb/mongodb-atlas-local:8.0")
             // map container port to a random free host port
             .WithPortBinding(MongoDbPort, assignRandomHostPort: true)
-            // wait until MongoDB inside the container is listening
+            // Wait for MongoDB and Atlas Search before provisioning indexes.
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
-                    .UntilInternalTcpPortIsAvailable(MongoDbPort)
+                    .UntilContainerIsHealthy()
             )
             .Build();
 

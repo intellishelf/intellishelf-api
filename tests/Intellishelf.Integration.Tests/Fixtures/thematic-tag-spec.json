@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "corpus_sha256": "0d36fae51ac228f2e7a1b4913086d56d4b25fa8614f8fb919391fdaf9c128cc3",
+  "provenance": "Three independently authored short factual descriptors per work, in English, using work form, place or era and subject. Existing fixture descriptions and all other fields are unchanged. Work and task familiarity is unavoidable from earlier experiments; do not regard tags as blinded, verified catalog records or as an independent held-out evaluation.",
+  "scheme": "Set Tags to the three listed phrases, using the production indexed-book-text builder. Do not alter query vectors or descriptions.",
+  "tags": {
+    "philebus": [
+      "Ancient Greece",
+      "Socratic dialogue",
+      "classical thought"
+    ],
+    "antigone": [
+      "Ancient Greece",
+      "stage tragedy",
+      "family duty"
+    ],
+    "disgrace": [
+      "South Africa",
+      "literary fiction",
+      "social change"
+    ],
+    "socrates": [
+      "Ancient Greece",
+      "trial speech",
+      "Socratic thought"
+    ],
+    "republic": [
+      "Ancient Greece",
+      "Socratic dialogue",
+      "political justice"
+    ],
+    "symposium": [
+      "Ancient Greece",
+      "Socratic dialogue",
+      "love"
+    ],
+    "medea": [
+      "Ancient Greece",
+      "stage tragedy",
+      "family betrayal"
+    ],
+    "odyssey": [
+      "Ancient Greece",
+      "epic poetry",
+      "homecoming"
+    ],
+    "iliad": [
+      "Ancient Greece",
+      "epic poetry",
+      "Trojan War"
+    ],
+    "oedipus": [
+      "Ancient Greece",
+      "stage tragedy",
+      "royal fate"
+    ],
+    "gilgamesh": [
+      "Mesopotamia",
+      "epic poetry",
+      "kingship"
+    ],
+    "aeneid": [
+      "Ancient Rome",
+      "epic poetry",
+      "founding myth"
+    ],
+    "metamorphoses": [
+      "Ancient Rome",
+      "narrative poetry",
+      "mythic transformation"
+    ],
+    "meditations": [
+      "Ancient Rome",
+      "personal reflections",
+      "Stoicism"
+    ],
+    "ethics": [
+      "Ancient Greece",
+      "ethical treatise",
+      "human flourishing"
+    ],
+    "epictetus": [
+      "Roman era",
+      "recorded lectures",
+      "Stoicism"
+    ],
+    "kant": [
+      "Enlightenment Europe",
+      "ethical treatise",
+      "moral duty"
+    ],
+    "descartes": [
+      "Early modern Europe",
+      "philosophical treatise",
+      "skepticism"
+    ],
+    "wollstonecraft": [
+      "Enlightenment Britain",
+      "political treatise",
+      "women’s education"
+    ],
+    "nietzsche": [
+      "Nineteenth-century Europe",
+      "philosophical treatise",
+      "morality"
+    ],
+    "sartre": [
+      "Twentieth-century France",
+      "philosophical treatise",
+      "existentialism"
+    ],
+    "camus": [
+      "Twentieth-century France",
+      "philosophical essay",
+      "the absurd"
+    ],
+    "beloved": [
+      "United States",
+      "literary fiction",
+      "slavery and memory"
+    ],
+    "remains": [
+      "Britain",
+      "literary fiction",
+      "memory and regret"
+    ],
+    "blindness": [
+      "Portugal",
+      "literary fiction",
+      "epidemic"
+    ],
+    "atonement": [
+      "Britain",
+      "literary fiction",
+      "guilt and memory"
+    ],
+    "road": [
+      "United States",
+      "literary fiction",
+      "parent and child"
+    ],
+    "half": [
+      "Nigeria",
+      "literary fiction",
+      "civil war"
+    ],
+    "station": [
+      "North America",
+      "literary fiction",
+      "pandemic"
+    ],
+    "gatsby": [
+      "United States",
+      "literary fiction",
+      "wealth and longing"
+    ],
+    "pride": [
+      "Regency England",
+      "novel of manners",
+      "courtship"
+    ],
+    "hamlet": [
+      "Early modern England",
+      "stage tragedy",
+      "revenge"
+    ],
+    "dune": [
+      "Imaginary planet",
+      "science fiction",
+      "desert ecology"
+    ],
+    "cosmos": [
+      "Outer space",
+      "popular science",
+      "astronomy"
+    ],
+    "cook": [
+      "Home kitchen",
+      "cookbook",
+      "food preparation"
+    ],
+    "garden": [
+      "British garden",
+      "horticulture",
+      "cultivated plants"
+    ]
+  }
+}

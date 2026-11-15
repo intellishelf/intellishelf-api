@@ -1,0 +1,3798 @@
+{
+  "original__original": {
+    "passing": 0,
+    "best": {
+      "floor": 0.621,
+      "margin": 0.065,
+      "tp": 64,
+      "returned": 103,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q03",
+        "q07"
+      ],
+      "f1": 0.6881720430107527
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        64,
+        103,
+        83,
+        6
+      ],
+      "language:uk": [
+        9,
+        24,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        12,
+        13,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        9,
+        18,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        55,
+        85,
+        73,
+        6
+      ],
+      "language:en": [
+        55,
+        79,
+        60,
+        6
+      ],
+      "category:greek": [
+        11,
+        17,
+        11,
+        4
+      ],
+      "category:philosophy": [
+        13,
+        13,
+        13,
+        0
+      ],
+      "category:modern": [
+        8,
+        13,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        8,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        2,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:revenge": [
+        2,
+        9,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        6,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        5,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "medea",
+          "oedipus",
+          "philebus",
+          "symposium"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "camus",
+          "gilgamesh",
+          "meditations",
+          "metamorphoses",
+          "nietzsche"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "meditations",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [
+          "camus",
+          "nietzsche"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "camus",
+          "metamorphoses",
+          "nietzsche",
+          "pride",
+          "sartre"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "camus",
+          "metamorphoses",
+          "nietzsche",
+          "pride",
+          "sartre"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "camus",
+          "cosmos",
+          "descartes",
+          "dune",
+          "garden",
+          "philebus",
+          "sartre",
+          "station"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [
+          "camus",
+          "descartes",
+          "dune",
+          "garden",
+          "philebus",
+          "sartre",
+          "station"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [
+          "iliad"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "iliad"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "atonement",
+          "beloved",
+          "iliad",
+          "philebus",
+          "pride",
+          "remains"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement",
+          "beloved",
+          "iliad",
+          "philebus",
+          "pride",
+          "remains"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "philebus",
+          "remains"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus",
+          "remains"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "original__library_request": {
+    "passing": 0,
+    "best": {
+      "floor": 0.6749999999999999,
+      "margin": 0.04,
+      "tp": 49,
+      "returned": 62,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q05"
+      ],
+      "f1": 0.6758620689655173
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        49,
+        62,
+        83,
+        2
+      ],
+      "language:uk": [
+        6,
+        14,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        11,
+        11,
+        28,
+        0
+      ],
+      "metadata:sparse": [
+        8,
+        15,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        41,
+        47,
+        73,
+        2
+      ],
+      "language:en": [
+        43,
+        48,
+        60,
+        2
+      ],
+      "category:greek": [
+        10,
+        12,
+        11,
+        2
+      ],
+      "category:philosophy": [
+        7,
+        7,
+        13,
+        0
+      ],
+      "category:modern": [
+        4,
+        4,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        6,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:revenge": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:family": [
+        2,
+        4,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        4,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "medea",
+          "philebus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [
+          "symposium"
+        ],
+        "irrelevant": [
+          "aeneid",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "camus",
+          "meditations",
+          "republic",
+          "socrates",
+          "symposium",
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "beloved",
+          "blindness",
+          "disgrace",
+          "gatsby",
+          "half"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "descartes",
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "descartes",
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet",
+          "medea"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "original__matching_book": {
+    "passing": 0,
+    "best": {
+      "floor": 0.6749999999999999,
+      "margin": 0.045,
+      "tp": 66,
+      "returned": 85,
+      "expected": 83,
+      "named_failures": [
+        "q03",
+        "q07"
+      ],
+      "f1": 0.7857142857142857
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        66,
+        85,
+        83,
+        5
+      ],
+      "language:uk": [
+        8,
+        18,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        16,
+        17,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        10,
+        18,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        56,
+        67,
+        73,
+        5
+      ],
+      "language:en": [
+        58,
+        67,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        12,
+        12,
+        13,
+        0
+      ],
+      "category:modern": [
+        8,
+        8,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        3,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:revenge": [
+        1,
+        4,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        5,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "blindness"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "iliad",
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "iliad",
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "original__hybrid_original_matching": {
+    "passing": 0,
+    "best": {
+      "floor": 0.647,
+      "margin": 0.045,
+      "tp": 67,
+      "returned": 90,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q03",
+        "q07"
+      ],
+      "f1": 0.7745664739884393
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        67,
+        90,
+        83,
+        5
+      ],
+      "language:uk": [
+        9,
+        21,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        15,
+        16,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        9,
+        17,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        58,
+        73,
+        73,
+        5
+      ],
+      "language:en": [
+        58,
+        69,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        12,
+        12,
+        13,
+        0
+      ],
+      "category:modern": [
+        9,
+        10,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        3,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        2,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:revenge": [
+        2,
+        6,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        6,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        5,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "philebus"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [],
+        "irrelevant": [
+          "pride"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "pride"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos",
+          "descartes",
+          "dune"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [
+          "descartes",
+          "dune"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "atonement",
+          "beloved",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement",
+          "beloved",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "philebus",
+          "remains"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus",
+          "remains"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "original__hybrid_both_templates": {
+    "passing": 0,
+    "best": {
+      "floor": 0.6679999999999999,
+      "margin": 0.045,
+      "tp": 65,
+      "returned": 86,
+      "expected": 83,
+      "named_failures": [
+        "q03",
+        "q07"
+      ],
+      "f1": 0.7692307692307693
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        65,
+        86,
+        83,
+        5
+      ],
+      "language:uk": [
+        9,
+        19,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        15,
+        16,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        10,
+        18,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        55,
+        68,
+        73,
+        5
+      ],
+      "language:en": [
+        56,
+        67,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        11,
+        11,
+        13,
+        0
+      ],
+      "category:modern": [
+        8,
+        9,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        6,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        2,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        3,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        1,
+        3,
+        2,
+        0
+      ],
+      "category:revenge": [
+        1,
+        4,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        5,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "symposium"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "symposium",
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "blindness"
+        ],
+        "irrelevant": [
+          "pride"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "pride"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "descartes",
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "descartes",
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "ethics"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "context__original": {
+    "passing": 0,
+    "best": {
+      "floor": 0.628,
+      "margin": 0.05,
+      "tp": 63,
+      "returned": 81,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q03",
+        "q07"
+      ],
+      "f1": 0.7682926829268293
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        63,
+        81,
+        83,
+        5
+      ],
+      "language:uk": [
+        7,
+        13,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        14,
+        15,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        9,
+        13,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        54,
+        68,
+        73,
+        5
+      ],
+      "language:en": [
+        56,
+        68,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        12,
+        12,
+        13,
+        0
+      ],
+      "category:modern": [
+        8,
+        12,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        4,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "category:revenge": [
+        1,
+        3,
+        2,
+        0
+      ],
+      "category:family": [
+        2,
+        3,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        4,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "oedipus",
+          "philebus"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "camus",
+          "metamorphoses",
+          "nietzsche",
+          "pride"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "camus",
+          "metamorphoses",
+          "nietzsche",
+          "pride"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos",
+          "descartes",
+          "dune",
+          "sartre"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [
+          "descartes",
+          "dune",
+          "sartre"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "context__library_request": {
+    "passing": 0,
+    "best": {
+      "floor": 0.661,
+      "margin": 0.035,
+      "tp": 60,
+      "returned": 74,
+      "expected": 83,
+      "named_failures": [
+        "q07",
+        "q08"
+      ],
+      "f1": 0.7643312101910829
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        60,
+        74,
+        83,
+        3
+      ],
+      "language:uk": [
+        9,
+        14,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        16,
+        18,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        10,
+        14,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        50,
+        60,
+        73,
+        3
+      ],
+      "language:en": [
+        51,
+        60,
+        60,
+        3
+      ],
+      "category:greek": [
+        11,
+        11,
+        11,
+        0
+      ],
+      "category:philosophy": [
+        6,
+        6,
+        13,
+        0
+      ],
+      "category:modern": [
+        7,
+        11,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        1,
+        2,
+        2,
+        0
+      ],
+      "category:revenge": [
+        1,
+        3,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        3,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos",
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [
+          "cosmos"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "camus",
+          "kant",
+          "meditations",
+          "republic",
+          "socrates",
+          "symposium",
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "blindness",
+          "half"
+        ],
+        "irrelevant": [
+          "camus",
+          "garden",
+          "hamlet",
+          "pride"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "camus",
+          "garden",
+          "hamlet",
+          "pride"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "context__matching_book": {
+    "passing": 0,
+    "best": {
+      "floor": 0.6769999999999999,
+      "margin": 0.05,
+      "tp": 64,
+      "returned": 80,
+      "expected": 83,
+      "named_failures": [
+        "q03",
+        "q07"
+      ],
+      "f1": 0.7852760736196319
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        64,
+        80,
+        83,
+        5
+      ],
+      "language:uk": [
+        6,
+        13,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        16,
+        17,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        10,
+        15,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        54,
+        65,
+        73,
+        5
+      ],
+      "language:en": [
+        58,
+        67,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        13,
+        13,
+        13,
+        0
+      ],
+      "category:modern": [
+        7,
+        7,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        5,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        2,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        3,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "category:revenge": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:family": [
+        2,
+        3,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        5,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "beloved",
+          "blindness"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "epictetus",
+          "ethics"
+        ],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [
+          "ethics"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "ethics"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet",
+          "medea"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [
+          "beloved"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh",
+          "philebus"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "context__hybrid_original_matching": {
+    "passing": 0,
+    "best": {
+      "floor": 0.653,
+      "margin": 0.045,
+      "tp": 65,
+      "returned": 78,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q03",
+        "q07"
+      ],
+      "f1": 0.8074534161490683
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        65,
+        78,
+        83,
+        5
+      ],
+      "language:uk": [
+        8,
+        14,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        15,
+        16,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        9,
+        13,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        56,
+        65,
+        73,
+        5
+      ],
+      "language:en": [
+        57,
+        64,
+        60,
+        5
+      ],
+      "category:greek": [
+        11,
+        14,
+        11,
+        3
+      ],
+      "category:philosophy": [
+        12,
+        12,
+        13,
+        0
+      ],
+      "category:modern": [
+        8,
+        8,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        2,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        2,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "category:revenge": [
+        1,
+        3,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        4,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "philebus"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [],
+        "irrelevant": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "aeneid",
+          "gilgamesh",
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "half"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos",
+          "dune"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [
+          "dune"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "metamorphoses"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone",
+          "gilgamesh"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "gilgamesh"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  },
+  "context__hybrid_both_templates": {
+    "passing": 0,
+    "best": {
+      "floor": 0.6719999999999999,
+      "margin": 0.03,
+      "tp": 54,
+      "returned": 62,
+      "expected": 83,
+      "named_failures": [
+        "q02",
+        "q07"
+      ],
+      "f1": 0.7448275862068966
+    },
+    "groups_tp_returned_expected_adjacent": {
+      "all": [
+        54,
+        62,
+        83,
+        3
+      ],
+      "language:uk": [
+        7,
+        12,
+        23,
+        0
+      ],
+      "category:antiquity": [
+        15,
+        16,
+        28,
+        1
+      ],
+      "metadata:sparse": [
+        9,
+        13,
+        10,
+        0
+      ],
+      "metadata:enriched": [
+        45,
+        49,
+        73,
+        3
+      ],
+      "language:en": [
+        47,
+        50,
+        60,
+        3
+      ],
+      "category:greek": [
+        10,
+        11,
+        11,
+        1
+      ],
+      "category:philosophy": [
+        5,
+        5,
+        13,
+        0
+      ],
+      "category:modern": [
+        6,
+        6,
+        9,
+        0
+      ],
+      "category:dialogue": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:missing": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "category:missing-close": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "category:tragedy": [
+        3,
+        3,
+        3,
+        0
+      ],
+      "category:roman-epic": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:stoicism": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:epidemic": [
+        2,
+        2,
+        2,
+        0
+      ],
+      "category:war": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "category:revenge": [
+        0,
+        2,
+        2,
+        0
+      ],
+      "category:family": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "category:epic-greek": [
+        2,
+        3,
+        2,
+        0
+      ],
+      "category:knowledge": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "category:gardening": [
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "details": {
+      "q01": {
+        "missed": [
+          "aeneid",
+          "epictetus",
+          "ethics",
+          "iliad",
+          "medea",
+          "meditations",
+          "metamorphoses",
+          "odyssey",
+          "oedipus",
+          "republic",
+          "socrates",
+          "symposium"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q02": {
+        "missed": [
+          "philebus"
+        ],
+        "irrelevant": [
+          "gilgamesh"
+        ],
+        "adjacent": [
+          "gilgamesh"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q03": {
+        "missed": [
+          "epictetus"
+        ],
+        "irrelevant": [
+          "metamorphoses"
+        ],
+        "adjacent": [
+          "metamorphoses"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q04": {
+        "missed": [
+          "camus",
+          "epictetus",
+          "kant",
+          "meditations",
+          "republic",
+          "socrates",
+          "symposium",
+          "wollstonecraft"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q05": {
+        "missed": [
+          "beloved",
+          "blindness",
+          "half"
+        ],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q06": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [
+          "socrates"
+        ],
+        "no_match_ok": null
+      },
+      "q07": {
+        "missed": [],
+        "irrelevant": [
+          "cosmos"
+        ],
+        "adjacent": [
+          "cosmos"
+        ],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": false
+      },
+      "q08": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": true
+      },
+      "q09": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q10": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q11": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q12": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q13": {
+        "missed": [
+          "half",
+          "iliad"
+        ],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q14": {
+        "missed": [
+          "hamlet",
+          "medea"
+        ],
+        "irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone",
+          "atonement"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q15": {
+        "missed": [],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q16": {
+        "missed": [],
+        "irrelevant": [
+          "antigone"
+        ],
+        "adjacent": [],
+        "other_irrelevant": [
+          "antigone"
+        ],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q17": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      },
+      "q18": {
+        "missed": [],
+        "irrelevant": [],
+        "adjacent": [],
+        "other_irrelevant": [],
+        "borderline_returned": [],
+        "no_match_ok": null
+      }
+    }
+  }
+}

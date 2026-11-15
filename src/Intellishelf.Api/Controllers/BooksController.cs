@@ -1,4 +1,5 @@
 using Intellishelf.Api.Contracts.Books;
+using Intellishelf.Common.TryResult;
 using Intellishelf.Api.ImageProcessing;
 using Intellishelf.Api.Mappers.Books;
 using Intellishelf.Api.Services;
@@ -6,6 +7,7 @@ using Intellishelf.Domain.Ai.Services;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Books.Services;
 using Intellishelf.Domain.Files.Services;
+using Intellishelf.Domain.Explore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +22,8 @@ public class BooksController(
     IBookService bookService,
     IFileStorageService fileStorageService,
     IImageFileValidator imageFileValidator,
-    IImageFileProcessor imageFileProcessor) : ApiControllerBase
+    IImageFileProcessor imageFileProcessor,
+    ExploreService exploreService) : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<Book>>> GetBooks([FromQuery] BookQueryParameters queryParameters)
@@ -136,6 +139,18 @@ public class BooksController(
         return result.IsSuccess
             ? Ok(result.Value)
             : HandleErrorResponse(result.Error);
+    }
+
+    public record ExploreRequest(string? Prompt);
+
+    [HttpPost("explore")]
+    public async Task<ActionResult<ExploreResult>> Explore([FromBody] ExploreRequest request, CancellationToken cancellationToken)
+    {
+        if (!Request.Headers.TryGetValue("X-Explore-User-Id", out var expectedUserId) ||
+            expectedUserId.Count != 1 || !string.Equals(expectedUserId[0], CurrentUserId, StringComparison.Ordinal))
+            return HandleErrorResponse(new Error(ExploreErrorCodes.SessionChanged, "Your session changed. Reload and try again."));
+        var result = await exploreService.TrySearchAsync(CurrentUserId, request.Prompt, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : HandleErrorResponse(result.Error);
     }
 
     [HttpPost("parse-text")]

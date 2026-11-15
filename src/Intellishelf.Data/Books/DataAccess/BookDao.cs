@@ -4,6 +4,7 @@ using Intellishelf.Data.Books.Mappers;
 using Intellishelf.Domain.Books.DataAccess;
 using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Models;
+using Intellishelf.Domain.Explore;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Search;
@@ -14,12 +15,25 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 {
     private readonly IMongoCollection<BookEntity> _booksCollection = database.GetCollection<BookEntity>(BookEntity.CollectionName);
 
+    private static readonly ProjectionDefinition<BookEntity, BookEntity> WithoutIndex = new BsonDocumentProjectionDefinition<BookEntity, BookEntity>(
+        new BsonDocument { { "Embedding", 0 }, { "EmbeddingHash", 0 }, { "EmbeddingModel", 0 } });
+
+    public async Task<TryResult<BookEditState>> GetEditStateAsync(string userId, string bookId)
+    {
+        var userIdObject = ObjectId.Parse(userId);
+        var state = await _booksCollection.Find(b => b.Id == bookId && b.UserId == userIdObject)
+            .Project(b => new { b.CoverImageUrl, b.Embedding, b.EmbeddingHash, b.EmbeddingModel })
+            .FirstOrDefaultAsync();
+        return state == null ? new Error(BookErrorCodes.BookNotFound, "Book not found") : new BookEditState(state.CoverImageUrl, new BookIndexState(state.Embedding, state.EmbeddingHash, state.EmbeddingModel));
+    }
+
     public async Task<TryResult<IReadOnlyCollection<Book>>> GetBooksAsync(string userId)
     {
         var userIdObject = ObjectId.Parse(userId);
 
         var books = await _booksCollection
             .Find(b => b.UserId == userIdObject)
+            .Project(WithoutIndex)
             .ToListAsync();
 
         var result = books.Select(mapper.Map).ToList();
@@ -40,6 +54,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         // Get paged data
         var books = await _booksCollection
             .Find(filter)
+            .Project(WithoutIndex)
             .Sort(sortDefinition)
             .Skip((queryParameters.Page - 1) * queryParameters.PageSize)
             .Limit(queryParameters.PageSize)
@@ -95,6 +110,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
 
         var bookEntity = await _booksCollection
             .Find(b => b.Id == bookId && b.UserId == userIdObject)
+            .Project(WithoutIndex)
             .FirstOrDefaultAsync();
 
         if (bookEntity == null)
@@ -111,16 +127,20 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             .Find(b => b.UserId == userIdObject &&
                       ((isbn10 != null && b.Isbn10 == isbn10) ||
                        (isbn13 != null && b.Isbn13 == isbn13)))
+            .Project(WithoutIndex)
             .FirstOrDefaultAsync();
 
         return bookEntity != null ? mapper.Map(bookEntity) : null;
     }
 
-    public async Task<TryResult<Book>> AddBookAsync(AddBookRequest request)
+    public async Task<TryResult<Book>> AddBookAsync(AddBookRequest request, BookIndexUpdate index)
     {
         var book = new BookEntity
         {
             UserId = ObjectId.Parse(request.UserId),
+            Embedding = index.Embedding,
+            EmbeddingHash = index.Hash,
+            EmbeddingModel = index.Model,
             Title = request.Title,
             Authors = request.Authors,
             PublicationDate = request.PublicationDate,
@@ -144,7 +164,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         return mapper.Map(book);
     }
 
-    public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
+    public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request, BookIndexUpdate index)
     {
         var userIdObject = ObjectId.Parse(request.UserId);
 
@@ -170,6 +190,10 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
             update.Set(b => b.FinishedReadingDate, request.FinishedReadingDate),
             update.CurrentDate(b => b.ModifiedDate)
         };
+
+        updates.Add(update.Set(b => b.Embedding, index.Embedding));
+        updates.Add(update.Set(b => b.EmbeddingHash, index.Hash));
+        updates.Add(update.Set(b => b.EmbeddingModel, index.Model));
 
         if (request.CoverImageUrl != null)
         {
@@ -234,6 +258,7 @@ public class BookDao(IMongoDatabase database, IBookEntityMapper mapper) : IBookD
         var books = await _booksCollection
             .Aggregate()
             .Search(searchFilter)
+            .Project(WithoutIndex)
             .Skip((queryParameters.Page - 1) * queryParameters.PageSize)
             .Limit(queryParameters.PageSize)
             .ToListAsync();

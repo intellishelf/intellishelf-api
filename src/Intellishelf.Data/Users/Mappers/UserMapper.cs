@@ -12,7 +12,8 @@ public class UserMapper : IUserMapper
             PasswordHash: entity.PasswordHash,
             PasswordSalt: entity.PasswordSalt,
             AuthProvider: entity.AuthProvider,
-            ExternalId: entity.ExternalId);
+            ExternalId: entity.ExternalId,
+            IsPro: entity.IsPro);
 
     public UserEntity MapNewUser(NewUser newUser) =>
         new()

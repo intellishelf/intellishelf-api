@@ -3,6 +3,7 @@ using Intellishelf.Domain.Books.Errors;
 using Intellishelf.Domain.Books.Helpers;
 using Intellishelf.Domain.Books.Models;
 using Intellishelf.Domain.Files.Services;
+using Intellishelf.Domain.Explore;
 
 namespace Intellishelf.Domain.Books.Services;
 
@@ -10,7 +11,8 @@ public class BookService(
     IBookDao bookDao,
     IFileStorageService fileStorageService,
     IBookMetadataService bookMetadataService,
-    IHttpImageDownloader httpImageDownloader) : IBookService
+    IHttpImageDownloader httpImageDownloader,
+    BookIndexer indexer) : IBookService
 {
     public async Task<TryResult<IReadOnlyCollection<Book>>> TryGetBooksAsync(string userId) =>
         await bookDao.GetBooksAsync(userId);
@@ -22,7 +24,7 @@ public class BookService(
         await bookDao.GetBookAsync(userId, bookId);
 
     public async Task<TryResult<Book>> TryAddBookAsync(AddBookRequest request) =>
-        await bookDao.AddBookAsync(request);
+        await bookDao.AddBookAsync(request, await indexer.PrepareAsync(request));
 
     public async Task<TryResult<Book>> TryAddBookFromIsbnAsync(string userId, string isbn)
     {
@@ -96,20 +98,22 @@ public class BookService(
             FinishedReadingDate = null
         };
 
-        return await bookDao.AddBookAsync(addBookRequest);
+        return await TryAddBookAsync(addBookRequest);
     }
 
     public async Task<TryResult> TryUpdateBookAsync(UpdateBookRequest request)
     {
-        var existingBook = await TryGetBookAsync(request.UserId, request.Id);
+        var state = await bookDao.GetEditStateAsync(request.UserId, request.Id);
+        if (!state.IsSuccess) return new Error(state.Error!.Code, state.Error.Message);
+        var index = await indexer.PrepareAsync(request, state.Value.Index);
 
-        if (request.CoverImageUrl != null && existingBook.IsSuccess &&
-            !string.IsNullOrEmpty(existingBook.Value.CoverImageUrl))
+        if (request.CoverImageUrl != null &&
+            !string.IsNullOrEmpty(state.Value.CoverImageUrl))
         {
-            await fileStorageService.DeleteFileFromUrlAsync(existingBook.Value.CoverImageUrl);
+            await fileStorageService.DeleteFileFromUrlAsync(state.Value.CoverImageUrl);
         }
 
-        return await bookDao.TryUpdateBookAsync(request);
+        return await bookDao.TryUpdateBookAsync(request, index);
     }
 
     public async Task<TryResult> TryDeleteBookAsync(string userId, string bookId)
