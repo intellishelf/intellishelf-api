@@ -1,0 +1,3962 @@
+{
+  "q01": {
+    "ranked": [
+      {
+        "work_id": "antigone",
+        "rank": 1,
+        "score": 0.7072508903211839,
+        "label": "relevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 2,
+        "score": 0.6668813140092265,
+        "label": "relevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 3,
+        "score": 0.6111764864711595,
+        "label": "relevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 4,
+        "score": 0.60338163414474,
+        "label": "relevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 5,
+        "score": 0.5980790894704944,
+        "label": "relevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 6,
+        "score": 0.5976714854674892,
+        "label": "relevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 7,
+        "score": 0.5911558482170259,
+        "label": "relevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 8,
+        "score": 0.588910893662369,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 9,
+        "score": 0.5874970996607961,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 10,
+        "score": 0.5845157952916789,
+        "label": "relevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 11,
+        "score": 0.5842786670372213,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 12,
+        "score": 0.5805454456882424,
+        "label": "relevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 13,
+        "score": 0.578649390820805,
+        "label": "relevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 14,
+        "score": 0.577637921343533,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 15,
+        "score": 0.5759719554908878,
+        "label": "relevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 16,
+        "score": 0.5745119711568649,
+        "label": "relevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 17,
+        "score": 0.5741231264128482,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 18,
+        "score": 0.5720030042953851,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 19,
+        "score": 0.5709840647562212,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 20,
+        "score": 0.5701936036766673,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 21,
+        "score": 0.5671475604216165,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 22,
+        "score": 0.5616857915820046,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 23,
+        "score": 0.560990343736929,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 24,
+        "score": 0.5583798931171488,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 25,
+        "score": 0.5576523490682224,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 26,
+        "score": 0.556479931906842,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 27,
+        "score": 0.5537596588874202,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 28,
+        "score": 0.5537264086327616,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 29,
+        "score": 0.5497454894132132,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 30,
+        "score": 0.5479142704778973,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 31,
+        "score": 0.5458248780559014,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 32,
+        "score": 0.5417519858737165,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 33,
+        "score": 0.5389575329858777,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 34,
+        "score": 0.5388587090990833,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 35,
+        "score": 0.5376771069484819,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 36,
+        "score": 0.5356104804564367,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q02": {
+    "ranked": [
+      {
+        "work_id": "ethics",
+        "rank": 1,
+        "score": 0.6555718687076035,
+        "label": "relevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 2,
+        "score": 0.6500671692857521,
+        "label": "relevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 3,
+        "score": 0.6443906994177353,
+        "label": "relevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 4,
+        "score": 0.6382904258726034,
+        "label": "relevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 5,
+        "score": 0.6370052076263155,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 6,
+        "score": 0.6306995065824377,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 7,
+        "score": 0.6300307394836496,
+        "label": "relevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 8,
+        "score": 0.6281984594311746,
+        "label": "relevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 9,
+        "score": 0.6235590094541478,
+        "label": "relevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 10,
+        "score": 0.6232878075627035,
+        "label": "relevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 11,
+        "score": 0.6213963793084288,
+        "label": "relevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 12,
+        "score": 0.6204643653089077,
+        "label": "relevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 13,
+        "score": 0.6196262634105874,
+        "label": "relevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 14,
+        "score": 0.6156745466732706,
+        "label": "relevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 15,
+        "score": 0.6114788253699829,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 16,
+        "score": 0.6042797285707233,
+        "label": "relevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 17,
+        "score": 0.5983704724923338,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 18,
+        "score": 0.5972360319159327,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 19,
+        "score": 0.593531015804075,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 20,
+        "score": 0.59325010803357,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 21,
+        "score": 0.5892495797144569,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 22,
+        "score": 0.5888531690837862,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 23,
+        "score": 0.5870632615427878,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 24,
+        "score": 0.5816409328319725,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 25,
+        "score": 0.5687613453605892,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 26,
+        "score": 0.5622382656847146,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 27,
+        "score": 0.5617107133418405,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 28,
+        "score": 0.5605183742848199,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 29,
+        "score": 0.55655426655675,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 30,
+        "score": 0.5530362805830105,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 31,
+        "score": 0.5528485161474745,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 32,
+        "score": 0.5489587470647831,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 33,
+        "score": 0.5478363912623901,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 34,
+        "score": 0.5476327755463364,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 35,
+        "score": 0.5448423484178898,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 36,
+        "score": 0.5327901673755702,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q03": {
+    "ranked": [
+      {
+        "work_id": "iliad",
+        "rank": 1,
+        "score": 0.6855736852905003,
+        "label": "relevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 2,
+        "score": 0.6785757319650212,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 3,
+        "score": 0.6759942503428576,
+        "label": "relevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 4,
+        "score": 0.6753340472017152,
+        "label": "relevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 5,
+        "score": 0.6665295660214323,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 6,
+        "score": 0.66148870333207,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 7,
+        "score": 0.6608945528982051,
+        "label": "relevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 8,
+        "score": 0.6605935975484887,
+        "label": "relevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 9,
+        "score": 0.658533889940419,
+        "label": "relevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 10,
+        "score": 0.6579951012481022,
+        "label": "relevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 11,
+        "score": 0.6571645011565403,
+        "label": "relevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 12,
+        "score": 0.655387662608227,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 13,
+        "score": 0.6512605496806333,
+        "label": "relevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 14,
+        "score": 0.6468134668539404,
+        "label": "relevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 15,
+        "score": 0.6358609634906128,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 16,
+        "score": 0.6248973305557176,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 17,
+        "score": 0.6242353489660734,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 18,
+        "score": 0.6203312672289456,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 19,
+        "score": 0.6152962935909061,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 20,
+        "score": 0.610133772804109,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 21,
+        "score": 0.6073164273035199,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 22,
+        "score": 0.6069427700950479,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 23,
+        "score": 0.6000629554223591,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 24,
+        "score": 0.5997680083799841,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 25,
+        "score": 0.5981346611003833,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 26,
+        "score": 0.5936703163493765,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 27,
+        "score": 0.5887086040101038,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 28,
+        "score": 0.5862806744815006,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 29,
+        "score": 0.5829483329449768,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 30,
+        "score": 0.5813214945731225,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 31,
+        "score": 0.5798308048610648,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 32,
+        "score": 0.5737831255773054,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 33,
+        "score": 0.5730299638396295,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 34,
+        "score": 0.5711084235147128,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 35,
+        "score": 0.5684553860510354,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 36,
+        "score": 0.5606895369180372,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q04": {
+    "ranked": [
+      {
+        "work_id": "descartes",
+        "rank": 1,
+        "score": 0.6853936159595263,
+        "label": "relevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 2,
+        "score": 0.6769056724681294,
+        "label": "relevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 3,
+        "score": 0.673223762322644,
+        "label": "relevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 4,
+        "score": 0.6691012423939705,
+        "label": "relevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 5,
+        "score": 0.6638654110069951,
+        "label": "relevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 6,
+        "score": 0.6536116511496527,
+        "label": "relevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 7,
+        "score": 0.6526565390754601,
+        "label": "relevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 8,
+        "score": 0.6520300330863495,
+        "label": "relevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 9,
+        "score": 0.6518980961709524,
+        "label": "relevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 10,
+        "score": 0.6492688710068222,
+        "label": "relevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 11,
+        "score": 0.6458748989184917,
+        "label": "relevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 12,
+        "score": 0.6372289581785595,
+        "label": "relevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 13,
+        "score": 0.6279013625405786,
+        "label": "relevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 14,
+        "score": 0.6038880729096178,
+        "label": "borderline"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 15,
+        "score": 0.6001824220004583,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 16,
+        "score": 0.5885812000512598,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 17,
+        "score": 0.5863924527729173,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 18,
+        "score": 0.5845859099296166,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 19,
+        "score": 0.5813298049537152,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 20,
+        "score": 0.5781554194167677,
+        "label": "borderline"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 21,
+        "score": 0.5775325935751382,
+        "label": "borderline"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 22,
+        "score": 0.5763033201614141,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 23,
+        "score": 0.5715973205546171,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 24,
+        "score": 0.5700319885622359,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 25,
+        "score": 0.5677050987850144,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 26,
+        "score": 0.5653998310058983,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 27,
+        "score": 0.5647525567046797,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 28,
+        "score": 0.5636385376929256,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 29,
+        "score": 0.5609555548040246,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 30,
+        "score": 0.5593524127080123,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 31,
+        "score": 0.5561153243616688,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 32,
+        "score": 0.5551004414510612,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 33,
+        "score": 0.5546873302481587,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 34,
+        "score": 0.5536356395004406,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 35,
+        "score": 0.5517297979454916,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 36,
+        "score": 0.5242682854678389,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q05": {
+    "ranked": [
+      {
+        "work_id": "road",
+        "rank": 1,
+        "score": 0.6607821481293112,
+        "label": "relevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 2,
+        "score": 0.6557229539900451,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 3,
+        "score": 0.6496642134202073,
+        "label": "relevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 4,
+        "score": 0.6414060018913905,
+        "label": "relevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 5,
+        "score": 0.6394706376331284,
+        "label": "relevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 6,
+        "score": 0.6365424774493632,
+        "label": "relevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 7,
+        "score": 0.6326182195151765,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 8,
+        "score": 0.6315324382186176,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 9,
+        "score": 0.6314717879842818,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 10,
+        "score": 0.6284680182000438,
+        "label": "relevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 11,
+        "score": 0.6273950978725015,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 12,
+        "score": 0.626256336639674,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 13,
+        "score": 0.6218711019098834,
+        "label": "relevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 14,
+        "score": 0.618390053055603,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 15,
+        "score": 0.6156986249361753,
+        "label": "relevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 16,
+        "score": 0.6138320830465491,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 17,
+        "score": 0.6137565783608302,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 18,
+        "score": 0.61257704622972,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 19,
+        "score": 0.6117029295080183,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 20,
+        "score": 0.6090314367610499,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 21,
+        "score": 0.6070818689353171,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 22,
+        "score": 0.6043669164104991,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 23,
+        "score": 0.6037276998930514,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 24,
+        "score": 0.600562654095394,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 25,
+        "score": 0.6005049178128525,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 26,
+        "score": 0.6004814393699609,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 27,
+        "score": 0.5983027406432241,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 28,
+        "score": 0.5980215573389437,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 29,
+        "score": 0.5962328385092671,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 30,
+        "score": 0.5961966796786213,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 31,
+        "score": 0.5938295080384057,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 32,
+        "score": 0.5934537165100836,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 33,
+        "score": 0.5895897259200586,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 34,
+        "score": 0.5889847078059993,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 35,
+        "score": 0.5857637016864242,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 36,
+        "score": 0.5718422607067642,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q06": {
+    "ranked": [
+      {
+        "work_id": "symposium",
+        "rank": 1,
+        "score": 0.7522374386228132,
+        "label": "relevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 2,
+        "score": 0.7373019802861078,
+        "label": "borderline"
+      },
+      {
+        "work_id": "republic",
+        "rank": 3,
+        "score": 0.7179774887645005,
+        "label": "relevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 4,
+        "score": 0.6987728245045379,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 5,
+        "score": 0.6887559762873576,
+        "label": "relevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 6,
+        "score": 0.6886643816879681,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 7,
+        "score": 0.6769331527479744,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 8,
+        "score": 0.6507800131386603,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 9,
+        "score": 0.6485151838181976,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 10,
+        "score": 0.6434049270837141,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 11,
+        "score": 0.6432952196001241,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 12,
+        "score": 0.6417619273602687,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 13,
+        "score": 0.6370409971309396,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 14,
+        "score": 0.6369446484317622,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 15,
+        "score": 0.6289639320523381,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 16,
+        "score": 0.627851246275082,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 17,
+        "score": 0.6223029019819041,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 18,
+        "score": 0.6192859122544813,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 19,
+        "score": 0.6157412640270489,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 20,
+        "score": 0.6084516279544532,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 21,
+        "score": 0.59188877023963,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 22,
+        "score": 0.5878067515913765,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 23,
+        "score": 0.5877898187075641,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 24,
+        "score": 0.5877526739447769,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 25,
+        "score": 0.5862433192905783,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 26,
+        "score": 0.582646598673128,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 27,
+        "score": 0.5811985900088235,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 28,
+        "score": 0.5801050169514523,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 29,
+        "score": 0.5768557403218753,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 30,
+        "score": 0.5765288463736176,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 31,
+        "score": 0.5717612047177203,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 32,
+        "score": 0.5693698759509318,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 33,
+        "score": 0.5691604671630419,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 34,
+        "score": 0.5644447243386752,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 35,
+        "score": 0.56323429274844,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 36,
+        "score": 0.5494341649944035,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q07": {
+    "ranked": [
+      {
+        "work_id": "cosmos",
+        "rank": 1,
+        "score": 0.6790346750466637,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 2,
+        "score": 0.6482866141130577,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 3,
+        "score": 0.641780350504375,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 4,
+        "score": 0.6406954107190501,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 5,
+        "score": 0.6323109378226717,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 6,
+        "score": 0.6298851209738977,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 7,
+        "score": 0.6277930116377463,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 8,
+        "score": 0.6242379033372683,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 9,
+        "score": 0.6205938167122655,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 10,
+        "score": 0.61985007642342,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 11,
+        "score": 0.6114768356580318,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 12,
+        "score": 0.6079159516995181,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 13,
+        "score": 0.6076793078366216,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 14,
+        "score": 0.605941949540971,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 15,
+        "score": 0.6059353858862075,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 16,
+        "score": 0.6055783845651301,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 17,
+        "score": 0.6051145528745283,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 18,
+        "score": 0.6050914157270796,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 19,
+        "score": 0.6041620380774291,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 20,
+        "score": 0.6039416540204261,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 21,
+        "score": 0.60284275662687,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 22,
+        "score": 0.6014162367819313,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 23,
+        "score": 0.5978314307613858,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 24,
+        "score": 0.5964591745877652,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 25,
+        "score": 0.5944505671754502,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 26,
+        "score": 0.5880447165314894,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 27,
+        "score": 0.5857683314396998,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 28,
+        "score": 0.5849631487817302,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 29,
+        "score": 0.5833966519591878,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 30,
+        "score": 0.581886705463698,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 31,
+        "score": 0.5795159063902773,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 32,
+        "score": 0.577532622334454,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 33,
+        "score": 0.5762419091465882,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 34,
+        "score": 0.5733594455552489,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 35,
+        "score": 0.5721476382239237,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 36,
+        "score": 0.5671398302749506,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q08": {
+    "ranked": [
+      {
+        "work_id": "gilgamesh",
+        "rank": 1,
+        "score": 0.6204980766407072,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 2,
+        "score": 0.6102245818519448,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 3,
+        "score": 0.6026998937938869,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 4,
+        "score": 0.6019240565789868,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 5,
+        "score": 0.5980896913118933,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 6,
+        "score": 0.5916188464472576,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 7,
+        "score": 0.5911816945555338,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 8,
+        "score": 0.5911683702598485,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 9,
+        "score": 0.5881128671522063,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 10,
+        "score": 0.5863593490084037,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 11,
+        "score": 0.5855808827759091,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 12,
+        "score": 0.5837454153012736,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 13,
+        "score": 0.58188036408462,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 14,
+        "score": 0.5814394509881465,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 15,
+        "score": 0.576904990871635,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 16,
+        "score": 0.5768526363651381,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 17,
+        "score": 0.5758904433233152,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 18,
+        "score": 0.5743973012737515,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 19,
+        "score": 0.5735202649014828,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 20,
+        "score": 0.5726770934075146,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 21,
+        "score": 0.5711113434959155,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 22,
+        "score": 0.5688338322365312,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 23,
+        "score": 0.5677117114562945,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 24,
+        "score": 0.5676319195043956,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 25,
+        "score": 0.5671966164274354,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 26,
+        "score": 0.5671158494713311,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 27,
+        "score": 0.566668457448892,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 28,
+        "score": 0.5653270401791991,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 29,
+        "score": 0.5652574754620612,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 30,
+        "score": 0.5637383798382287,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 31,
+        "score": 0.560890867854908,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 32,
+        "score": 0.5586059514158873,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 33,
+        "score": 0.5540987785752984,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 34,
+        "score": 0.5534565717453611,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 35,
+        "score": 0.5530256256494759,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 36,
+        "score": 0.5429521720450595,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q09": {
+    "ranked": [
+      {
+        "work_id": "oedipus",
+        "rank": 1,
+        "score": 0.7312686025636146,
+        "label": "relevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 2,
+        "score": 0.7138125870351734,
+        "label": "relevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 3,
+        "score": 0.6908340248157268,
+        "label": "relevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 4,
+        "score": 0.6710789746482608,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 5,
+        "score": 0.6634647291470429,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 6,
+        "score": 0.6599704689083998,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 7,
+        "score": 0.6581178661576628,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 8,
+        "score": 0.6562016264809476,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 9,
+        "score": 0.65295818824684,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 10,
+        "score": 0.6488501449155651,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 11,
+        "score": 0.6437695052515655,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 12,
+        "score": 0.6410465964544977,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 13,
+        "score": 0.6372690252882214,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 14,
+        "score": 0.63400165616038,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 15,
+        "score": 0.632443350694009,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 16,
+        "score": 0.623573322716085,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 17,
+        "score": 0.622881901928636,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 18,
+        "score": 0.6194197002074596,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 19,
+        "score": 0.6149091948916994,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 20,
+        "score": 0.6147656631240862,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 21,
+        "score": 0.6123774571266986,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 22,
+        "score": 0.6061347396113923,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 23,
+        "score": 0.6052964469060659,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 24,
+        "score": 0.5993029338803604,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 25,
+        "score": 0.5964562491249565,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 26,
+        "score": 0.5958519114593828,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 27,
+        "score": 0.5953883825153191,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 28,
+        "score": 0.5887973000352075,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 29,
+        "score": 0.5884892898042811,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 30,
+        "score": 0.5828165569029035,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 31,
+        "score": 0.5824475502537677,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 32,
+        "score": 0.5668713835488778,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 33,
+        "score": 0.5659683172901273,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 34,
+        "score": 0.5587365648815313,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 35,
+        "score": 0.5519410338771248,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 36,
+        "score": 0.5313697906319902,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q10": {
+    "ranked": [
+      {
+        "work_id": "aeneid",
+        "rank": 1,
+        "score": 0.7824041693152258,
+        "label": "relevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 2,
+        "score": 0.7374207081658721,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 3,
+        "score": 0.704133169085439,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 4,
+        "score": 0.6944325339011768,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 5,
+        "score": 0.6831358575833907,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 6,
+        "score": 0.6600006010836227,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 7,
+        "score": 0.6363752069101241,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 8,
+        "score": 0.6321854657341303,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 9,
+        "score": 0.6290831597916998,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 10,
+        "score": 0.6277156686339362,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 11,
+        "score": 0.6276046441328899,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 12,
+        "score": 0.6256183032924005,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 13,
+        "score": 0.6249327172934017,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 14,
+        "score": 0.6239515324671926,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 15,
+        "score": 0.6207662781418283,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 16,
+        "score": 0.6200361533542337,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 17,
+        "score": 0.6086607584787662,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 18,
+        "score": 0.6085032840601663,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 19,
+        "score": 0.6077976628311691,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 20,
+        "score": 0.6055794442606613,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 21,
+        "score": 0.6030982080836262,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 22,
+        "score": 0.6005448105926984,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 23,
+        "score": 0.5986843930979489,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 24,
+        "score": 0.5940223612462546,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 25,
+        "score": 0.5931597318486893,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 26,
+        "score": 0.5920127484033183,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 27,
+        "score": 0.5914312725451646,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 28,
+        "score": 0.5875922960469574,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 29,
+        "score": 0.587361771397187,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 30,
+        "score": 0.5855727197537949,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 31,
+        "score": 0.5838605364468502,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 32,
+        "score": 0.5769306101271139,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 33,
+        "score": 0.5711742837769603,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 34,
+        "score": 0.5709727213647644,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 35,
+        "score": 0.5605761671835725,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 36,
+        "score": 0.5507586571103793,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q11": {
+    "ranked": [
+      {
+        "work_id": "meditations",
+        "rank": 1,
+        "score": 0.7511000513034061,
+        "label": "relevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 2,
+        "score": 0.7313716972181686,
+        "label": "relevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 3,
+        "score": 0.6841247995143798,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 4,
+        "score": 0.6722959193769599,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 5,
+        "score": 0.6581887317852568,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 6,
+        "score": 0.6542889759842709,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 7,
+        "score": 0.6496595568740675,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 8,
+        "score": 0.6458342570379084,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 9,
+        "score": 0.6414460790279362,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 10,
+        "score": 0.6200093573087149,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 11,
+        "score": 0.6181324507454167,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 12,
+        "score": 0.6180525150045341,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 13,
+        "score": 0.614454820055705,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 14,
+        "score": 0.5992613580469124,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 15,
+        "score": 0.5968110241182258,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 16,
+        "score": 0.5955750872259571,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 17,
+        "score": 0.5910378669385551,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 18,
+        "score": 0.5884659666467923,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 19,
+        "score": 0.5872643757027998,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 20,
+        "score": 0.5845115667860762,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 21,
+        "score": 0.5813529286012198,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 22,
+        "score": 0.5778795286617907,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 23,
+        "score": 0.5761052033892652,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 24,
+        "score": 0.5751586321789548,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 25,
+        "score": 0.5713322363741526,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 26,
+        "score": 0.5695611700014015,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 27,
+        "score": 0.5688699987457249,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 28,
+        "score": 0.562998690304774,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 29,
+        "score": 0.5613244194578698,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 30,
+        "score": 0.5611251008617375,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 31,
+        "score": 0.5587304124530441,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 32,
+        "score": 0.5565683466854117,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 33,
+        "score": 0.5492932358819145,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 34,
+        "score": 0.5435446367253106,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 35,
+        "score": 0.5357717925572025,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 36,
+        "score": 0.5274240194712216,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q12": {
+    "ranked": [
+      {
+        "work_id": "station",
+        "rank": 1,
+        "score": 0.76020798303845,
+        "label": "relevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 2,
+        "score": 0.7360634775311754,
+        "label": "relevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 3,
+        "score": 0.6693404490320212,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 4,
+        "score": 0.6627520975866341,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 5,
+        "score": 0.658530074618968,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 6,
+        "score": 0.6460643016072368,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 7,
+        "score": 0.6429563657973141,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 8,
+        "score": 0.6421976601405168,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 9,
+        "score": 0.6297022160579937,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 10,
+        "score": 0.6283694173472446,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 11,
+        "score": 0.6281584466046408,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 12,
+        "score": 0.6223249055882568,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 13,
+        "score": 0.6221473650717594,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 14,
+        "score": 0.6196078074144781,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 15,
+        "score": 0.6126740532740421,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 16,
+        "score": 0.6101976881310375,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 17,
+        "score": 0.6093128020561771,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 18,
+        "score": 0.6076879668330307,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 19,
+        "score": 0.601317124516187,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 20,
+        "score": 0.5985349974581983,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 21,
+        "score": 0.5967853338101456,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 22,
+        "score": 0.5936174744653879,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 23,
+        "score": 0.5933034042720386,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 24,
+        "score": 0.5932012371184444,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 25,
+        "score": 0.5916564280988786,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 26,
+        "score": 0.586132034674279,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 27,
+        "score": 0.5836841754732645,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 28,
+        "score": 0.5829823859853683,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 29,
+        "score": 0.5817188709229844,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 30,
+        "score": 0.5797891644300978,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 31,
+        "score": 0.5796817057263984,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 32,
+        "score": 0.5714585516701741,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 33,
+        "score": 0.5664263705512682,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 34,
+        "score": 0.5592704119506948,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 35,
+        "score": 0.5544057825939346,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 36,
+        "score": 0.5466851733357563,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q13": {
+    "ranked": [
+      {
+        "work_id": "antigone",
+        "rank": 1,
+        "score": 0.6549072568431383,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 2,
+        "score": 0.6408635409950476,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 3,
+        "score": 0.6185061211373366,
+        "label": "relevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 4,
+        "score": 0.5968860951570966,
+        "label": "relevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 5,
+        "score": 0.569682120682707,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 6,
+        "score": 0.5665184560002492,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 7,
+        "score": 0.564858349107405,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 8,
+        "score": 0.5627395673828954,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 9,
+        "score": 0.5622880488685029,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 10,
+        "score": 0.5617360040303536,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 11,
+        "score": 0.5576783472087629,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 12,
+        "score": 0.5562271449772117,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 13,
+        "score": 0.5518610178488722,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 14,
+        "score": 0.5471613816608767,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 15,
+        "score": 0.5457321320083651,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 16,
+        "score": 0.5440984870322761,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 17,
+        "score": 0.5436387786242404,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 18,
+        "score": 0.5427664338949044,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 19,
+        "score": 0.5422531852203396,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 20,
+        "score": 0.5409544550782528,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 21,
+        "score": 0.5405595197753903,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 22,
+        "score": 0.5394508505769327,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 23,
+        "score": 0.5387806272196752,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 24,
+        "score": 0.5383017040236091,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 25,
+        "score": 0.5347023254789649,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 26,
+        "score": 0.5334752886375247,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 27,
+        "score": 0.5319029104246716,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 28,
+        "score": 0.5308826930499246,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 29,
+        "score": 0.5302952584152401,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 30,
+        "score": 0.5302533258205254,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 31,
+        "score": 0.5287660440839701,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 32,
+        "score": 0.5273318909290516,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 33,
+        "score": 0.5204841474313887,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 34,
+        "score": 0.5180936374270458,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 35,
+        "score": 0.514274264094917,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 36,
+        "score": 0.4925783153723807,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q14": {
+    "ranked": [
+      {
+        "work_id": "antigone",
+        "rank": 1,
+        "score": 0.6751267149069393,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 2,
+        "score": 0.667458757874922,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 3,
+        "score": 0.6548424129441731,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 4,
+        "score": 0.6537283881671512,
+        "label": "relevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 5,
+        "score": 0.6340892375340895,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 6,
+        "score": 0.6306160677492955,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 7,
+        "score": 0.6282633827105372,
+        "label": "relevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 8,
+        "score": 0.6271684182191524,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 9,
+        "score": 0.622462601149841,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 10,
+        "score": 0.619612137266708,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 11,
+        "score": 0.618404221802919,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 12,
+        "score": 0.6182638312897006,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 13,
+        "score": 0.6178290254345831,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 14,
+        "score": 0.6146699568575136,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 15,
+        "score": 0.6120967843788105,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 16,
+        "score": 0.6115611124071234,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 17,
+        "score": 0.6114805863024398,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 18,
+        "score": 0.6098654387817535,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 19,
+        "score": 0.6074336845365834,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 20,
+        "score": 0.6056018706082678,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 21,
+        "score": 0.6049629212810326,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 22,
+        "score": 0.603956317034425,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 23,
+        "score": 0.5953093348610128,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 24,
+        "score": 0.5941659534472821,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 25,
+        "score": 0.5923741483137414,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 26,
+        "score": 0.5917531108268395,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 27,
+        "score": 0.5900543373495307,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 28,
+        "score": 0.5889198871861118,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 29,
+        "score": 0.5877971228762167,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 30,
+        "score": 0.5844562048888043,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 31,
+        "score": 0.5818071834047795,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 32,
+        "score": 0.5807703593666669,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 33,
+        "score": 0.5803835395297181,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 34,
+        "score": 0.5750828372867747,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 35,
+        "score": 0.571013977110628,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 36,
+        "score": 0.5598106636218618,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q15": {
+    "ranked": [
+      {
+        "work_id": "beloved",
+        "rank": 1,
+        "score": 0.6603975626857996,
+        "label": "relevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 2,
+        "score": 0.6529958863629917,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 3,
+        "score": 0.6523722385531812,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 4,
+        "score": 0.6500360407220167,
+        "label": "relevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 5,
+        "score": 0.6338331373455133,
+        "label": "relevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 6,
+        "score": 0.6285334175313482,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 7,
+        "score": 0.6139910134966241,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 8,
+        "score": 0.6085368250652998,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 9,
+        "score": 0.6063350286600103,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 10,
+        "score": 0.5965962697030748,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 11,
+        "score": 0.5900184618435425,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 12,
+        "score": 0.5893650776737183,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 13,
+        "score": 0.587891733902098,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 14,
+        "score": 0.5875576307541849,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 15,
+        "score": 0.5861494124017815,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 16,
+        "score": 0.5817487078834831,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 17,
+        "score": 0.580643975809123,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 18,
+        "score": 0.5793848789602942,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 19,
+        "score": 0.5778613023424828,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 20,
+        "score": 0.5708363576212667,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 21,
+        "score": 0.568830701517122,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 22,
+        "score": 0.5681672949356822,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 23,
+        "score": 0.5675649610878516,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 24,
+        "score": 0.5630165461376742,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 25,
+        "score": 0.5568974578246966,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 26,
+        "score": 0.5534610176546066,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 27,
+        "score": 0.5526107606156961,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 28,
+        "score": 0.5525555223593848,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 29,
+        "score": 0.5518575301995994,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 30,
+        "score": 0.5509404581231419,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 31,
+        "score": 0.5495681818148893,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 32,
+        "score": 0.5470938831733321,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 33,
+        "score": 0.5386241298093374,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 34,
+        "score": 0.5360425982329539,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 35,
+        "score": 0.5340091683193853,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 36,
+        "score": 0.533815816360767,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q16": {
+    "ranked": [
+      {
+        "work_id": "odyssey",
+        "rank": 1,
+        "score": 0.714914810847287,
+        "label": "relevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 2,
+        "score": 0.7127153288734844,
+        "label": "relevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 3,
+        "score": 0.6895653565044872,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 4,
+        "score": 0.6725576336328039,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 5,
+        "score": 0.6721558393530254,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 6,
+        "score": 0.646859113183485,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 7,
+        "score": 0.6427040407406923,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 8,
+        "score": 0.6249535058387129,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 9,
+        "score": 0.615477120504523,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 10,
+        "score": 0.5994336091731637,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 11,
+        "score": 0.5903631819892304,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 12,
+        "score": 0.589625182902327,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 13,
+        "score": 0.580316553375303,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 14,
+        "score": 0.5785563642464384,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 15,
+        "score": 0.5779385684640166,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 16,
+        "score": 0.574785033566047,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 17,
+        "score": 0.5720422728993072,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 18,
+        "score": 0.5671683774628016,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 19,
+        "score": 0.5666557402798181,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 20,
+        "score": 0.5665154342321859,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 21,
+        "score": 0.5598825330988335,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 22,
+        "score": 0.5591324578407889,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 23,
+        "score": 0.5585367696062382,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 24,
+        "score": 0.5496492977901235,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 25,
+        "score": 0.5493316235129064,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 26,
+        "score": 0.5480636433653068,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 27,
+        "score": 0.546993280827726,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 28,
+        "score": 0.5465381502597477,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 29,
+        "score": 0.5462521895635623,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 30,
+        "score": 0.5440188615824926,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 31,
+        "score": 0.533532581347036,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 32,
+        "score": 0.5325952272349429,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 33,
+        "score": 0.5322720035967403,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 34,
+        "score": 0.5205228848018945,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 35,
+        "score": 0.5119715039595957,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 36,
+        "score": 0.5038322113313805,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q17": {
+    "ranked": [
+      {
+        "work_id": "descartes",
+        "rank": 1,
+        "score": 0.7508705187283873,
+        "label": "relevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 2,
+        "score": 0.658133863252826,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 3,
+        "score": 0.648393522513085,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 4,
+        "score": 0.6452058655162196,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 5,
+        "score": 0.6447038152397304,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 6,
+        "score": 0.6308037467085003,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 7,
+        "score": 0.628984067597342,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 8,
+        "score": 0.6270309910625812,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 9,
+        "score": 0.6246584503271269,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 10,
+        "score": 0.6224740432220197,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 11,
+        "score": 0.6220982740912999,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 12,
+        "score": 0.6090022995650471,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 13,
+        "score": 0.6037206513326672,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 14,
+        "score": 0.6027748032010687,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 15,
+        "score": 0.6003867300166621,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 16,
+        "score": 0.5993589092192688,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 17,
+        "score": 0.5941922907288336,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 18,
+        "score": 0.5894813314478184,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 19,
+        "score": 0.5892560490570666,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "garden",
+        "rank": 20,
+        "score": 0.5880226609971356,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 21,
+        "score": 0.5872420143273828,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 22,
+        "score": 0.5745442274510882,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 23,
+        "score": 0.5693933485823441,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 24,
+        "score": 0.5693540971780631,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 25,
+        "score": 0.5687925481710434,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 26,
+        "score": 0.5680597300990776,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 27,
+        "score": 0.5678113402209454,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 28,
+        "score": 0.567808227114187,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 29,
+        "score": 0.566785957157277,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 30,
+        "score": 0.5639865908645095,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 31,
+        "score": 0.5621410902244383,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 32,
+        "score": 0.5590509425728896,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 33,
+        "score": 0.5554723340627516,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 34,
+        "score": 0.5553033925208078,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 35,
+        "score": 0.5536565901603673,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 36,
+        "score": 0.5531334290211313,
+        "label": "irrelevant"
+      }
+    ]
+  },
+  "q18": {
+    "ranked": [
+      {
+        "work_id": "garden",
+        "rank": 1,
+        "score": 0.7942887219748331,
+        "label": "relevant"
+      },
+      {
+        "work_id": "cook",
+        "rank": 2,
+        "score": 0.6574734617195861,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "cosmos",
+        "rank": 3,
+        "score": 0.6313685668687838,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "metamorphoses",
+        "rank": 4,
+        "score": 0.6145266527320679,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "meditations",
+        "rank": 5,
+        "score": 0.6103358577370919,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "dune",
+        "rank": 6,
+        "score": 0.6079934457757004,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "road",
+        "rank": 7,
+        "score": 0.6074466579048854,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gilgamesh",
+        "rank": 8,
+        "score": 0.6070909036745762,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "remains",
+        "rank": 9,
+        "score": 0.6030984824439455,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "pride",
+        "rank": 10,
+        "score": 0.6026665444204394,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "camus",
+        "rank": 11,
+        "score": 0.6020757465432375,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "beloved",
+        "rank": 12,
+        "score": 0.6005307953017879,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "ethics",
+        "rank": 13,
+        "score": 0.5996490051639395,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "epictetus",
+        "rank": 14,
+        "score": 0.5987050405270247,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "gatsby",
+        "rank": 15,
+        "score": 0.5947733832846123,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "descartes",
+        "rank": 16,
+        "score": 0.5933253334599958,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "kant",
+        "rank": 17,
+        "score": 0.5924953981938292,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "blindness",
+        "rank": 18,
+        "score": 0.5902335622348925,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "aeneid",
+        "rank": 19,
+        "score": 0.589428663978596,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "station",
+        "rank": 20,
+        "score": 0.5885513382841419,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "odyssey",
+        "rank": 21,
+        "score": 0.5847660891253004,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "disgrace",
+        "rank": 22,
+        "score": 0.5842916736918089,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "philebus",
+        "rank": 23,
+        "score": 0.5821091745838077,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "iliad",
+        "rank": 24,
+        "score": 0.5806087208101518,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "sartre",
+        "rank": 25,
+        "score": 0.5794897215616844,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "nietzsche",
+        "rank": 26,
+        "score": 0.5794125008822945,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "atonement",
+        "rank": 27,
+        "score": 0.579155693497675,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "wollstonecraft",
+        "rank": 28,
+        "score": 0.5783924178210986,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "hamlet",
+        "rank": 29,
+        "score": 0.5779222176670961,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "republic",
+        "rank": 30,
+        "score": 0.5768290589508077,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "half",
+        "rank": 31,
+        "score": 0.5760161546554752,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "antigone",
+        "rank": 32,
+        "score": 0.5718891227798109,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "medea",
+        "rank": 33,
+        "score": 0.5713299377994406,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "oedipus",
+        "rank": 34,
+        "score": 0.5677737466777903,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "symposium",
+        "rank": 35,
+        "score": 0.5616687090724877,
+        "label": "irrelevant"
+      },
+      {
+        "work_id": "socrates",
+        "rank": 36,
+        "score": 0.560823441917334,
+        "label": "irrelevant"
+      }
+    ]
+  }
+}

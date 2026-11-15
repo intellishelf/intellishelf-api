@@ -1,0 +1,142 @@
+{
+  "q02": {
+    "philebus": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "antigone": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "disgrace": {
+      "plain": [
+        "irrelevant"
+      ],
+      "context": [
+        "irrelevant"
+      ],
+      "frozen": "irrelevant",
+      "comparable": true
+    }
+  },
+  "q03": {
+    "philebus": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "antigone": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "disgrace": {
+      "plain": [],
+      "context": [],
+      "frozen": "irrelevant",
+      "comparable": false
+    }
+  },
+  "q04": {
+    "philebus": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "antigone": {
+      "plain": [
+        "borderline"
+      ],
+      "context": [
+        "borderline"
+      ],
+      "frozen": "borderline",
+      "comparable": true
+    },
+    "disgrace": {
+      "plain": [
+        "irrelevant"
+      ],
+      "context": [
+        "irrelevant"
+      ],
+      "frozen": "irrelevant",
+      "comparable": true
+    }
+  },
+  "q05": {
+    "philebus": {
+      "plain": [],
+      "context": [],
+      "frozen": "irrelevant",
+      "comparable": false
+    },
+    "antigone": {
+      "plain": [],
+      "context": [],
+      "frozen": "irrelevant",
+      "comparable": false
+    },
+    "disgrace": {
+      "plain": [],
+      "context": [],
+      "frozen": "relevant",
+      "comparable": false
+    }
+  },
+  "q06": {
+    "philebus": {
+      "plain": [
+        "relevant"
+      ],
+      "context": [
+        "relevant"
+      ],
+      "frozen": "relevant",
+      "comparable": true
+    },
+    "antigone": {
+      "plain": [
+        "borderline"
+      ],
+      "context": [
+        "borderline"
+      ],
+      "frozen": "irrelevant",
+      "comparable": true
+    },
+    "disgrace": {
+      "plain": [],
+      "context": [],
+      "frozen": "irrelevant",
+      "comparable": false
+    }
+  }
+}
