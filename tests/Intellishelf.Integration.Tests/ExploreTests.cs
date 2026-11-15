@@ -490,6 +490,34 @@ public sealed class ExploreTests(MongoDbFixture mongo, AzuriteFixture azurite) :
         Assert.Equal(book.Id, Assert.Single(result.Items).Id);
     }
 
+    [Fact]
+    public async Task GivenMultipartBookWithEmptyAuthor_WhenExploring_ThenReturnsMatchingBook()
+    {
+        await Pro(true);
+        using var form = new MultipartFormDataContent();
+        form.Add(new StringContent("Synthetic Lighthouse"), "Title");
+        form.Add(new StringContent(""), "Authors");
+        form.Add(new StringContent("Unread"), "Status");
+        using var save = await _client.PostAsync("/api/books", form, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Created, save.StatusCode);
+        var book = await save.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken);
+        Assert.NotNull(book);
+        var stored = await mongo.FindBookByIdAsync(book.Id);
+        Assert.NotNull(stored?.Authors);
+        Assert.Contains(stored.Authors, author => author is null);
+        var deadline = DateTime.UtcNow.AddSeconds(30);
+        ExploreResult result;
+        do
+        {
+            using var response = await Query("Lighthouse");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            result = (await response.Content.ReadFromJsonAsync<ExploreResult>(TestContext.Current.CancellationToken))!;
+            if (result.Items.Any(x => x.Id == book.Id)) break;
+            await Task.Delay(250, TestContext.Current.CancellationToken);
+        } while (DateTime.UtcNow < deadline);
+        Assert.Contains(result.Items, x => x.Id == book.Id);
+    }
+
     private sealed class SpyProvider : IEmbeddingProvider
     {
         private readonly StandInEmbeddingProvider _inner = new(Options.Create(new ExploreOptions()));

@@ -66,7 +66,7 @@ public sealed class ExploreService(IUserDao users, IEmbeddingProvider provider, 
             var ordered = books.Select(x => new
             {
                 x.Book,
-                Tier = string.Equals(x.Book.Title.Trim(), prompt, StringComparison.OrdinalIgnoreCase) || x.Authors.Any(a => string.Equals(a.Trim(), prompt, StringComparison.OrdinalIgnoreCase)) ? 0 : titleIds.Contains(x.Book.Id) ? 1 : 2,
+                Tier = string.Equals(x.Book.Title?.Trim(), prompt, StringComparison.OrdinalIgnoreCase) || x.Authors.Any(a => string.Equals(a?.Trim(), prompt, StringComparison.OrdinalIgnoreCase)) ? 0 : titleIds.Contains(x.Book.Id) ? 1 : 2,
                 Score = (keywordRanks.TryGetValue(x.Book.Id, out var kr) ? config.KeywordWeight / (60 + kr) : 0) + (vectorRanks.TryGetValue(x.Book.Id, out var vr) ? config.VectorWeight / (60 + vr.Rank) : 0),
                 VectorScore = vectorRanks.TryGetValue(x.Book.Id, out var v) ? v.Score : 0
             }).OrderBy(x => x.Tier).ThenByDescending(x => x.Score).ThenByDescending(x => x.VectorScore).ThenBy(x => x.Book.Id, StringComparer.Ordinal).ToList();
