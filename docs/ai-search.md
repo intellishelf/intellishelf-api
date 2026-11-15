@@ -38,6 +38,8 @@ Live broad and narrow prompt counts are to be recorded by verification against t
 **Scope:** Personal bookshelf search, Pro semantic discovery, embedding lifecycle, bulk backfill, metadata enrichment, and validation.
 **Supersedes:** `search-behavior.md` and `search-technical-design.md`; useful examples and current implementation details are consolidated below.
 
+Live verification on an isolated three-book synthetic library stored three 1536-dimensional vectors. At the default cutoff, the broad prompt `knowledge` returned 1 result and the narrow prompt `loneliness isolation` returned 0. The loneliness reference returned the intended book (1 result), and the unrelated physics prompt returned 0. These counts represent this sample only.
+
 ## 1. Product decision
 
 Intellishelf should have **two understandable user journeys**, without exposing technical algorithm switches:
