@@ -18,6 +18,7 @@ public class BookMapper : IBookMapper
             Pages = contract.Pages,
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
+            Language = NormalizeLanguage(contract.Language),
             Tags = contract.Tags,
             CoverImageUrl = coverImageUrl,
             Status = contract.Status,
@@ -39,10 +40,14 @@ public class BookMapper : IBookMapper
             Pages = contract.Pages,
             PublicationDate = contract.PublicationDate,
             Publisher = contract.Publisher,
+            Language = NormalizeLanguage(contract.Language),
             Tags = contract.Tags,
             CoverImageUrl = coverImageUrl,
             Status = contract.Status,
             StartedReadingDate = contract.StartedReadingDate,
             FinishedReadingDate = contract.FinishedReadingDate
         };
+
+    private static string? NormalizeLanguage(string? language) =>
+        string.IsNullOrWhiteSpace(language) ? null : language.Trim();
 }

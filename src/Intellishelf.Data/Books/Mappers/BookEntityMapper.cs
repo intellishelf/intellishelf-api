@@ -19,6 +19,7 @@ public class BookEntityMapper : IBookEntityMapper
             Annotation = bookEntity.Annotation,
             PublicationDate = bookEntity.PublicationDate,
             Publisher = bookEntity.Publisher,
+            Language = bookEntity.Language,
             CoverImageUrl = bookEntity.CoverImageUrl,
             CreatedDate = bookEntity.CreatedDate,
             Tags = bookEntity.Tags,

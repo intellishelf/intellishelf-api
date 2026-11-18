@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using Xunit;
 
 namespace Intellishelf.Integration.Tests;
@@ -210,6 +211,85 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
         Assert.NotNull(persistedBook.CoverImageUrl);
         var blobExists = await _azuriteFixture.BlobExistsFromUrlAsync(persistedBook.CoverImageUrl);
         Assert.True(blobExists);
+    }
+
+    [Fact]
+    private async Task GivenLanguage_WhenPostNewBook_ThenLanguagePersistedAndReturned()
+    {
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Language Book"), "Title");
+        content.Add(new StringContent("uk"), "Language");
+
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("uk", book.Language);
+        var persisted = await _mongoDbFixture.FindBookByIdAsync(book.Id);
+        Assert.Equal("uk", persisted?.Language);
+    }
+
+    [Fact]
+    private async Task GivenNoLanguage_WhenPostNewBook_ThenCreatedWithNullLanguage()
+    {
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("No Language Book"), "Title");
+
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var book = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Null(book.Language);
+    }
+
+    [Fact]
+    private async Task GivenBookWithLanguage_WhenUpdateWithNewThenEmptyLanguage_ThenSetThenCleared()
+    {
+        var book = CreateBookEntity("Original", "Mallory");
+        await _mongoDbFixture.SeedBooksAsync(book);
+
+        using var setLanguage = new MultipartFormDataContent();
+        setLanguage.Add(new StringContent("Original"), "Title");
+        setLanguage.Add(new StringContent("en"), "Language");
+        var setResponse = await _client.PutAsync($"/api/books/{book.Id}", setLanguage, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.NoContent, setResponse.StatusCode);
+        Assert.Equal("en", (await _mongoDbFixture.FindBookByIdAsync(book.Id))?.Language);
+
+        var getResponse = await _client.GetAsync($"/api/books/{book.Id}", TestContext.Current.CancellationToken);
+        var fetched = Assert.IsType<Book>(await getResponse.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("en", fetched.Language);
+
+        using var clearLanguage = new MultipartFormDataContent();
+        clearLanguage.Add(new StringContent("Original"), "Title");
+        var clearResponse = await _client.PutAsync($"/api/books/{book.Id}", clearLanguage, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.NoContent, clearResponse.StatusCode);
+        Assert.Null((await _mongoDbFixture.FindBookByIdAsync(book.Id))?.Language);
+    }
+
+    [Fact]
+    private async Task GivenLegacyBookWithoutLanguageField_WhenGetListAndUpdate_ThenSucceedsWithNullLanguage()
+    {
+        var book = CreateBookEntity("Legacy", "Old Author");
+        await _mongoDbFixture.SeedBooksAsync(book);
+        var raw = _mongoDbFixture.Database.GetCollection<BsonDocument>(BookEntity.CollectionName);
+        await raw.UpdateOneAsync(
+            new BsonDocument("_id", ObjectId.Parse(book.Id)),
+            new BsonDocument("$unset", new BsonDocument("Language", "")));
+        var stored = await raw.Find(new BsonDocument("_id", ObjectId.Parse(book.Id))).FirstAsync(TestContext.Current.CancellationToken);
+        Assert.False(stored.Contains("Language"));
+
+        var getResponse = await _client.GetAsync($"/api/books/{book.Id}", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var fetched = Assert.IsType<Book>(await getResponse.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Null(fetched.Language);
+
+        var listResponse = await _client.GetAsync("/api/books/all", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, listResponse.StatusCode);
+
+        using var update = new MultipartFormDataContent();
+        update.Add(new StringContent("Legacy Updated"), "Title");
+        var updateResponse = await _client.PutAsync($"/api/books/{book.Id}", update, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
     }
 
     [Fact]
