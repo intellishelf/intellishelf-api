@@ -59,6 +59,15 @@ public class MongoDbFixture : IAsyncLifetime
     public async Task SeedBooksAsync(params BookEntity[] books) =>
         await Database.GetCollection<BookEntity>(BookEntity.CollectionName).InsertManyAsync(books);
 
+    public async Task SeedLegacyBookWithoutLanguageAsync(BookEntity book)
+    {
+        var collection = Database.GetCollection<BsonDocument>(BookEntity.CollectionName);
+        var document = book.ToBsonDocument();
+        document.Remove(nameof(BookEntity.Language));
+        document.Remove("language");
+        await collection.InsertOneAsync(document);
+    }
+
     /// <summary>
     /// Seeds books and waits for Atlas Search indexing to complete.
     /// Use this method ONLY for search tests. Regular tests should use SeedBooksAsync().
