@@ -17,4 +17,6 @@ public class UserEntity : EntityBase
     public required AuthProvider AuthProvider { get; init; }
 
     public string? ExternalId { get; init; }
+
+    public string? DisplayName { get; init; }
 }
