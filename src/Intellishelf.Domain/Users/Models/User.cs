@@ -6,5 +6,6 @@ public record User(
     string? PasswordHash,
     string? PasswordSalt,
     AuthProvider AuthProvider,
-    string? ExternalId
+    string? ExternalId,
+    string? DisplayName = null
 );
