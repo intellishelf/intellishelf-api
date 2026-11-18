@@ -289,6 +289,111 @@ public sealed class BooksTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
+    private async Task GivenLanguage_WhenPostNewBook_ThenPersistedAndReturnedOnGetAndList()
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("Language Book"), "Title");
+        content.Add(new StringContent("Author"), "Authors[0]");
+        content.Add(new StringContent("en"), "Language");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var created = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Equal("en", created.Language);
+        Assert.Equal("en", (await _mongoDbFixture.FindBookByIdAsync(created.Id))?.Language);
+
+        var single = await _client.GetFromJsonAsync<Book>($"/api/books/{created.Id}", TestContext.Current.CancellationToken);
+        Assert.Equal("en", single?.Language);
+
+        var all = await _client.GetFromJsonAsync<List<Book>>("/api/books/all", TestContext.Current.CancellationToken);
+        Assert.Equal("en", Assert.Single(all!, b => b.Id == created.Id).Language);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    private async Task GivenNoOrEmptyLanguage_WhenPostNewBook_ThenCreatedWithoutLanguage(bool sendEmpty)
+    {
+        // Arrange
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("No Language Book"), "Title");
+        content.Add(new StringContent("Author"), "Authors[0]");
+        if (sendEmpty)
+            content.Add(new StringContent(""), "Language");
+
+        // Act
+        var response = await _client.PostAsync("/api/books", content, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var created = Assert.IsType<Book>(await response.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken));
+        Assert.Null(created.Language);
+        Assert.Null((await _mongoDbFixture.FindBookByIdAsync(created.Id))?.Language);
+    }
+
+    [Fact]
+    private async Task GivenLegacyBookWithoutLanguageField_WhenGetListAndUpdate_ThenNoErrorAndNoLanguage()
+    {
+        // Arrange
+        var legacy = CreateBookEntity("Legacy", "Author");
+        await _mongoDbFixture.SeedLegacyBookWithoutLanguageAsync(legacy);
+
+        // Act
+        var single = await _client.GetAsync($"/api/books/{legacy.Id}", TestContext.Current.CancellationToken);
+        var list = await _client.GetAsync("/api/books/all", TestContext.Current.CancellationToken);
+
+        using var update = new MultipartFormDataContent();
+        update.Add(new StringContent("Legacy Updated"), "Title");
+        update.Add(new StringContent("Author"), "Authors[0]");
+        update.Add(new StringContent(nameof(ReadingStatus.Unread)), "Status");
+        var updateResponse = await _client.PutAsync($"/api/books/{legacy.Id}", update, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, single.StatusCode);
+        Assert.Null((await single.Content.ReadFromJsonAsync<Book>(TestContext.Current.CancellationToken))?.Language);
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        Assert.Null(Assert.Single((await list.Content.ReadFromJsonAsync<List<Book>>(TestContext.Current.CancellationToken))!, b => b.Id == legacy.Id).Language);
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+        Assert.Null((await _mongoDbFixture.FindBookByIdAsync(legacy.Id))?.Language);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    private async Task GivenBookWithLanguage_WhenUpdateWithBlankLanguage_ThenLanguageCleared(bool sendEmpty)
+    {
+        // Arrange
+        var book = CreateBookEntity("Has Language", "Author");
+        await _mongoDbFixture.SeedBooksAsync(book);
+
+        using var setLanguage = new MultipartFormDataContent();
+        setLanguage.Add(new StringContent("uk"), "Language");
+        setLanguage.Add(new StringContent("Has Language"), "Title");
+        setLanguage.Add(new StringContent("Author"), "Authors[0]");
+        setLanguage.Add(new StringContent(nameof(ReadingStatus.Unread)), "Status");
+        Assert.Equal(HttpStatusCode.NoContent, (await _client.PutAsync($"/api/books/{book.Id}", setLanguage, TestContext.Current.CancellationToken)).StatusCode);
+        Assert.Equal("uk", (await _mongoDbFixture.FindBookByIdAsync(book.Id))?.Language);
+
+        using var clear = new MultipartFormDataContent();
+        clear.Add(new StringContent("Has Language"), "Title");
+        clear.Add(new StringContent("Author"), "Authors[0]");
+        clear.Add(new StringContent(nameof(ReadingStatus.Unread)), "Status");
+        if (sendEmpty)
+            clear.Add(new StringContent(""), "Language");
+
+        // Act
+        var response = await _client.PutAsync($"/api/books/{book.Id}", clear, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Null((await _mongoDbFixture.FindBookByIdAsync(book.Id))?.Language);
+    }
+
+    [Fact]
     private async Task GivenBookOwnedByAnotherUser_WhenDeleteBook_ThenNotFound()
     {
         // Arrange
